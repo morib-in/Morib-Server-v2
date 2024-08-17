@@ -24,4 +24,10 @@ public class HomeViewController {
         return null;
     }
 
+    // 오늘 나의 작업시간 조회
+    @GetMapping("/today")
+    public ResponseEntity<?> fetchTotalTimeOfToday() {
+        homeViewFacade.fetchUserTimer();
+        return null;
+    }
 }
