@@ -3,7 +3,7 @@ package org.morib.server.api.timerView.service;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.timerView.dto.TaskInTodoCard;
+import org.morib.server.api.timerView.dto.TaskInTodoCardDto;
 import org.morib.server.api.timerView.service.fetch.FetchTimerService;
 import org.morib.server.api.timerView.service.stop.StopTimerService;
 
@@ -28,7 +28,7 @@ public class TimerViewFacade {
      *  이전 코드의 로직을 참고하여 진행한다.
      * @param targetDate
      */
-    public TaskInTodoCard getTodoCard(LocalDate targetDate) {
+    public TaskInTodoCardDto getTodoCard(LocalDate targetDate) {
         return null;
     }
 
