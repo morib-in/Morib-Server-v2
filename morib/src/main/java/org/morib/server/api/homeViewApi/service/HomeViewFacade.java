@@ -19,4 +19,7 @@ public class HomeViewFacade {
     public void fetchUserTimer() {
         fetchUserTimerService.execute();
     }
+    public void startTimer() {
+        startTimerService.execute();
+    }
 }

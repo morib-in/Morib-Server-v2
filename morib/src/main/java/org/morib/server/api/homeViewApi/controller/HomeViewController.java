@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeViewApi.service.HomeViewFacade;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
@@ -30,4 +27,13 @@ public class HomeViewController {
         homeViewFacade.fetchUserTimer();
         return null;
     }
+
+    // 할일 추가 후 타이머 시작
+    @PostMapping("/timers/start")
+    public ResponseEntity<?> startTimer() {
+        homeViewFacade.startTimer();
+        return null;
+    }
+
+
 }
