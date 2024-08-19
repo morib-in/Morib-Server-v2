@@ -1,13 +1,12 @@
 package org.morib.server.domain.user.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.mset.infra.MsetRepository;
 import org.morib.server.domain.user.infra.UserRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class UserDataServiceImpl implements UserDataService {
+public class UserGatewayImpl implements UserGateway {
 
     private final UserRepository userRepository;
 

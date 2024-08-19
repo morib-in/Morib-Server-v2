@@ -1,14 +1,14 @@
-package org.morib.server.domain.mset.application;
+package org.morib.server.domain.permission.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.mset.infra.MsetRepository;
-import org.springframework.stereotype.Component;
+import org.morib.server.domain.permission.infra.PermissionRepository;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class MsetDataServiceImpl implements MsetDataService{
+public class PermissionGatewayImpl implements PermissionGateway {
 
-    private final MsetRepository msetRepository;
+    private final PermissionRepository permissionRepository;
 
     @Override
     public void save() {

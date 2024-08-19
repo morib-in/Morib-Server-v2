@@ -1,13 +1,12 @@
 package org.morib.server.domain.todo.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.mset.infra.MsetRepository;
 import org.morib.server.domain.todo.infra.TodoRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class TodoDataServiceImpl implements TodoDataService {
+public class TodoGatewayImpl implements TodoGateway {
 
     private final TodoRepository todoRepository;
 
