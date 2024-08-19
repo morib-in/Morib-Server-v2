@@ -4,14 +4,14 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.timerView.dto.TaskInTodoCardDto;
-import org.morib.server.api.timerView.service.fetch.FetchTimerService;
-import org.morib.server.api.timerView.service.stop.StopTimerService;
+import org.morib.server.api.timerView.service.fetch.todo.FetchTodoService;
+import org.morib.server.api.timerView.service.stop.timer.StopTimerService;
 
 @Facade
 @RequiredArgsConstructor
 public class TimerViewFacade {
 
-    private final FetchTimerService fetchTimerService;
+    private final FetchTodoService fetchTodoService;
     private final StopTimerService stopTimerService;
 
     /**
@@ -19,7 +19,7 @@ public class TimerViewFacade {
      *  이전 코드의 로직을 참고하여 진행한다.
      */
     public void stopTimerAndFetch() {
-        fetchTimerService.fetch();
+        fetchTodoService.fetch(LocalDate.now());
         stopTimerService.stop();
     }
 
