@@ -11,13 +11,6 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
     private final ModalViewFacade modalViewFacade;
 
-    // 카테고리 생성
-    @PostMapping("/categories")
-    public ResponseEntity<?> create() {
-        modalViewFacade.createCategory();
-        return null;
-    }
-
     // 사용자의 모든 카테고리 조회
     @GetMapping("/categories")
     public ResponseEntity<?> fetch() {
@@ -25,10 +18,5 @@ public class CategoryController {
         return null;
     }
 
-    // 카테고리 삭제
-    @DeleteMapping("/categories")
-    public ResponseEntity<?> delete() {
-        modalViewFacade.deleteCategory();
-        return null;
-    }
+
 }
