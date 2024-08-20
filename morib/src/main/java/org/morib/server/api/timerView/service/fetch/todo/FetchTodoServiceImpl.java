@@ -12,12 +12,7 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     private final TodoGateway todoGateway;
 
     @Override
-    public void fetch() {
-
-    }
-
-    @Override
-    public void todoFetch(LocalDate targetDate) {
+    public void fetch(LocalDate targetDate) {
 
     }
 }
