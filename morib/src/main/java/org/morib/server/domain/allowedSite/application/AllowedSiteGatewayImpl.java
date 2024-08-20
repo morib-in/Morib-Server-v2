@@ -1,14 +1,14 @@
-package org.morib.server.domain.permission.application;
+package org.morib.server.domain.allowedSite.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.permission.infra.PermissionRepository;
+import org.morib.server.domain.allowedSite.infra.AllowedSiteRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PermissionGatewayImpl implements PermissionGateway {
+public class AllowedSiteGatewayImpl implements AllowedSiteGateway {
 
-    private final PermissionRepository permissionRepository;
+    private final AllowedSiteRepository allowedSiteRepository;
 
     @Override
     public void save() {

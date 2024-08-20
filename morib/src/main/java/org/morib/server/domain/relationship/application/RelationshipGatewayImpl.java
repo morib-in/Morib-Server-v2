@@ -1,14 +1,14 @@
-package org.morib.server.domain.mset.application;
+package org.morib.server.domain.relationship.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.mset.infra.MsetRepository;
+import org.morib.server.domain.relationship.infra.RelationshipRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MsetGatewayImpl implements MsetGateway {
+public class RelationshipGatewayImpl implements RelationshipGateway {
 
-    private final MsetRepository msetRepository;
+    private final RelationshipRepository permissionRepository;
 
     @Override
     public void save() {
