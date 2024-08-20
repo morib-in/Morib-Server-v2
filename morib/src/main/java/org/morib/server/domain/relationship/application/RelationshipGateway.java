@@ -1,8 +1,8 @@
-package org.morib.server.domain.mset.application;
+package org.morib.server.domain.relationship.application;
 
 
 
-public interface MsetGateway {
+public interface RelationshipGateway {
 
     void save();
 

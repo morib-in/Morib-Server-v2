@@ -1,8 +1,8 @@
-package org.morib.server.domain.permission.application;
+package org.morib.server.domain.allowedSite.application;
 
 
 
-public interface PermissionGateway {
+public interface AllowedSiteGateway {
 
     void save();
 
