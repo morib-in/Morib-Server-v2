@@ -1,7 +1,7 @@
 package org.morib.server.api.modalViewApi.service.create;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.category.infra.CategoryGateway;
+import org.morib.server.domain.category.application.CategoryGateway;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
