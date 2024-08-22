@@ -24,18 +24,22 @@ public class HomeViewFacade {
     }
 
     public void fetchUserTimer() {
-        fetchUserTimerService.execute();
+        fetchTaskService.fetch();
+        fetchTimerService.fetch();
+        aggregateTimerService.aggregate();
     }
 
     public void createTask() {
-        createTaskService.execute();
+        createTaskService.create();
     }
 
     public void toggleTaskStatus() {
-        toggleTaskStatusService.execute();
+        fetchTaskService.fetch();
+        toggleTaskStatusService.toggle();
     }
 
     public void startTimer() {
-        startTimerService.execute();
+        createTodoService.create();
+        createTimerService.create();
     }
 }
