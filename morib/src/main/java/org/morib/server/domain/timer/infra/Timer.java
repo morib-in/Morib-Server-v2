@@ -24,4 +24,8 @@ public class Timer {
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
+
+    public void addElapsedTime(int i) {
+        this.elapsedTime += i;
+    }
 }
