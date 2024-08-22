@@ -24,7 +24,7 @@ public class TimerViewController {
     @PostMapping("/timer/stop/{taskId}")
     public ResponseEntity<String> stopTimerAndFetchAccumulatedTime( // @AuthenticationPrincipal Long userId,
          @PathVariable Long taskId, @RequestBody StopTimerRequestDto dto){
-        timerViewFacade.stopTimer(taskId, dto);
+        timerViewFacade.afterStopTimer(taskId, dto);
         return ResponseEntity.status(200).body("요청이 성공했습니다!");
     }
 
