@@ -1,12 +1,13 @@
 package org.morib.server.domain.user.application;
 
 
+import org.morib.server.domain.user.infra.User;
 
 public interface UserGateway {
 
     void save();
 
-    void findById();
+    User findById(Long userId);
 
     void findAll();
 
