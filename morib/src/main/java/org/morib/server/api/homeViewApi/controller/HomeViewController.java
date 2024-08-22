@@ -1,6 +1,7 @@
 package org.morib.server.api.homeViewApi.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.api.homeViewApi.dto.fetch.HomeViewRequestDto;
 import org.morib.server.api.homeViewApi.service.HomeViewFacade;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +17,12 @@ public class HomeViewController {
 
     // 홈뷰 전체 조회
     @GetMapping("/home")
-    public ResponseEntity<?> fetchHome() {
-        homeViewFacade.fetchHome();
+    public ResponseEntity<?> fetchHome( // @AuthenticationPrincipal Long userId,
+                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        // userId 임시 코드
+        Long userId = 1L;
+        homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate));
         return null;
     }
 
