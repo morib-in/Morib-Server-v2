@@ -1,7 +1,7 @@
 package org.morib.server.api.homeViewApi.service.toggle;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.task.TaskOperator;
+import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.infra.TaskGateway;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ToggleTaskStatusServiceImpl implements ToggleTaskStatusService{
     private final TaskGateway taskGateway;
-    private final TaskOperator taskOperator;
+    private final TaskManager taskManager;
 
     @Override
     public void execute() {
