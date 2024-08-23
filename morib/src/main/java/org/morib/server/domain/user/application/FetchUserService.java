@@ -1,4 +1,4 @@
-package org.morib.server.api.timerView.service.fetch.user;
+package org.morib.server.domain.user.application;
 
 
 import org.morib.server.domain.user.infra.User;

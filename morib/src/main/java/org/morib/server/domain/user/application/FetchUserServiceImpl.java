@@ -7,33 +7,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserGatewayImpl implements UserGateway {
-
+public class FetchUserServiceImpl implements FetchUserService {
+    
     private final UserRepository userRepository;
 
     @Override
-    public void save() {
-
-    }
-
-    @Override
-    public User findById(Long userId) {
-        // 이후 예외처리 추가
+    public User fetchByUserId(Long  userId) {
         return userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-    }
-
-    @Override
-    public void findAll() {
-
-    }
-
-    @Override
-    public void deleteById() {
-
-    }
-
-    @Override
-    public void deleteAll() {
-
     }
 }
