@@ -54,7 +54,7 @@ public class HomeViewFacade {
                                             .collect(Collectors.toList());
                                     return FetchCombinedDto.of(categoryDto, taskDtos);
                                 })
-                                .collect(Collectors.toList())
+                                .toList()
                 ));
         return combinedDto.entrySet().stream()
                 .map(entry -> HomeViewResponseDto.of(entry.getKey(), entry.getValue()))
