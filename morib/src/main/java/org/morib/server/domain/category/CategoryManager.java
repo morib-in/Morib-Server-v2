@@ -1,6 +1,9 @@
 package org.morib.server.domain.category;
 
 import org.morib.server.annotation.Manager;
+import org.morib.server.api.homeViewApi.vo.CategoriesByDate;
+import org.morib.server.api.homeViewApi.vo.CombinedByDate;
+import org.morib.server.api.homeViewApi.vo.TasksByCategory;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 
@@ -11,34 +14,30 @@ import java.util.stream.Collectors;
 @Manager
 public class CategoryManager {
 
-    public Map<LocalDate, List<Category>> classifyByDate(List<Category> categories, LocalDate startDate, LocalDate endDate) {
-        Map<LocalDate, List<Category>> result = new LinkedHashMap<>();
+    public List<CategoriesByDate> classifyByDate(List<Category> categories, LocalDate startDate, LocalDate endDate) {
+        List<CategoriesByDate> result = new ArrayList<>();
         for (LocalDate idxDate = startDate; !idxDate.isAfter(endDate); idxDate = idxDate.plusDays(1)) {
             LocalDate copiedIdxDate = idxDate;
-            result.put(copiedIdxDate, categories.stream()
-                    .filter(category -> isInRange(copiedIdxDate, category.getStartDate(), category.getEndDate()))
-                    .collect(Collectors.toList()));
+            result.add(CategoriesByDate.of(copiedIdxDate, categories.stream()
+                            .filter(category -> isInRange(copiedIdxDate, category.getStartDate(), category.getEndDate()))
+                            .collect(Collectors.toList())));
         }
         return result;
     }
 
-    public Map<LocalDate, Map<Category, List<Task>>> classifyTaskByCategory(Map<LocalDate, List<Category>> categories) {
-        Map<LocalDate, Map<Category, List<Task>>> result = new LinkedHashMap<>();
-        for (Map.Entry<LocalDate, List<Category>> entry : categories.entrySet()) {
-            LocalDate idxDate = entry.getKey();
-            Map<Category, List<Task>> categoryTaskMap = new LinkedHashMap<>();
-            for (Category category : entry.getValue()) {
-                List<Task> taskList = new ArrayList<>();
-                for (Task task : category.getTasks()) {
-                    if (isInRange(idxDate, task.getStartDate(), task.getEndDate())) {
-                        taskList.add(task);
-                    }
+    public CombinedByDate classifyTaskByCategory(CategoriesByDate categoriesByDate) {
+        LocalDate idxDate = categoriesByDate.getDate();
+        List<TasksByCategory> tasksByCategory = new ArrayList<>();
+        for (Category category : categoriesByDate.getCategories()) {
+            List<Task> tasks = new ArrayList<>();
+            for (Task task : category.getTasks()) {
+                if (isInRange(idxDate, task.getStartDate(), task.getEndDate())) {
+                    tasks.add(task);
                 }
-                categoryTaskMap.put(category, taskList);
             }
-            result.put(idxDate, categoryTaskMap);
+            tasksByCategory.add(TasksByCategory.of(category, tasks));
         }
-        return result;
+        return CombinedByDate.of(idxDate, tasksByCategory);
     }
 
     private boolean isInRange(LocalDate idxDate, LocalDate startDate, LocalDate endDate) {
