@@ -1,4 +1,4 @@
-package org.morib.server.api.timerView.service.fetch.timer;
+package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -10,10 +10,8 @@ public interface FetchTimerService {
     void fetch();
 
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
+    
+    int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate);
 
-    void addElapsedTime(Timer timer, int elapsedTime);
-
-    Long sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate);
-
-    Long sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
+    int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
 }
