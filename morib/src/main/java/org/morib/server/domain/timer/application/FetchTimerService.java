@@ -1,8 +1,7 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
-import java.util.Set;
-
+import java.util.LinkedHashSet;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
 
@@ -11,7 +10,9 @@ public interface FetchTimerService {
 
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
 
-    int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate);
+    void addElapsedTime(Timer timer, int elapsedTime);
 
-    int sumOneTaskElapsedTimeInTargetDate(Task task, LocalDate targetDate);
+    int sumTasksElapsedTimeByTargetDate(LinkedHashSet<Task> tasks, LocalDate targetDate);
+
+    Object sumOneTaskElapsedTimeInTargetDate(Task task, LocalDate targetDate);
 }
