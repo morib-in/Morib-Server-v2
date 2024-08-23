@@ -23,7 +23,6 @@ public class StopTimerFacadeImpl implements StopTimerFacade {
     private final FetchTimerService fetchTimerService;
     private final FetchUserService fetchUserService;
     private final FetchTaskService fetchTaskService;
-    private final TimerOperator timerOperator;
 
     @Override
     @Transactional
@@ -33,6 +32,6 @@ public class StopTimerFacadeImpl implements StopTimerFacade {
         Set<Category> categories = user.getCategories();
         Task findTask = fetchTaskService.fetchByTaskIdInCategories(categories, taskId);
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
-        timerOperator.addElapsedTime(timer, dto.elapsedTime());
+        fetchTimerService.addElapsedTime(timer, dto.elapsedTime());
     }
 }
