@@ -1,7 +1,7 @@
 package org.morib.server.api.homeViewApi.service.aggregate.timer;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.timer.TimerManager;
+import org.morib.server.domain.timer.application.TimerManager;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
