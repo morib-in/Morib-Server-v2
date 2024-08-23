@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.fetch.category;
+package org.morib.server.domain.category.application;
 
 import org.morib.server.api.homeViewApi.dto.fetch.HomeViewRequestDto;
 import org.morib.server.domain.category.infra.Category;
@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface FetchCategoryService {
-    List<Category> fetch(HomeViewRequestDto request);
+    List<Category> fetchByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate);
 }
