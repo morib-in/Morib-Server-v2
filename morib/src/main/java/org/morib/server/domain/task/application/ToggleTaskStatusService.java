@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.toggle.task;
+package org.morib.server.domain.task.application;
 
 public interface ToggleTaskStatusService {
     void toggle();

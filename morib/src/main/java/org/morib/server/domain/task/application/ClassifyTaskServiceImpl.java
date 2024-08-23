@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.classify.task;
+package org.morib.server.domain.task.application;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.TaskManager;
