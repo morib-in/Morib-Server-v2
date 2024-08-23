@@ -1,8 +1,12 @@
 package org.morib.server.domain.todo.infra;
 
-import org.morib.server.domain.mset.infra.Mset;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TodoRepository extends JpaRepository<Todo, Long> {
+import java.time.LocalDate;
+import java.util.Optional;
 
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+    Optional<Todo> findTodoByUserId(Long userId);
+
+    Optional<Todo> findTodoByUserIdAndTargetDate(Long userId, LocalDate targetDate);
 }
