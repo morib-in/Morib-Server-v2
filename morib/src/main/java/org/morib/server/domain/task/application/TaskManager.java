@@ -8,7 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskManager {
 
-    public boolean isTaskHaveSameTaskId(Task task, Long taskId) {
-        return task.getId().equals(taskId);
-    }
+
 }
