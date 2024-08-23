@@ -18,9 +18,9 @@ public class FetchTimerServiceImpl implements FetchTimerService {
     }
 
     @Override
-    public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate) {
+    public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
         return findTask.getTimers().stream()
-            .filter(timer -> timer.getTargetDate().equals(localDate))
+            .filter(timer -> timer.getTargetDate().equals(targetDate))
             .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
     }
 
