@@ -1,7 +1,7 @@
 package org.morib.server.api.homeViewApi.service.toggle;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.task.TaskManager;
+import org.morib.server.domain.task.application.TaskManager;
 import org.morib.server.domain.task.infra.TaskGateway;
 import org.springframework.stereotype.Service;
 
