@@ -10,10 +10,10 @@ public record TaskInTodoCardDto(
     LocalDate endDate,
     boolean isComplete,
     LocalDate targetDate,
-    Long targetTime
+    int targetTime
 ) {
 
-    public static TaskInTodoCardDto of(Task task, LocalDate targetDate, Long targetTime){
+    public static TaskInTodoCardDto of(Task task, LocalDate targetDate, int targetTime){
         return new TaskInTodoCardDto(task.getName(), task.getStartDate(), task.getEndDate(), task.getIsComplete(), targetDate, targetTime);
     }
 }
