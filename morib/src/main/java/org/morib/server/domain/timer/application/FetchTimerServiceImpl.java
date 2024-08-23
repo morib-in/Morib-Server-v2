@@ -1,9 +1,11 @@
-package org.morib.server.domain.timer.application;
+package org.morib.server.api.timerView.service.fetch.timer;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerOperator;
 import org.morib.server.domain.timer.infra.Timer;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FetchTimerServiceImpl implements FetchTimerService {
 
-    private final TimeManager timeManager;
+    private final TimerOperator timerOperator;
 
     @Override
     public void fetch() {
@@ -19,20 +21,33 @@ public class FetchTimerServiceImpl implements FetchTimerService {
     }
 
     @Override
-    public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
+    public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate) {
         return findTask.getTimers().stream()
-            .filter(timer -> timer.getTargetDate().equals(targetDate))
-            .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
+                .filter(timer -> timer.getTargetDate().equals(localDate))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
     }
 
     @Override
     public void addElapsedTime(Timer timer, int elapsedTime) {
-        timeManager.addElapsedTime(timer, elapsedTime);
+        timerOperator.addElapsedTime(timer, elapsedTime);
+    }
+
+
+    @Override
+    public Long sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate) {
+        return tasks.stream()
+                .flatMap(t -> t.getTimers().stream())
+                .filter(timer -> timer.getTargetDate().equals(targetDate))
+                .mapToLong(Timer::getElapsedTime)
+                .sum();
     }
 
     @Override
-    public int sumTasksElapsedTimeByTargetDate(LinkedHashSet<Task> tasks, LocalDate targetDate) {
-        return 0;
+    public Long sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
+        return t.getTimers().stream()
+                .filter(timer -> timer.getTargetDate().equals(targetDate))
+                .mapToLong(Timer::getElapsedTime)
+                .sum();
     }
 
 
