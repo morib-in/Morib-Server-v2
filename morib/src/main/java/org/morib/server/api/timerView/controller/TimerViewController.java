@@ -3,7 +3,9 @@ package org.morib.server.api.timerView.controller;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.timerView.dto.StopTimerRequestDto;
-import org.morib.server.api.timerView.facade.TimerViewFacade;
+import org.morib.server.api.timerView.dto.TodoCardResponseDto;
+import org.morib.server.api.timerView.service.fetch.todo.FetchTodoFacade;
+import org.morib.server.api.timerView.service.stop.timer.StopTimerFacade;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,20 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TimerViewController {
 
-    private final TimerViewFacade timerViewFacade;
+    private final StopTimerFacade stopTimerFacade;
+    private final FetchTodoFacade fetchTodoFacade;
 
     @PostMapping("/timer/stop/{taskId}")
     public ResponseEntity<String> stopTimerAndFetchAccumulatedTime( // @AuthenticationPrincipal Long userId,
          @PathVariable Long taskId, @RequestBody StopTimerRequestDto dto){
-        timerViewFacade.stopAfterSumElapsedTime(taskId, dto);
+        stopTimerFacade.afterStopTimer(taskId, dto);
         return ResponseEntity.status(200).body("요청이 성공했습니다!");
     }
 
 
     @GetMapping("/timer/todo-card")
-    public ResponseEntity getTodoCards(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
-       // todoFacade.getTodoCard(targetDate);
-        return ResponseEntity.ok("void");
+    public ResponseEntity<TodoCardResponseDto> getTodoCards(// @AuthenticationPrincipal Long userId,
+                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+        return ResponseEntity.ok(fetchTodoFacade.fetchTodoCard(targetDate));
     }
 
 
