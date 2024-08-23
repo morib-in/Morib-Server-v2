@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.classify.category;
+package org.morib.server.domain.category.application;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.category.CategoryManager;

@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.classify.category;
+package org.morib.server.domain.category.application;
 
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
