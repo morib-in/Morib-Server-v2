@@ -10,8 +10,8 @@ public interface FetchTimerService {
     void fetch();
 
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
-    
+
     int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate);
 
-    int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
+    int sumOneTaskElapsedTimeInTargetDate(Task task, LocalDate targetDate);
 }

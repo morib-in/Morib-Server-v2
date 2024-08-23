@@ -27,12 +27,6 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
-    public void addElapsedTime(Timer timer, int elapsedTime) {
-        timerManager.addElapsedTime(timer, elapsedTime);
-    }
-
-
-    @Override
     public int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate) {
         return tasks.stream()
                 .flatMap(t -> t.getTimers().stream())
@@ -42,8 +36,8 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
-    public int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
-        return t.getTimers().stream()
+    public int sumOneTaskElapsedTimeInTargetDate(Task task, LocalDate targetDate) {
+        return task.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
                 .mapToInt(Timer::getElapsedTime)
                 .sum();
