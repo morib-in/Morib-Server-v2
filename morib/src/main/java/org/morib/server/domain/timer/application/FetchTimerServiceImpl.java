@@ -1,7 +1,6 @@
-package org.morib.server.api.homeViewApi.service.fetch.timer;
+package org.morib.server.domain.timer.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.timer.application.TimerGateway;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package org.morib.server.api.homeViewApi.service.fetch.timer;
+package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
 
