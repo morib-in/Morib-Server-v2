@@ -1,6 +1,7 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
@@ -27,6 +28,11 @@ public class FetchTimerServiceImpl implements FetchTimerService {
     @Override
     public void addElapsedTime(Timer timer, int elapsedTime) {
         timeManager.addElapsedTime(timer, elapsedTime);
+    }
+
+    @Override
+    public int sumTasksElapsedTimeByTargetDate(LinkedHashSet<Task> tasks, LocalDate targetDate) {
+        return 0;
     }
 
 
