@@ -1,4 +1,4 @@
-package org.morib.server.api.timerView.service.fetch.todo;
+package org.morib.server.domain.todo.application;
 
 import java.time.LocalDate;
 
