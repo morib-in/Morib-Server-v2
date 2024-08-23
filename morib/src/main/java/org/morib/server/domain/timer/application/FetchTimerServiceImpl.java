@@ -1,9 +1,8 @@
-package org.morib.server.api.timerView.service.fetch.timer;
+package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.TimerOperator;
 import org.morib.server.domain.timer.infra.Timer;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FetchTimerServiceImpl implements FetchTimerService {
 
-    private final TimerOperator timerOperator;
+    private final TimeManager timeManager;
 
     @Override
     public void fetch() {
@@ -27,7 +26,7 @@ public class FetchTimerServiceImpl implements FetchTimerService {
 
     @Override
     public void addElapsedTime(Timer timer, int elapsedTime) {
-        timerOperator.addElapsedTime(timer, elapsedTime);
+        timeManager.addElapsedTime(timer, elapsedTime);
     }
 
 
