@@ -29,19 +29,25 @@ public class CategoryManager {
         LocalDate idxDate = categoriesByDate.getDate();
         List<TasksByCategory> tasksByCategory = new ArrayList<>();
         for (Category category : categoriesByDate.getCategories()) {
-            List<Task> tasks = new ArrayList<>();
-            for (Task task : category.getTasks()) {
-                if (isInRange(idxDate, task.getStartDate(), task.getEndDate())) {
-                    tasks.add(task);
-                }
-            }
-            tasksByCategory.add(TasksByCategory.of(category, tasks));
+            tasksByCategory.add(TasksByCategory.of(category, getTasks(category, idxDate)));
         }
         return CombinedByDate.of(idxDate, tasksByCategory);
+    }
+
+    private List<Task> getTasks(Category category, LocalDate idxDate) {
+        List<Task> tasks = new ArrayList<>();
+        for (Task task : category.getTasks()) {
+            if (isInRange(idxDate, task.getStartDate(), task.getEndDate())) {
+                tasks.add(task);
+            }
+        }
+        return tasks;
     }
 
     private boolean isInRange(LocalDate idxDate, LocalDate startDate, LocalDate endDate) {
         return (idxDate.isEqual(startDate) || idxDate.isAfter(startDate)) &&
                 (idxDate.isEqual(endDate) || idxDate.isBefore(endDate));
     }
+    
+    
 }
