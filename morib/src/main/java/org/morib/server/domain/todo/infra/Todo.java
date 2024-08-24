@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Todo {
+public class Todo extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "todo_id")

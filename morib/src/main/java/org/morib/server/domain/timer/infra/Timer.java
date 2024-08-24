@@ -9,11 +9,12 @@ import org.morib.server.domain.task.infra.Task;
 
 import java.time.LocalDate;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.BaseTimeEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Timer {
+public class Timer extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timer_id")
