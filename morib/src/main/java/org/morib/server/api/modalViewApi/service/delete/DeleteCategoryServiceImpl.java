@@ -1,9 +1,9 @@
 package org.morib.server.api.modalViewApi.service.delete;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.category.infra.CategoryGateway;
-import org.morib.server.domain.task.infra.TaskGateway;
-import org.morib.server.domain.timer.infra.TimerGateway;
+import org.morib.server.domain.category.application.CategoryGateway;
+import org.morib.server.domain.task.application.TaskGateway;
+import org.morib.server.domain.timer.application.TimerGateway;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
