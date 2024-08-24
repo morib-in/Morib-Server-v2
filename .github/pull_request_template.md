@@ -1,5 +1,5 @@
 ## 📍 Issue
-closes #issue
+- closes #issue
 
 ## ✨ Key Changes
 
