@@ -1,16 +1,19 @@
 package org.morib.server.api.timerView.dto;
 
+import org.morib.server.domain.task.infra.Task;
+
 import java.time.LocalDate;
 
 public record TaskInTodoCardDto(
-    Long id,
-    String categoryName,
     String name,
     LocalDate startDate,
     LocalDate endDate,
     boolean isComplete,
     LocalDate targetDate,
-    int targetTime,
-    int taskOrder
+    int targetTime
 ) {
+
+    public static TaskInTodoCardDto of(Task task, LocalDate targetDate, int targetTime){
+        return new TaskInTodoCardDto(task.getName(), task.getStartDate(), task.getEndDate(), task.getIsComplete(), targetDate, targetTime);
+    }
 }

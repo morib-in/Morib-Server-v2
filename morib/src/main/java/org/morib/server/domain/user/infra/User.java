@@ -2,6 +2,7 @@ package org.morib.server.domain.user.infra;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.user.infra.type.Platform;
@@ -9,6 +10,7 @@ import org.morib.server.domain.user.infra.type.Platform;
 import java.util.Set;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
