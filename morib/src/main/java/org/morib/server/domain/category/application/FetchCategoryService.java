@@ -1,6 +1,5 @@
 package org.morib.server.domain.category.application;
 
-import org.morib.server.api.homeViewApi.dto.fetch.HomeViewRequestDto;
 import org.morib.server.domain.category.infra.Category;
 
 import java.time.LocalDate;

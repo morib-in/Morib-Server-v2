@@ -2,7 +2,7 @@ package org.morib.server.domain.task.application;
 
 import lombok.RequiredArgsConstructor;
 
-import org.morib.server.api.homeViewApi.vo.TaskWithElapsedTime;
+import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
 import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.infra.Task;
 import org.springframework.stereotype.Service;

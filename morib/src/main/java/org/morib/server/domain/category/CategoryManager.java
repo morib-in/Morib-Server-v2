@@ -1,9 +1,9 @@
 package org.morib.server.domain.category;
 
 import org.morib.server.annotation.Manager;
-import org.morib.server.api.homeViewApi.vo.CategoriesByDate;
-import org.morib.server.api.homeViewApi.vo.CombinedByDate;
-import org.morib.server.api.homeViewApi.vo.TasksByCategory;
+import org.morib.server.api.homeView.vo.CategoriesByDate;
+import org.morib.server.api.homeView.vo.CombinedByDate;
+import org.morib.server.api.homeView.vo.TasksByCategory;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 

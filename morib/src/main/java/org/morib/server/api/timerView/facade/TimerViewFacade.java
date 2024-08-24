@@ -11,7 +11,7 @@ import org.morib.server.api.timerView.dto.TaskInTodoCardDto;
 import org.morib.server.api.timerView.dto.TodoCardResponseDto;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.application.TimerManager;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
