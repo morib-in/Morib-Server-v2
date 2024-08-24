@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.allowedSite.infra.type.OwnerType;
+import org.morib.server.global.common.BaseTimeEntity;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AllowedSite {
+public class AllowedSite extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "allowed_site_id")
