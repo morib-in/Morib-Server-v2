@@ -26,10 +26,7 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
     }
 
-    @Override
-    public void addElapsedTime(Timer timer, int elapsedTime) {
-        timerManager.addElapsedTime(timer, elapsedTime);
-    }
+
 
 
     @Override

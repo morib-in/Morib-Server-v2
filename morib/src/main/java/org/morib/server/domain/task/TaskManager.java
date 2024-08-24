@@ -1,15 +1,12 @@
-package org.morib.server.domain.task.application;
+package org.morib.server.domain.task;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeViewApi.vo.TaskWithElapsedTime;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
