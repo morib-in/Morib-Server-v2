@@ -8,6 +8,7 @@ import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 
 import java.time.LocalDate;
+import org.morib.server.domain.user.infra.User;
 
 @Entity
 @Getter
@@ -17,6 +18,11 @@ public class Timer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timer_id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
     @Column(nullable = false)
     private LocalDate targetDate;
     @Column(nullable = false)
