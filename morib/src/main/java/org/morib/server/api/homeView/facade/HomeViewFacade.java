@@ -10,15 +10,11 @@ import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.application.ToggleTaskStatusService;
-import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +26,7 @@ public class HomeViewFacade {
     private final FetchTimerService fetchTimerService;
     private final ClassifyTimerService classifyTimerService;
     private final ToggleTaskStatusService toggleTaskStatusService;
+    private final HomeDtoBuilder homeDtoBuilder;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
@@ -40,41 +37,7 @@ public class HomeViewFacade {
                 .flatMap(combinedByDate -> combinedByDate.getCombined().stream()
                 .flatMap(tasksByCategory -> classifyTaskService.classifyTimerByTask(combinedByDate.getDate(), tasksByCategory.getTasks()).stream()
                 )).toList();
-        return convertToHomeViewResponseDto(createFetchCombinedDtoMap(combined, tasks));
-    }
-
-    private Map<LocalDate, List<FetchCombinedDto>> createFetchCombinedDtoMap(
-            List<CombinedByDate> combined, List<TaskWithElapsedTime> tasks) {
-        return combined.stream()
-                .collect(Collectors.toMap(
-                        CombinedByDate::getDate,
-                        combinedByDate -> combinedByDate.getCombined().stream()
-                                .map(entry -> {
-                                    FetchCategoryDto categoryDto = FetchCategoryDto.of(entry.getCategory());
-                                    List<FetchTaskDto> taskDtos = createFetchTaskDtoList(entry.getTasks(), tasks);
-                                    return FetchCombinedDto.of(categoryDto, taskDtos);
-                                })
-                                .collect(Collectors.toList())
-                ));
-    }
-
-    private List<FetchTaskDto> createFetchTaskDtoList(List<Task> tasks, List<TaskWithElapsedTime> taskWithElapsedTimes) {
-        return tasks.stream()
-                .map(task -> {
-                    int elapsedTime = taskWithElapsedTimes.stream()
-                            .filter(taskWithElapsedTime -> taskWithElapsedTime.getTask().equals(task))
-                            .map(TaskWithElapsedTime::getElapsedTime)
-                            .findFirst()
-                            .orElse(0);
-                    return FetchTaskDto.of(task, elapsedTime);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<HomeViewResponseDto> convertToHomeViewResponseDto(Map<LocalDate, List<FetchCombinedDto>> combinedDtoMap) {
-        return combinedDtoMap.entrySet().stream()
-                .map(entry -> HomeViewResponseDto.of(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        return homeDtoBuilder.convertToHomeViewResponseDto(homeDtoBuilder.createFetchCombinedDtoMap(combined, tasks));
     }
 
     public void fetchUserTimer() {
