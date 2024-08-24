@@ -11,4 +11,5 @@ public interface FetchTaskService {
     Task fetchById(Long taskId);
 
     LinkedHashSet<Task> fetchByTodoAndSameTargetDate(Todo todo, LocalDate targetDate);
+
 }

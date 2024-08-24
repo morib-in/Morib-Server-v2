@@ -46,5 +46,4 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .sum();
     }
 
-
 }
