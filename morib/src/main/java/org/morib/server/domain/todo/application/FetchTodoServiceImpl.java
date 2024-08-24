@@ -1,4 +1,4 @@
-package org.morib.server.api.timerView.service.fetch.todo;
+package org.morib.server.domain.todo.application;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +21,7 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     @Override
     public Todo fetchByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
         return todoGateway.findTodoByUserIdAndTargetDate(userId, targetDate);
+
     }
 
     @Override

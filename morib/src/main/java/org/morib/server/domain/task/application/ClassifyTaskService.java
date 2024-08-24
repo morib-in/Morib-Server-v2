@@ -1,7 +1,6 @@
 package org.morib.server.domain.task.application;
 
-import org.morib.server.api.homeViewApi.vo.CombinedByDate;
-import org.morib.server.api.homeViewApi.vo.TaskWithElapsedTime;
+import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
 import org.morib.server.domain.task.infra.Task;
 
 import java.time.LocalDate;
