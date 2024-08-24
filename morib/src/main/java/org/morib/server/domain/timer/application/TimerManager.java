@@ -12,7 +12,8 @@ public class TimerManager {
         // 각 task의 timer들을 종합해 오늘 나의 작업시간 계산
     }
 
-    public void addElapsedTime(Timer timer, int elapsedTime) {
+    public void addElapsedTime(Timer timer, int elapsedTime){
         timer.addElapsedTime(elapsedTime);
     }
+
 }
