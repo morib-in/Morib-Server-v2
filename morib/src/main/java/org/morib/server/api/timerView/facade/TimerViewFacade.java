@@ -43,7 +43,7 @@ public class TimerViewFacade {
      * 해당 타이머들의 총 시간을 계산해야함!
      * 1. todo를 유저를 통해 찾는다.
      * 2. 찾은 todo 에서 task들을 불러온다.
-     * 3. 찾은 task 들의 총 시간을 더하면 끝 -> task의 timer의 시간들을 다 더해야함!
+     * 3. totalTimeToday~ 는 유저id랑, targetDate를 바탕으로 timer를 조회해서 모든 elapsedTime을 더한 값이다.
      * @param targetDate
      * @return
      */
