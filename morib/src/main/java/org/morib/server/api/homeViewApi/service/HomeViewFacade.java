@@ -45,12 +45,10 @@ public class HomeViewFacade {
                 fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate()),
                 request.startDate(), request.endDate());
         List<CombinedByDate> combined = classifyCategoryService.classifyTaskByCategory(categories);
-
         List<TaskWithElapsedTime> tasks = combined.stream()
                 .flatMap(combinedByDate -> combinedByDate.getCombined().stream()
                 .flatMap(tasksByCategory -> classifyTaskService.classifyTimerByTask(combinedByDate.getDate(), tasksByCategory.getTasks()).stream()
                 )).toList();
-
         return convertToHomeViewResponseDto(createFetchCombinedDtoMap(combined, tasks));
     }
 
