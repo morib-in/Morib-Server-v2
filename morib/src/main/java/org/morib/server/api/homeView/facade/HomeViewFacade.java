@@ -1,6 +1,5 @@
 package org.morib.server.api.homeView.facade;
 
-import java.sql.SQLException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
@@ -23,7 +22,6 @@ import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -108,8 +106,7 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public void startTimer(StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
-        Long mockUserId=1L;
+    public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
         Todo todo;
         try {
             todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);

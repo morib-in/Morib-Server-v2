@@ -42,7 +42,8 @@ public class HomeViewController {
     public ResponseEntity<BaseResponse<?>> startTimer(//@AuthenticationPrincipal Long userId,
        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
         @RequestBody StartTimerRequestDto startTimerRequestDto) {
-        homeViewFacade.startTimer(startTimerRequestDto, targetDate);
+        Long mockUserId = 1L;
+        homeViewFacade.startTimer(mockUserId,startTimerRequestDto, targetDate);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
