@@ -9,7 +9,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface ClassifyTaskService {
-    List<TaskWithTimers> classifyTimerByTask(LocalDate date, List<Task> tasks);
-
     LinkedHashSet<Task> sortTasksByCreatedAt(Set<Task> tasks);
 }

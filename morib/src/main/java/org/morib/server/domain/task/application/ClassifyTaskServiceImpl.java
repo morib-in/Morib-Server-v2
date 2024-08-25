@@ -16,12 +16,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class ClassifyTaskServiceImpl implements ClassifyTaskService {
-    private final TaskManager taskManager;
-
-    @Override
-    public List<TaskWithTimers> classifyTimerByTask(LocalDate date, List<Task> tasks) {
-        return tasks.stream().map(task -> taskManager.classifyTimerByTask(date, task)).toList();
-    }
 
     @Override
     public LinkedHashSet<Task> sortTasksByCreatedAt(Set<Task> tasks) {
