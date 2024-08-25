@@ -2,6 +2,7 @@ package org.morib.server.api.homeView.facade;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.*;
 import org.morib.server.api.homeView.vo.CategoriesByDate;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Service
+@Facade
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final ClassifyCategoryService classifyCategoryService;
