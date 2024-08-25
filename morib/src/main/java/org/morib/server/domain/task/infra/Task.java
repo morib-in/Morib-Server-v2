@@ -2,6 +2,7 @@ package org.morib.server.domain.task.infra;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.category.infra.Category;
@@ -36,5 +37,24 @@ public class Task extends BaseTimeEntity {
 
     @ManyToMany(mappedBy = "tasks", cascade = CascadeType.REMOVE)
     private Set<Todo> todos;
+
+    @Builder
+    public Task (String name, Boolean isComplete, LocalDate startDate, LocalDate endDate, Category category) {
+        this.name = name;
+        this.isComplete = isComplete;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.category = category;
+    }
+
+    public  static Task createTask(String name, Boolean isComplete, LocalDate startDate, LocalDate endDate, Category category) {
+        return Task.builder()
+                .name(name)
+                .isComplete(isComplete)
+                .startDate(startDate)
+                .endDate(endDate)
+                .category(category)
+                .build();
+    }
 
 }
