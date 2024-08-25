@@ -1,23 +1,27 @@
 package org.morib.server.api.modalView.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.api.modalView.dto.CreateCategoryRequest;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
+import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.BaseResponse;
+import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
 public class ModalViewController {
+
     private final ModalViewFacade modalViewFacade;
 
-    // 카테고리 생성
     @PostMapping("/categories")
-    public ResponseEntity<?> create() {
-        return null;
+    public ResponseEntity<BaseResponse<?>> create(// @AuthenticationPrincipal Long userId,
+                                                @RequestBody CreateCategoryRequest createCategoryRequest) {
+        Long userId = 1L;
+        modalViewFacade.createCategory(userId, createCategoryRequest);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     // 카테고리 삭제
