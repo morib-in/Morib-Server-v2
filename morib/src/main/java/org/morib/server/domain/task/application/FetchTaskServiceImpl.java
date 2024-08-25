@@ -1,17 +1,17 @@
 package org.morib.server.domain.task.application;
 
-import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.vo.TaskWithTimers;
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
