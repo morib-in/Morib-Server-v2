@@ -45,8 +45,7 @@ public class CategoryManager {
     }
 
     private boolean isInRange(LocalDate idxDate, LocalDate startDate, LocalDate endDate) {
-        return (idxDate.isEqual(startDate) || idxDate.isAfter(startDate)) &&
-                (idxDate.isEqual(endDate) || idxDate.isBefore(endDate));
+        return !idxDate.isBefore(startDate) && !idxDate.isAfter(endDate);
     }
     
     
