@@ -39,18 +39,17 @@ public class Task extends BaseTimeEntity {
     private Set<Todo> todos;
 
     @Builder
-    public Task (String name, Boolean isComplete, LocalDate startDate, LocalDate endDate, Category category) {
+    public Task (String name, LocalDate startDate, LocalDate endDate, Category category) {
         this.name = name;
-        this.isComplete = isComplete;
+        this.isComplete = false;
         this.startDate = startDate;
         this.endDate = endDate;
         this.category = category;
     }
 
-    public  static Task createTask(String name, Boolean isComplete, LocalDate startDate, LocalDate endDate, Category category) {
+    public static Task createTask(String name, LocalDate startDate, LocalDate endDate, Category category) {
         return Task.builder()
                 .name(name)
-                .isComplete(isComplete)
                 .startDate(startDate)
                 .endDate(endDate)
                 .category(category)

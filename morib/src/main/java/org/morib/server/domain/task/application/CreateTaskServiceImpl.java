@@ -15,11 +15,7 @@ public class CreateTaskServiceImpl implements CreateTaskService{
 
     @Override
     public Task createTaskByCategoryAndBetweenDate(Category category, CreateTaskRequestDto dto) {
-        return taskRepository.save(Task.builder()
-            .name(dto.name())
-            .startDate(dto.startDate())
-            .endDate(dto.endDate())
-            .category(category)
-            .build());
+        return taskRepository.save(Task.createTask(dto.name(), dto.startDate(),
+            dto.endDate(), category));
     }
 }
