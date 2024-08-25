@@ -2,8 +2,8 @@ package org.morib.server.domain.category;
 
 import org.morib.server.annotation.Manager;
 import org.morib.server.api.homeView.vo.CategoriesByDate;
-import org.morib.server.api.homeView.vo.CombinedByDate;
-import org.morib.server.api.homeView.vo.TasksByCategory;
+import org.morib.server.api.homeView.vo.CategoryWithTasksByDate;
+import org.morib.server.api.homeView.vo.CategoryWithTasks;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 
@@ -25,13 +25,13 @@ public class CategoryManager {
         return result;
     }
 
-    public CombinedByDate classifyTaskByCategory(CategoriesByDate categoriesByDate) {
+    public CategoryWithTasksByDate classifyTaskByCategory(CategoriesByDate categoriesByDate) {
         LocalDate idxDate = categoriesByDate.getDate();
-        List<TasksByCategory> tasksByCategory = new ArrayList<>();
+        List<CategoryWithTasks> categoryWithTasks = new ArrayList<>();
         for (Category category : categoriesByDate.getCategories()) {
-            tasksByCategory.add(TasksByCategory.of(category, getTasks(category, idxDate)));
+            categoryWithTasks.add(CategoryWithTasks.of(category, getTasks(category, idxDate)));
         }
-        return CombinedByDate.of(idxDate, tasksByCategory);
+        return CategoryWithTasksByDate.of(idxDate, categoryWithTasks);
     }
 
     private List<Task> getTasks(Category category, LocalDate idxDate) {
