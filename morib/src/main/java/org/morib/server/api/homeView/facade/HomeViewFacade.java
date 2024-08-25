@@ -1,20 +1,25 @@
 package org.morib.server.api.homeView.facade;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.homeView.dto.fetch.*;
-import org.morib.server.api.homeView.vo.CategoriesByDate;
-import org.morib.server.api.homeView.vo.CombinedByDate;
-import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
+import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
+import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
+import org.morib.server.api.homeView.vo.CategoryWithTasks;
+import org.morib.server.api.homeView.vo.TaskWithTimers;
 import org.morib.server.domain.category.application.ClassifyCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.application.ToggleTaskStatusService;
+import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -29,15 +34,29 @@ public class HomeViewFacade {
     private final HomeDtoBuilder homeDtoBuilder;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
-        List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
-                fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate()),
-                request.startDate(), request.endDate());
-        List<CombinedByDate> combined = classifyCategoryService.classifyTaskByCategory(categories);
-        List<TaskWithElapsedTime> tasks = combined.stream()
-                .flatMap(combinedByDate -> combinedByDate.getCombined().stream()
-                .flatMap(tasksByCategory -> classifyTaskService.classifyTimerByTask(combinedByDate.getDate(), tasksByCategory.getTasks()).stream()
-                )).toList();
-        return homeDtoBuilder.convertToHomeViewResponseDto(homeDtoBuilder.createFetchCombinedDtoMap(combined, tasks));
+        List<Category> categories = fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate());
+        LinkedHashSet<CategoryWithTasks> categoryWithTasks = fetchTasksByCategories(categories);
+        // Dto Build
+        return null;
+    }
+
+    private LinkedHashSet<CategoryWithTasks> fetchTasksByCategories(List<Category> categories) {
+        return categories.stream()
+                .map(this::convertToCategoryWithTasks)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    // Category -> CategoryWithTasks
+    private CategoryWithTasks convertToCategoryWithTasks(Category category) {
+        LinkedHashSet<TaskWithTimers> taskWithTimers = convertToTaskWithTimers(classifyTaskService.sortTasksByCreatedAt(category.getTasks()));
+        return fetchCategoryService.convertToCategoryWithTasks(category, taskWithTimers);
+    }
+
+    // Task -> TaskWithTimers
+    private LinkedHashSet<TaskWithTimers> convertToTaskWithTimers(LinkedHashSet<Task> tasks) {
+        return tasks.stream()
+                .map(fetchTaskService::convertToTaskWithTimers)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void fetchUserTimer() {
