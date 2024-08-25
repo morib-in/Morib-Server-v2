@@ -2,6 +2,7 @@ package org.morib.server.domain.todo.infra;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
@@ -34,4 +35,15 @@ public class Todo extends BaseTimeEntity {
             inverseJoinColumns = @JoinColumn(name = "task_id")
     )
     private Set<Task> tasks = new LinkedHashSet<>();
+
+    @Builder
+    public Todo(LocalDate targetDate, User user) {
+        this.targetDate = targetDate;
+        this.user = user;
+    }
+
+    public void updateTasks(Set<Task> tasks) {
+        this.tasks = tasks;
+    }
+
 }
