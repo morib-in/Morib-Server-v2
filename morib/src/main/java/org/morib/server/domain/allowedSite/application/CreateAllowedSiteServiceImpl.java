@@ -13,6 +13,6 @@ public class CreateAllowedSiteServiceImpl implements CreateAllowedSiteService {
 
     @Override
     public AllowedSite create(String siteName, String siteUrl, OwnerType ownerType, Long ownerId) {
-        return AllowedSite.create(siteName, siteUrl, ownerType, ownerId);
+        return allowedSiteRepository.save(AllowedSite.create(siteName, siteUrl, ownerType, ownerId));
     }
 }
