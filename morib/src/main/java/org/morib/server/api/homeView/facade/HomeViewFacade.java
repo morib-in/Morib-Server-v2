@@ -107,20 +107,7 @@ public class HomeViewFacade {
 
     @Transactional
     public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
-        Todo todo;
-        try {
-            todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
-        }
-        catch (DataAccessException e){
-            throw new IllegalArgumentException("DB 접속 중 오류가 발생하였습니다.");
-        }
-        catch (IllegalArgumentException e){
-            //추후 에러 정의
-            return;
-        }
-        catch (RuntimeException e){
-            todo = createTodoService.saveTodoByTargetDateAndUser(targetDate, fetchUserService.fetchByUserId(mockUserId));
-        }
+        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
     }

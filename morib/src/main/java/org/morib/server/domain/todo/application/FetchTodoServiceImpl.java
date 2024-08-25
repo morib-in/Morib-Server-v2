@@ -20,7 +20,7 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     @Override
     public Todo fetchByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
         return todoRepository.findTodoByUserIdAndTargetDate(userId, targetDate)
-            .orElseThrow(() -> new RuntimeException("해당 유저의 todo가 없습니다."));
+            .orElseThrow(() -> new IllegalArgumentException("해당 유저의 todo가 없습니다."));
     }
 
     @Override
