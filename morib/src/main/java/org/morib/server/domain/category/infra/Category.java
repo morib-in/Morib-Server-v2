@@ -22,8 +22,6 @@ public class Category extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private Long userId;
-    @Column(nullable = false)
     private LocalDate startDate;
     private LocalDate endDate;
     @ManyToOne
