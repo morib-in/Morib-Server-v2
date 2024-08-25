@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("select e from Category e where " +
-            "e.userId = :userId " +
+            "e.user.id = :userId " +
             "and e.startDate between :startDate and :endDate " +
             "or e.endDate between :startDate and :endDate " +
             "or (e.startDate <= :startDate and e.endDate >= :endDate)")
