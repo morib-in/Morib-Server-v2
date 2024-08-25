@@ -1,52 +1,30 @@
 package org.morib.server.api.homeView.facade;
 
-import org.morib.server.api.homeView.dto.fetch.FetchCategoryDto;
-import org.morib.server.api.homeView.dto.fetch.FetchCombinedDto;
-import org.morib.server.api.homeView.dto.fetch.FetchTaskDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
-import org.morib.server.api.homeView.vo.CombinedByDate;
-import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
+import org.morib.server.api.homeView.vo.CategoryWithTasks;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.infra.Timer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class HomeDtoBuilder {
-    protected Map<LocalDate, List<FetchCombinedDto>> createFetchCombinedDtoMap(
-            List<CombinedByDate> combined, List<TaskWithElapsedTime> tasks) {
-        return combined.stream()
-                .collect(Collectors.toMap(
-                        CombinedByDate::getDate,
-                        combinedByDate -> combinedByDate.getCombined().stream()
-                                .map(entry -> {
-                                    FetchCategoryDto categoryDto = FetchCategoryDto.of(entry.getCategory());
-                                    List<FetchTaskDto> taskDtos = createFetchTaskDtoList(entry.getTasks(), tasks);
-                                    return FetchCombinedDto.of(categoryDto, taskDtos);
-                                })
-                                .collect(Collectors.toList())
-                ));
+    public List<HomeViewResponseDto> filterAndConvertToDto(LinkedHashSet<CategoryWithTasks> categoryWithTasksSet, LocalDate idxDate) {
+        return null;
     }
 
-    protected List<FetchTaskDto> createFetchTaskDtoList(List<Task> tasks, List<TaskWithElapsedTime> taskWithElapsedTimes) {
-        return tasks.stream()
-                .map(task -> {
-                    int elapsedTime = taskWithElapsedTimes.stream()
-                            .filter(taskWithElapsedTime -> taskWithElapsedTime.getTask().equals(task))
-                            .map(TaskWithElapsedTime::getElapsedTime)
-                            .findFirst()
-                            .orElse(0);
-                    return FetchTaskDto.of(task, elapsedTime);
-                })
-                .collect(Collectors.toList());
+
+    private boolean isInRange(LocalDate idxDate, LocalDate startDate, LocalDate endDate) {
+        return !idxDate.isBefore(startDate) && !idxDate.isAfter(endDate);
     }
 
-    protected List<HomeViewResponseDto> convertToHomeViewResponseDto(Map<LocalDate, List<FetchCombinedDto>> combinedDtoMap) {
-        return combinedDtoMap.entrySet().stream()
-                .map(entry -> HomeViewResponseDto.of(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+    private int fetchTimerByDate(LocalDate idxDate, Task task) {
+        return task.getTimers().stream()
+                .filter(timer -> timer.getTargetDate().equals(idxDate))
+                .findFirst().map(Timer::getElapsedTime)
+                .orElse(0);
     }
 }
