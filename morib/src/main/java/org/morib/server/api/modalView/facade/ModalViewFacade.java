@@ -2,11 +2,9 @@ package org.morib.server.api.modalView.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.modalView.dto.CreateCategoryRequest;
-import org.morib.server.domain.allowedSite.AllowedSiteManager;
+import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.infra.type.OwnerType;
-import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.user.application.FetchUserService;
@@ -23,10 +21,10 @@ public class ModalViewFacade {
     private final CreateAllowedSiteService createAllowedSiteService;
 
     @Transactional
-    public void createCategory(Long userId, CreateCategoryRequest createCategoryRequest) {
+    public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
         User user = fetchUserService.fetchByUserId(userId);
-        Category createdCategory = createCategoryService.create(createCategoryRequest.name(), createCategoryRequest.startDate(), createCategoryRequest.endDate(), user);
-        createCategoryRequest.allowedSites().stream().map(
+        Category createdCategory = createCategoryService.create(createCategoryRequestDto.name(), createCategoryRequestDto.startDate(), createCategoryRequestDto.endDate(), user);
+        createCategoryRequestDto.allowedSites().stream().map(
                 allowedSite -> createAllowedSiteService.create(allowedSite.getSiteName(), allowedSite.getSiteUrl(), OwnerType.CATEGORY, createdCategory.getId()));
     }
 }

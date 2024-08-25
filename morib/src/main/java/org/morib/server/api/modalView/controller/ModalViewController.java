@@ -1,7 +1,7 @@
 package org.morib.server.api.modalView.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.modalView.dto.CreateCategoryRequest;
+import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -18,9 +18,9 @@ public class ModalViewController {
 
     @PostMapping("/categories")
     public ResponseEntity<BaseResponse<?>> create(// @AuthenticationPrincipal Long userId,
-                                                @RequestBody CreateCategoryRequest createCategoryRequest) {
+                                                @RequestBody CreateCategoryRequestDto createCategoryRequestDto) {
         Long userId = 1L;
-        modalViewFacade.createCategory(userId, createCategoryRequest);
+        modalViewFacade.createCategory(userId, createCategoryRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 

@@ -5,7 +5,7 @@ import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import java.time.LocalDate;
 import java.util.List;
 
-public record CreateCategoryRequest(
+public record CreateCategoryRequestDto(
         String name,
         LocalDate startDate,
         LocalDate endDate,
