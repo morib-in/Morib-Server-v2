@@ -1,5 +1,6 @@
 package org.morib.server.api.homeView.facade;
 
+import java.sql.SQLException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
@@ -21,6 +22,7 @@ import org.morib.server.domain.todo.application.CreateTodoService;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -111,7 +113,15 @@ public class HomeViewFacade {
         Todo todo;
         try {
             todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
-        }catch (IllegalArgumentException e){
+        }
+        catch (DataAccessException e){
+            throw new IllegalArgumentException("DB 접속 중 오류가 발생하였습니다.");
+        }
+        catch (IllegalArgumentException e){
+            //추후 에러 정의
+            return;
+        }
+        catch (RuntimeException e){
             todo = createTodoService.saveTodoByTargetDateAndUser(targetDate, fetchUserService.fetchByUserId(mockUserId));
         }
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
