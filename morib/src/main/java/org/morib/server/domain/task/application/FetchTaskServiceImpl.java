@@ -1,11 +1,12 @@
 package org.morib.server.domain.task.application;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
@@ -35,6 +36,21 @@ public class FetchTaskServiceImpl implements FetchTaskService {
         return tasks.stream().
             filter(task -> isTimerInTaskPresentTargetDate(task, targetDate))
             .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Override
+    public Set<Task> fetchByTaskIds(List<Long> taskIds) {
+        Set<Task> tasks = new LinkedHashSet<>();
+        for (Long taskId : taskIds) {
+            Task findTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
+            tasks.add(findTask);
+        }
+        return convertUnmmodifiableSet(tasks);
+    }
+
+    private Set<Task> convertUnmmodifiableSet(Set<Task> tasks) {
+        return Collections.unmodifiableSet(tasks);
     }
 
     private boolean isTimerInTaskPresentTargetDate(Task task, LocalDate targetDate) {

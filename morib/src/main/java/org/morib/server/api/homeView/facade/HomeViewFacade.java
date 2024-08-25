@@ -1,6 +1,9 @@
 package org.morib.server.api.homeView.facade;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.morib.server.annotation.Facade;
+import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.*;
 import org.morib.server.api.homeView.vo.CategoriesByDate;
 import org.morib.server.api.homeView.vo.CombinedByDate;
@@ -13,15 +16,21 @@ import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
-import org.springframework.stereotype.Service;
+import org.morib.server.domain.todo.TodoManager;
+import org.morib.server.domain.todo.application.CreateTodoService;
+import org.morib.server.domain.todo.application.FetchTodoService;
+import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.application.FetchUserService;
+import org.springframework.dao.DataAccessException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Service
+@Facade
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final ClassifyCategoryService classifyCategoryService;
@@ -30,6 +39,10 @@ public class HomeViewFacade {
     private final FetchTimerService fetchTimerService;
     private final ClassifyTimerService classifyTimerService;
     private final ToggleTaskStatusService toggleTaskStatusService;
+    private final FetchUserService fetchUserService;
+    private final FetchTodoService fetchTodoService;
+    private final CreateTodoService createTodoService;
+    private final TodoManager todoManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
@@ -92,8 +105,10 @@ public class HomeViewFacade {
         toggleTaskStatusService.toggle();
     }
 
-    public void startTimer() {
-//        createTodoService.create();
-//        createTimerService.create();
+    @Transactional
+    public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
+        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
+        Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+        todoManager.updateTask(todo, tasks);
     }
 }

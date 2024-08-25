@@ -1,8 +1,12 @@
 package org.morib.server.api.homeView.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
+import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.BaseResponse;
+import org.morib.server.global.message.SuccessMessage;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,10 +38,13 @@ public class HomeViewController {
     }
 
     // 할일 추가 후 타이머 시작
-    @PostMapping("/timers/start")
-    public ResponseEntity<?> startTimer() {
-        homeViewFacade.startTimer();
-        return null;
+    @PostMapping("/timer/start")
+    public ResponseEntity<BaseResponse<?>> startTimer(//@AuthenticationPrincipal Long userId,
+       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
+        @RequestBody StartTimerRequestDto startTimerRequestDto) {
+        Long mockUserId = 1L;
+        homeViewFacade.startTimer(mockUserId,startTimerRequestDto, targetDate);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 
