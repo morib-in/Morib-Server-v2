@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,7 +22,7 @@ public class TaskController {
 
     //태스크 생성
     @PostMapping("/tasks/{categoryId}")
-    public ResponseEntity<?> createTask(//@AuthenticationPrincipal Long userId,
+    public ResponseEntity<BaseResponse<?>> createTask(//@AuthenticationPrincipal Long userId,
         @PathVariable Long categoryId, @RequestBody
     CreateTaskRequestDto createTaskRequestDto) {
         Long mockUserId = 1L;
