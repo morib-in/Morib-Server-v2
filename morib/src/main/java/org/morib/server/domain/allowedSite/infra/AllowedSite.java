@@ -7,6 +7,7 @@ import org.morib.server.domain.allowedSite.infra.type.OwnerType;
 import org.morib.server.global.common.BaseTimeEntity;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AllowedSite extends BaseTimeEntity {
     @Id
