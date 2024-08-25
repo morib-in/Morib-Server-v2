@@ -42,6 +42,13 @@ public class Todo extends BaseTimeEntity {
         this.user = user;
     }
 
+    public static Todo createByTargetDateAndUser(LocalDate targetDate, User user) {
+        return Todo.builder().
+            targetDate(targetDate).
+            user(user)
+            .build();
+    }
+
     public void updateTasks(Set<Task> tasks) {
         this.tasks = tasks;
     }
