@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.user.infra.User;
 
 public interface FetchTimerService {
     void fetch();
@@ -15,4 +16,5 @@ public interface FetchTimerService {
 
     int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
 
+    Timer fetchByUserAndTargetDate(User user, LocalDate targetDate);
 }

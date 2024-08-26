@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.infra.TimerRepository;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class FetchTimerServiceImpl implements FetchTimerService{
 
     private final TimerManager timerManager;
+    private final TimerRepository timerRepository;
 
     @Override
     public void fetch() {
@@ -46,5 +49,13 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .mapToInt(Timer::getElapsedTime)
                 .sum();
     }
+
+    @Override
+    public Timer fetchByUserAndTargetDate(User user, LocalDate targetDate) {
+        return timerRepository.findByUserAndTargetDate(user, targetDate).
+                orElseThrow(() -> new IllegalArgumentException("찾고자 하는 timer가 없습니다!"));
+    }
+
+
 
 }
