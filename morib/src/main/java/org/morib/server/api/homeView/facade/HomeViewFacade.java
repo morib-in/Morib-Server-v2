@@ -16,12 +16,13 @@ import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.TodoManager;
 import org.morib.server.domain.todo.application.CreateTodoService;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
-import org.springframework.dao.DataAccessException;
+import org.morib.server.domain.user.infra.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -110,5 +111,12 @@ public class HomeViewFacade {
         Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
+    }
+
+    @Transactional
+    public FetchMyElapsedTimeResponseDto fetchMyElapsedTime(Long mockUserId, LocalDate targetDate) {
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        Timer findTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
+        return FetchMyElapsedTimeResponseDto.of(findTimer);
     }
 }
