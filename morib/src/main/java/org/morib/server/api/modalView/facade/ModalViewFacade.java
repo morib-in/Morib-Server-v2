@@ -6,7 +6,7 @@ import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.AllowedSiteByCategoryResponseDto;
 import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
 import org.morib.server.api.modalView.vo.CategoryInfoInAllowedSite;
-import org.morib.server.api.modalView.vo.MsetInfosInAllowedSite;
+import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
@@ -45,16 +45,16 @@ public class ModalViewFacade {
         User user = fetchUserService.fetchByUserId(mockUserId);
         Category findCategory = fetchCategoryService.fetchByIdAndUser(categoryId, user);
         List<AllowedSite> allowedSites = fetchAllowedSiteService.fetchByCategoryId(categoryId);
-        CategoryInfoInAllowedSite category = CategoryInfoInAllowedSite.of(mockUserId, categoryId,
+        CategoryInfoInAllowedSite category = CategoryInfoInAllowedSite.of(categoryId,
             findCategory);
-        List<MsetInfosInAllowedSite> msetList = mappedByMsetInfosAllowedSite(allowedSites);
+        List<AllowSiteForCalledByCatgory> msetList = mappedByMsetInfosAllowedSite(allowedSites);
 
         return AllowedSiteByCategoryResponseDto.of(category, msetList);
     }
 
-    private static List<MsetInfosInAllowedSite> mappedByMsetInfosAllowedSite(
+    private static List<AllowSiteForCalledByCatgory> mappedByMsetInfosAllowedSite(
         List<AllowedSite> allowedSites) {
-        return allowedSites.stream().map(MsetInfosInAllowedSite::of)
+        return allowedSites.stream().map(AllowSiteForCalledByCatgory::of)
             .toList();
     }
 

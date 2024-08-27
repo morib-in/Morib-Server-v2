@@ -24,7 +24,7 @@ public class ModalViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @GetMapping("/allowedSite/categories/{categoryId}")
+    @GetMapping("/mset/categories/{categoryId}")
     public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByCategory(// @AuthenticationPrincipal Long userId,
         @PathVariable Long categoryId){
         Long mockUserId = 1L;
