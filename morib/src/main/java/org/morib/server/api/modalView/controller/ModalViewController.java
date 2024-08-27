@@ -24,6 +24,14 @@ public class ModalViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @GetMapping("/mset/categories/{categoryId}")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByCategory(// @AuthenticationPrincipal Long userId,
+        @PathVariable Long categoryId){
+        Long mockUserId = 1L;
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
+            fetchAllowedSiteByCategoryId(mockUserId, categoryId));
+    }
+
     // 카테고리 삭제
     @DeleteMapping("/categories")
     public ResponseEntity<?> delete() {
