@@ -104,8 +104,9 @@ public class HomeViewFacade {
     public void createTask(Long mockUserId, Long categoryId,
         CreateTaskRequestDto requestDto) {
         User findUser = fetchUserService.fetchByUserId(mockUserId);
-        Category category = fetchCategoryService.fetchByUserAndCategoryId(findUser,categoryId);
-        createTaskService.createTaskByCategoryAndBetweenDate(category, requestDto);
+        Category findCategory = fetchCategoryService.fetchByUserAndCategoryId(findUser,categoryId);
+        createTaskService.createTaskByCategoryAndBetweenDate(findCategory, requestDto.name(),
+            requestDto.startDate(), requestDto.endDate());
     }
 
 
