@@ -6,7 +6,6 @@ import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;
 import org.morib.server.domain.user.infra.User;
@@ -31,24 +30,20 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
     }
 
-
-
-
-    @Override
-    public int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate) {
-        return tasks.stream()
-                .flatMap(t -> t.getTimers().stream())
-                .filter(timer -> timer.getTargetDate().equals(targetDate))
-                .mapToInt(Timer::getElapsedTime)
-                .sum();
-    }
-
     @Override
     public int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
         return t.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
                 .mapToInt(Timer::getElapsedTime)
                 .sum();
+    }
+
+    @Override
+    public int sumElapsedTimeByUser(User user, LocalDate targetDate) {
+        return timerRepository.findByUser(user).stream()
+            .filter(timer -> timer.getTargetDate().equals(targetDate))
+            .mapToInt(Timer::getElapsedTime)
+            .sum();
     }
 
     @Override

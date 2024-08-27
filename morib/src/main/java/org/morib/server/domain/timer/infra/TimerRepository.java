@@ -9,4 +9,8 @@ import java.time.LocalDate;
 
 public interface TimerRepository extends JpaRepository<Timer, Long> {
     List<Timer> findByUserAndTargetDate(User user, LocalDate targetDate);
+
+
+    List<Timer> findByUser(User user);
+
 }

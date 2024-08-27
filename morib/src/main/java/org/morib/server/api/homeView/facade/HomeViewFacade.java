@@ -3,6 +3,7 @@ package org.morib.server.api.homeView.facade;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.*;
 import org.morib.server.api.homeView.vo.CategoriesByDate;
@@ -10,7 +11,9 @@ import org.morib.server.api.homeView.vo.CombinedByDate;
 import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
 import org.morib.server.domain.category.application.ClassifyCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.application.ClassifyTaskService;
+import org.morib.server.domain.task.application.CreateTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
@@ -25,10 +28,12 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -41,6 +46,7 @@ public class HomeViewFacade {
     private final FetchTimerService fetchTimerService;
     private final ClassifyTimerService classifyTimerService;
     private final ToggleTaskStatusService toggleTaskStatusService;
+    private final CreateTaskService createTaskService;
     private final FetchUserService fetchUserService;
     private final FetchTodoService fetchTodoService;
     private final CreateTodoService createTodoService;
@@ -99,9 +105,15 @@ public class HomeViewFacade {
 //        aggregateTimerService.aggregate();
     }
 
-    public void createTask() {
-//        createTaskService.create();
+    @Transactional
+    public void createTask(Long mockUserId, Long categoryId,
+        CreateTaskRequestDto requestDto) {
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        Category findCategory = fetchCategoryService.fetchByUserAndCategoryId(findUser,categoryId);
+        createTaskService.createTaskByCategoryAndBetweenDate(findCategory, requestDto.name(),
+            requestDto.startDate(), requestDto.endDate());
     }
+
 
     public void toggleTaskStatus() {
         fetchTaskService.fetch();
