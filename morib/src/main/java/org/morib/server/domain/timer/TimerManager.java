@@ -1,5 +1,6 @@
 package org.morib.server.domain.timer;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.timer.infra.Timer;
 import org.springframework.stereotype.Service;
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TimerManager {
 
-    public void aggregate() {
-        // 각 task의 timer들을 종합해 오늘 나의 작업시간 계산
+    public int sumUserTotalElapsedTime(List<Timer> timers) {
+        return timers.stream()
+            .mapToInt(Timer::getElapsedTime)
+            .sum();
     }
 
     public void addElapsedTime(Timer timer, int elapsedTime){

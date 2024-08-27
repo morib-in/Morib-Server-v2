@@ -1,6 +1,5 @@
 package org.morib.server.api.timerView.facade;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,6 +15,8 @@ import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.application.FetchUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Facade
@@ -25,6 +26,7 @@ public class TimerViewFacade {
     private final FetchTimerService fetchTimerService;
     private final FetchTaskService fetchTaskService;
     private final FetchTodoService fetchTodoService;
+    private final FetchUserService fetchUserService;
     private final TimerManager timerManager;
 
     @Transactional
@@ -43,16 +45,16 @@ public class TimerViewFacade {
      * 해당 타이머들의 총 시간을 계산해야함!
      * 1. todo를 유저를 통해 찾는다.
      * 2. 찾은 todo 에서 task들을 불러온다.
-     * 3. totalTimeToday~ 는 유저id랑, targetDate를 바탕으로 timer를 조회해서 모든 elapsedTime을 더한 값이다.
+     * 3. totalTimeToday~ 는 유저id랑, targetDate를 바탕으로 user의 모든 timer를 조회해서 elapsedTime을 더한 값이다.
      * @param targetDate
      * @return
      */
     @Transactional
-    public TodoCardResponseDto fetchTodoCard(LocalDate targetDate) {
-        Long mockUserId = 1L;
+    public TodoCardResponseDto fetchTodoCard(Long mockUserId, LocalDate targetDate) {
         Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
         LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo, targetDate);
-        int totalTimeOfToday = fetchTimerService.sumTasksElapsedTimeByTargetDate(tasks, targetDate);
+        int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(mockUserId), targetDate);
+
         List<TaskInTodoCardDto> taskInTodoCardDtos = tasks.stream()
             .map(t -> getTaskInTodoCardDto(targetDate, t))
             .toList();

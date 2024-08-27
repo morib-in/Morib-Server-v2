@@ -18,5 +18,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "or (e.startDate <= :startDate and e.endDate >= :endDate)")
     List<Category> findByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate);
 
+
     Optional<Category> findByIdAndUser(Long categoryId, User user);
+
+    Optional<Category> findByUserAndId(User findUser, Long categoryId);
+
 }
