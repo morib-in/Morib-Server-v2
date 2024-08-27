@@ -1,42 +1,37 @@
 package org.morib.server.api.homeView.facade;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
-import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
-import org.morib.server.api.homeView.vo.CategoryWithTasks;
-import org.morib.server.api.homeView.vo.TaskWithTimers;
-import org.morib.server.domain.category.application.ClassifyCategoryService;
+import org.morib.server.api.homeView.dto.fetch.*;
+import org.morib.server.api.homeView.vo.*;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
-import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.global.common.DataUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
-    private final ClassifyCategoryService classifyCategoryService;
     private final FetchTaskService fetchTaskService;
     private final ClassifyTaskService classifyTaskService;
     private final FetchTimerService fetchTimerService;
-    private final ClassifyTimerService classifyTimerService;
-    private final ToggleTaskStatusService toggleTaskStatusService;
-    private final HomeDtoBuilder homeDtoBuilder;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<Category> categories = fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate());
         LinkedHashSet<CategoryWithTasks> categoryWithTasks = fetchTasksByCategories(categories);
-        // Dto Build
-        return null;
+        return classifyAndBuildHomeViewResponseDto(request.startDate(), request.endDate(), categoryWithTasks);
     }
 
     private LinkedHashSet<CategoryWithTasks> fetchTasksByCategories(List<Category> categories) {
@@ -45,17 +40,46 @@ public class HomeViewFacade {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    // Category -> CategoryWithTasks
     private CategoryWithTasks convertToCategoryWithTasks(Category category) {
         LinkedHashSet<TaskWithTimers> taskWithTimers = convertToTaskWithTimers(classifyTaskService.sortTasksByCreatedAt(category.getTasks()));
         return fetchCategoryService.convertToCategoryWithTasks(category, taskWithTimers);
     }
 
-    // Task -> TaskWithTimers
     private LinkedHashSet<TaskWithTimers> convertToTaskWithTimers(LinkedHashSet<Task> tasks) {
         return tasks.stream()
                 .map(fetchTaskService::convertToTaskWithTimers)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private List<HomeViewResponseDto> classifyAndBuildHomeViewResponseDto(LocalDate startDate, LocalDate endDate, LinkedHashSet<CategoryWithTasks> categoryWithTasks) {
+        List<HomeViewResponseDto> result = new ArrayList<>();
+        for (LocalDate idxDate = startDate; !idxDate.isAfter(endDate); idxDate = idxDate.plusDays(1)) {
+            List<CombinedCategoryAndTaskInfo> combinedCategoryAndTaskInfos = buildFetchCombinedDtoByDate(idxDate, categoryWithTasks);
+
+            if (!combinedCategoryAndTaskInfos.isEmpty()) {
+                result.add(HomeViewResponseDto.of(idxDate, combinedCategoryAndTaskInfos));
+            }
+        }
+        return result;
+    }
+
+    private List<CombinedCategoryAndTaskInfo> buildFetchCombinedDtoByDate(LocalDate idxDate, LinkedHashSet<CategoryWithTasks> categoryWithTasks) {
+        return categoryWithTasks.stream()
+                .filter(ct -> DataUtils.isInRange(idxDate, ct.category().getStartDate(), ct.category().getEndDate()))
+                .map(ct -> buildFetchCombinedDto(ct, idxDate))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private CombinedCategoryAndTaskInfo buildFetchCombinedDto(CategoryWithTasks categoryWithTasks, LocalDate idxDate) {
+        List<TaskInfo> taskInfos = categoryWithTasks.taskWithTimers().stream()
+                .filter(twt -> DataUtils.isInRange(idxDate, twt.task().getStartDate(), twt.task().getEndDate()))
+                .map(twt -> TaskInfo.of(twt.task(), fetchTimerService.fetchElapsedTimeOrZeroByTaskAndTargetDate(twt.task(), idxDate)))
+                .toList();
+        if (!taskInfos.isEmpty()) {
+            return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(categoryWithTasks.category()), taskInfos);
+        }
+        return null;
     }
 
     public void fetchUserTimer() {
@@ -70,7 +94,6 @@ public class HomeViewFacade {
 
     public void toggleTaskStatus() {
         fetchTaskService.fetch();
-        toggleTaskStatusService.toggle();
     }
 
     public void startTimer() {
