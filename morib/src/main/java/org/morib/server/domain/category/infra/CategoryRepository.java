@@ -1,5 +1,7 @@
 package org.morib.server.domain.category.infra;
 
+import java.util.Optional;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,4 +18,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "or (e.startDate <= :startDate and e.endDate >= :endDate)")
     List<Category> findByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate);
 
+    Optional<Category> findByUserAndId(User findUser, Long categoryId);
 }

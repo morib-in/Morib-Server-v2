@@ -2,6 +2,8 @@ package org.morib.server.domain.task.infra;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.morib.server.domain.category.infra.Category;
@@ -15,6 +17,8 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Task extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +27,7 @@ public class Task extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
-    private Boolean isComplete;
+    private Boolean isComplete = false;
     @Column(nullable = false)
     private LocalDate startDate;
     private LocalDate endDate;
@@ -36,5 +40,14 @@ public class Task extends BaseTimeEntity {
 
     @ManyToMany(mappedBy = "tasks", cascade = CascadeType.REMOVE)
     private Set<Todo> todos;
+
+    public static Task createTask(String name, LocalDate startDate, LocalDate endDate, Category category) {
+        return Task.builder()
+                .name(name)
+                .startDate(startDate)
+                .endDate(endDate)
+                .category(category)
+                .build();
+    }
 
 }
