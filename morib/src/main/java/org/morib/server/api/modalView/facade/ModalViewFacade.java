@@ -52,7 +52,7 @@ public class ModalViewFacade {
         return AllowedSiteByCategoryResponseDto.of(category, msetList);
     }
 
-    private static List<AllowSiteForCalledByCatgory> mappedByMsetInfosAllowedSite(
+    private List<AllowSiteForCalledByCatgory> mappedByMsetInfosAllowedSite(
         List<AllowedSite> allowedSites) {
         return allowedSites.stream().map(AllowSiteForCalledByCatgory::of)
             .toList();
