@@ -27,8 +27,14 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
     }
 
-
-
+    @Override
+    public int fetchElapsedTimeOrZeroByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
+        return findTask.getTimers().stream()
+                .filter(timer -> timer.getTargetDate().equals(targetDate))
+                .findFirst()
+                .map(Timer::getElapsedTime)
+                .orElse(0);
+    }
 
     @Override
     public int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate) {
