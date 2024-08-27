@@ -1,6 +1,7 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
@@ -51,9 +52,8 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
-    public Timer fetchByUserAndTargetDate(User user, LocalDate targetDate) {
-        return timerRepository.findByUserAndTargetDate(user, targetDate).
-                orElseThrow(() -> new IllegalArgumentException("찾고자 하는 timer가 없습니다!"));
+    public List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate) {
+        return timerRepository.findByUserAndTargetDate(user, targetDate);
     }
 
 

@@ -14,6 +14,7 @@ import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
@@ -44,6 +45,7 @@ public class HomeViewFacade {
     private final FetchTodoService fetchTodoService;
     private final CreateTodoService createTodoService;
     private final TodoManager todoManager;
+    private final TimerManager timerManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
@@ -114,9 +116,10 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public FetchMyElapsedTimeResponseDto fetchMyElapsedTime(Long mockUserId, LocalDate targetDate) {
+    public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long mockUserId, LocalDate targetDate) {
         User findUser = fetchUserService.fetchByUserId(mockUserId);
-        Timer findTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
-        return FetchMyElapsedTimeResponseDto.of(findTimer);
+        List<Timer> findTodayTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
+        int sumUserTotalElapsedTime = timerManager.sumUserTotalElapsedTime(findTodayTimer);
+        return FetchMyElapsedTimeResponseDto.of(targetDate, sumUserTotalElapsedTime);
     }
 }
