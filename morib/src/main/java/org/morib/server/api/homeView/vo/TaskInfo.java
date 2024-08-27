@@ -1,10 +1,10 @@
-package org.morib.server.api.homeView.dto.fetch;
+package org.morib.server.api.homeView.vo;
 
 import org.morib.server.domain.task.infra.Task;
 
 import java.time.LocalDate;
 
-public record FetchTaskDto(
+public record TaskInfo(
         Long id,
         String name,
         LocalDate startDate,
@@ -12,8 +12,8 @@ public record FetchTaskDto(
         int targetTime,
         boolean isComplete
 ) {
-    public static FetchTaskDto of(Task task, int elapsedTime) {
-        return new FetchTaskDto(
+    public static TaskInfo of(Task task, int elapsedTime) {
+        return new TaskInfo(
                 task.getId(),
                 task.getName(),
                 task.getStartDate(),
