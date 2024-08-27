@@ -5,8 +5,12 @@ import org.morib.server.domain.user.infra.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
+import java.time.LocalDate;
+
 public interface TimerRepository extends JpaRepository<Timer, Long> {
+    List<Timer> findByUserAndTargetDate(User user, LocalDate targetDate);
+
 
     List<Timer> findByUser(User user);
+
 }

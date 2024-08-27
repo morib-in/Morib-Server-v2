@@ -1,6 +1,7 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import org.morib.server.domain.task.infra.Task;
@@ -15,5 +16,8 @@ public interface FetchTimerService {
 
     int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
 
+    List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate);
+
     int sumElapsedTimeByUser(User user, LocalDate targetDate);
+
 }

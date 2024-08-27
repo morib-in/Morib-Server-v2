@@ -1,6 +1,8 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FetchTimerServiceImpl implements FetchTimerService{
 
+    private final TimerManager timerManager;
     private final TimerRepository timerRepository;
 
     @Override
@@ -42,5 +45,12 @@ public class FetchTimerServiceImpl implements FetchTimerService{
             .mapToInt(Timer::getElapsedTime)
             .sum();
     }
+
+    @Override
+    public List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate) {
+        return timerRepository.findByUserAndTargetDate(user, targetDate);
+    }
+
+
 
 }

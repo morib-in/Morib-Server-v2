@@ -47,5 +47,17 @@ public class HomeViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    // 오늘 나의 작업시간 조회
+    @GetMapping("/timer")
+    public ResponseEntity<BaseResponse<?>> fetchTotalElapsedTimeTodayByUser(//@AuthenticationPrincipal Long userId,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate
+     ){
+        Long mockUserId = 1L;
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                homeViewFacade.fetchTotalElapsedTimeTodayByUser(mockUserId, targetDate)
+                );
+    }
+
+
 
 }

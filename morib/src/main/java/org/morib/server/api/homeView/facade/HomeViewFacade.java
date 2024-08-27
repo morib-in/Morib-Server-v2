@@ -17,13 +17,17 @@ import org.morib.server.domain.task.application.CreateTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.application.ToggleTaskStatusService;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.TodoManager;
 import org.morib.server.domain.todo.application.CreateTodoService;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.infra.User;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -47,6 +51,7 @@ public class HomeViewFacade {
     private final FetchTodoService fetchTodoService;
     private final CreateTodoService createTodoService;
     private final TodoManager todoManager;
+    private final TimerManager timerManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
@@ -120,5 +125,13 @@ public class HomeViewFacade {
         Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
+    }
+
+    @Transactional
+    public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long mockUserId, LocalDate targetDate) {
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        List<Timer> findTodayTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
+        int sumUserTotalElapsedTime = timerManager.sumUserTotalElapsedTime(findTodayTimer);
+        return FetchMyElapsedTimeResponseDto.of(targetDate, sumUserTotalElapsedTime);
     }
 }
