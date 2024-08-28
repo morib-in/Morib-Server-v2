@@ -9,6 +9,8 @@ import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
@@ -35,9 +37,10 @@ public class ModalViewController {
     @GetMapping("/mset/tasks/{taskId}")
     public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(// @AuthenticationPrincipal Long userId,
         @PathVariable Long taskId){
-        Long mockUserId = 1L;
+//        if(Objects.isNull(userId))
+//            throw new IllegalArgumentException("userId가 없습니다.");
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
-            fetchAllowedSiteByTaskId(mockUserId, taskId));
+            fetchAllowedSiteByTaskId(taskId));
     }
 
 
