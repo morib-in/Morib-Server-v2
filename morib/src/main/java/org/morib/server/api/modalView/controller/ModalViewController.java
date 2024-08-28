@@ -9,8 +9,6 @@ import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")

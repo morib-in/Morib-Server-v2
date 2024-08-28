@@ -1,11 +1,12 @@
 package org.morib.server.api.homeView.facade;
 
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
-import org.morib.server.api.homeView.dto.fetch.*;
+import org.morib.server.api.homeView.dto.fetch.FetchMyElapsedTimeResponseDto;
+import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
+import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
 import org.morib.server.api.homeView.vo.*;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
@@ -14,11 +15,7 @@ import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.CreateTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.application.FetchTimerService;
-import org.morib.server.global.common.DataUtils;
-import org.springframework.stereotype.Service;
 import org.morib.server.domain.timer.TimerManager;
-import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.TodoManager;
@@ -27,15 +24,12 @@ import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.DataUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Facade
@@ -44,8 +38,6 @@ public class HomeViewFacade {
     private final FetchTaskService fetchTaskService;
     private final ClassifyTaskService classifyTaskService;
     private final FetchTimerService fetchTimerService;
-    private final ClassifyTimerService classifyTimerService;
-    private final ToggleTaskStatusService toggleTaskStatusService;
     private final CreateTaskService createTaskService;
     private final FetchUserService fetchUserService;
     private final FetchTodoService fetchTodoService;
@@ -106,12 +98,6 @@ public class HomeViewFacade {
             return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(categoryWithTasks.category()), taskInfos);
         }
         return null;
-    }
-
-    public void fetchUserTimer() {
-        fetchTaskService.fetch();
-        fetchTimerService.fetch();
-//        aggregateTimerService.aggregate();
     }
 
     @Transactional
