@@ -47,6 +47,12 @@ public class ModalViewController {
         return null;
     }
 
+    @GetMapping("/tabName")
+    public ResponseEntity<BaseResponse<?>> fetchTabNameByUrl(@RequestParam("url") String url) {
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchTabNameByUrl(url));
+
+    }
+
 
 
 
