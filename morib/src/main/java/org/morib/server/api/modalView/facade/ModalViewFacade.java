@@ -48,14 +48,14 @@ public class ModalViewFacade {
     @Transactional(readOnly = true)
     public AllowedSiteByCategoryResponseDto fetchAllowedSiteByCategoryId(Long mockUserId,
         Long categoryId) {
-        User user = fetchUserService.fetchByUserId(mockUserId);
-        Category findCategory = fetchCategoryService.fetchByIdAndUser(categoryId, user);
-        List<AllowedSite> allowedSites = fetchAllowedSiteService.fetchByCategoryId(categoryId);
-        CategoryInfoInAllowedSite infoInAllowedSite = CategoryInfoInAllowedSite.of(categoryId,
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        Category findCategory = fetchCategoryService.fetchByIdAndUser(categoryId, findUser);
+        List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByCategoryId(categoryId);
+        CategoryInfoInAllowedSite catgoryInfoInAllowedSite = CategoryInfoInAllowedSite.of(categoryId,
             findCategory);
-        List<AllowSiteForCalledByCatgory> msetList = mappedByAllowSiteForCalledByCategory(allowedSites);
+        List<AllowSiteForCalledByCatgory> msetList = mappedByAllowSiteForCalledByCategory(findAllowedSites);
 
-        return AllowedSiteByCategoryResponseDto.of(infoInAllowedSite, msetList);
+        return AllowedSiteByCategoryResponseDto.of(catgoryInfoInAllowedSite, msetList);
     }
 
     private List<AllowSiteForCalledByCatgory> mappedByAllowSiteForCalledByCategory(
@@ -67,9 +67,9 @@ public class ModalViewFacade {
     @Transactional(readOnly = true)
     public AllowedSiteByTaskResponseDto fetchAllowedSiteByTaskId(Long taskId) {
         Task findTask = fetchTaskService.fetchById(taskId);
-        List<AllowedSite> allowedSites = fetchAllowedSiteService.fetchByTaskId(taskId);
+        List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByTaskId(taskId);
         TaskInfoInAllowedSite taskInfoInAllowedSite = TaskInfoInAllowedSite.of(findTask);
-        List<AllowSiteForCalledByTask> msets = mappedByAllowSiteForCalledByTask(allowedSites);
+        List<AllowSiteForCalledByTask> msets = mappedByAllowSiteForCalledByTask(findAllowedSites);
 
         return AllowedSiteByTaskResponseDto.of(taskInfoInAllowedSite, msets);
     }

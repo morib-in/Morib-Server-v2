@@ -6,9 +6,9 @@ import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
 
 public record AllowedSiteByCategoryResponseDto(
     CategoryInfoInAllowedSite category,
-    List<AllowSiteForCalledByCatgory> mSetList
+    List<AllowSiteForCalledByCatgory> msetList
 ) {
-    public static AllowedSiteByCategoryResponseDto of(CategoryInfoInAllowedSite category, List<AllowSiteForCalledByCatgory> mSetList) {
-        return new AllowedSiteByCategoryResponseDto(category, mSetList);
+    public static AllowedSiteByCategoryResponseDto of(CategoryInfoInAllowedSite category, List<AllowSiteForCalledByCatgory> msetList) {
+        return new AllowedSiteByCategoryResponseDto(category, msetList);
     }
 }

@@ -35,10 +35,7 @@ public class ModalViewController {
     }
 
     @GetMapping("/mset/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(// @AuthenticationPrincipal Long userId,
-        @PathVariable Long taskId){
-//        if(Objects.isNull(userId))
-//            throw new IllegalArgumentException("userId가 없습니다.");
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(@PathVariable Long taskId){
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
             fetchAllowedSiteByTaskId(taskId));
     }
