@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
@@ -31,9 +33,9 @@ public class TaskController {
     }
 
     // 태스크 상태 변경 (체크박스)
-    @PatchMapping("/tasks")
-    public ResponseEntity<?> toggle() {
-        homeViewFacade.toggleTaskStatus();
-        return null;
+    @PatchMapping("/tasks/{taskId}/status")
+    public ResponseEntity<BaseResponse<?>> toggle(@PathVariable Long taskId) {
+        homeViewFacade.toggleTaskStatus(taskId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 }

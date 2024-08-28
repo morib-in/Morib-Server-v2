@@ -19,4 +19,8 @@ public class TaskManager {
                 .orElse(0); // 일치하는 타이머가 없으면 0으로 설정
         return new TaskWithElapsedTime(date, task, elapsedTime);
     }
+
+    public void toggleTaskStatus(Task findTask) {
+        findTask.toggleStatus();
+    }
 }

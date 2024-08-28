@@ -12,6 +12,7 @@ import org.morib.server.api.homeView.vo.TaskWithElapsedTime;
 import org.morib.server.domain.category.application.ClassifyCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.CreateTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
@@ -33,7 +34,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.morib.server.domain.user.infra.User;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -52,6 +53,7 @@ public class HomeViewFacade {
     private final CreateTodoService createTodoService;
     private final TodoManager todoManager;
     private final TimerManager timerManager;
+    private final TaskManager taskManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<CategoriesByDate> categories = classifyCategoryService.classifyByDate(
@@ -114,10 +116,10 @@ public class HomeViewFacade {
             requestDto.startDate(), requestDto.endDate());
     }
 
-
-    public void toggleTaskStatus() {
-        fetchTaskService.fetch();
-        toggleTaskStatusService.toggle();
+    @Transactional
+    public void toggleTaskStatus(Long taskId) {
+        Task findTask = fetchTaskService.fetchById(taskId);
+        taskManager.toggleTaskStatus(findTask);
     }
 
     @Transactional
