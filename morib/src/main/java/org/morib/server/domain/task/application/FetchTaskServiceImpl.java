@@ -50,12 +50,6 @@ public class FetchTaskServiceImpl implements FetchTaskService {
         return convertUnmmodifiableSet(tasks);
     }
 
-    @Override
-    public Task fetchByUserAndTaskId(User findUser, Long taskId) {
-        return taskRepository.findByUserAndTaskId(findUser, taskId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
-    }
-
     private Set<Task> convertUnmmodifiableSet(Set<Task> tasks) {
         return Collections.unmodifiableSet(tasks);
     }

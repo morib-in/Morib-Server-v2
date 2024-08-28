@@ -65,9 +65,8 @@ public class ModalViewFacade {
     }
 
     @Transactional(readOnly = true)
-    public AllowedSiteByTaskResponseDto fetchAllowedSiteByTaskId(Long mockUserId, Long taskId) {
-        User findUser = fetchUserService.fetchByUserId(mockUserId);
-        Task findTask = fetchTaskService.fetchByUserAndTaskId(findUser, taskId);
+    public AllowedSiteByTaskResponseDto fetchAllowedSiteByTaskId(Long taskId) {
+        Task findTask = fetchTaskService.fetchById(taskId);
         List<AllowedSite> allowedSites = fetchAllowedSiteService.fetchByTaskId(taskId);
         TaskInfoInAllowedSite taskInfoInAllowedSite = TaskInfoInAllowedSite.of(findTask);
         List<AllowSiteForCalledByTask> msets = mappedByAllowSiteForCalledByTask(allowedSites);
