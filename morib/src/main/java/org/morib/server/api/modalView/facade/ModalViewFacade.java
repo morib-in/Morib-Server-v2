@@ -53,12 +53,12 @@ public class ModalViewFacade {
         List<AllowedSite> allowedSites = fetchAllowedSiteService.fetchByCategoryId(categoryId);
         CategoryInfoInAllowedSite infoInAllowedSite = CategoryInfoInAllowedSite.of(categoryId,
             findCategory);
-        List<AllowSiteForCalledByCatgory> msetList = mappedByMsetInfosAllowedSite(allowedSites);
+        List<AllowSiteForCalledByCatgory> msetList = mappedByAllowSiteForCalledByCategory(allowedSites);
 
         return AllowedSiteByCategoryResponseDto.of(infoInAllowedSite, msetList);
     }
 
-    private List<AllowSiteForCalledByCatgory> mappedByMsetInfosAllowedSite(
+    private List<AllowSiteForCalledByCatgory> mappedByAllowSiteForCalledByCategory(
         List<AllowedSite> allowedSites) {
         return allowedSites.stream().map(AllowSiteForCalledByCatgory::of)
             .toList();
