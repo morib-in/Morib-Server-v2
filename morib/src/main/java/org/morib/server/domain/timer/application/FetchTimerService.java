@@ -12,12 +12,16 @@ public interface FetchTimerService {
     void fetch();
 
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
-    
 
+    int fetchElapsedTimeOrZeroByTaskAndTargetDate(Task findTask, LocalDate targetDate);
+
+    int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate);
+
+    int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
+    
     int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
 
     List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate);
 
     int sumElapsedTimeByUser(User user, LocalDate targetDate);
-
 }

@@ -21,13 +21,12 @@ public class HomeViewController {
 
     // 홈뷰 전체 조회
     @GetMapping("/home")
-    public ResponseEntity<?> fetchHome( // @AuthenticationPrincipal Long userId,
-                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<BaseResponse<?>> fetchHome( // @AuthenticationPrincipal Long userId,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         // userId 임시 코드
         Long userId = 1L;
-        homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate));
-        return null;
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate)));
     }
 
     // 오늘 나의 작업시간 조회

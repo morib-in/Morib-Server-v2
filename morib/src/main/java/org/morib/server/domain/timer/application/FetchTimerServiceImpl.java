@@ -31,6 +31,15 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
+    public int fetchElapsedTimeOrZeroByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
+        return findTask.getTimers().stream()
+                .filter(timer -> timer.getTargetDate().equals(targetDate))
+                .findFirst()
+                .map(Timer::getElapsedTime)
+                .orElse(0);
+    }
+
+    @Override
     public int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
         return t.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
@@ -50,7 +59,5 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     public List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate) {
         return timerRepository.findByUserAndTargetDate(user, targetDate);
     }
-
-
 
 }
