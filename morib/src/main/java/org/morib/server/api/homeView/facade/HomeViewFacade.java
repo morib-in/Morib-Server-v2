@@ -8,7 +8,6 @@ import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.application.ClassifyTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.global.common.DataUtils;
 import org.springframework.stereotype.Service;
