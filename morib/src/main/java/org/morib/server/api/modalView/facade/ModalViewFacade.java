@@ -78,5 +78,7 @@ public class ModalViewFacade {
         return allowedSites.stream().
                 map(AllowSiteForCalledByTask::of)
                 .toList();
+    public void deleteCategoryById(Long categoryId) {
+        deleteCategoryService.deleteById(categoryId);
     }
 }
