@@ -34,10 +34,7 @@ public class TaskController {
 
     // 태스크 상태 변경 (체크박스)
     @PatchMapping("/tasks/{taskId}/status")
-    public ResponseEntity<BaseResponse<?>> toggle(//@AuthenticationPrincipal Long userId,
-            @PathVariable Long taskId) {
-//        if(Objects.isNull(mockUserId))
-//            throw new IllegalArgumentException("유저 정보가 없습니다.");
+    public ResponseEntity<BaseResponse<?>> toggle(@PathVariable Long taskId) {
         homeViewFacade.toggleTaskStatus(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
