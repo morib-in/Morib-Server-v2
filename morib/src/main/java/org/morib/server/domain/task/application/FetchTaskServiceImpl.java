@@ -29,12 +29,6 @@ public class FetchTaskServiceImpl implements FetchTaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    public void fetch() {
-        //timer가 멈췄을때 계산해주는 역할을 해야함!
-
-    }
-
-    @Override
     public Task fetchById(Long taskId) {
         return taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
     }

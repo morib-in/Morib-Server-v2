@@ -9,8 +9,6 @@ import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.user.infra.User;
 
 public interface FetchTimerService {
-    void fetch();
-
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
 
     int fetchElapsedTimeOrZeroByTaskAndTargetDate(Task findTask, LocalDate targetDate);

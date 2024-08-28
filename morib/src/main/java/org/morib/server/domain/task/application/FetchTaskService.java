@@ -9,7 +9,6 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.todo.infra.Todo;
 
 public interface FetchTaskService {
-    void fetch();
 
     Task fetchById(Long taskId);
 

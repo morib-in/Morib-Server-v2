@@ -6,6 +6,7 @@ import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;
 import org.morib.server.domain.user.infra.User;
@@ -17,11 +18,6 @@ public class FetchTimerServiceImpl implements FetchTimerService{
 
     private final TimerManager timerManager;
     private final TimerRepository timerRepository;
-
-    @Override
-    public void fetch() {
-
-    }
 
     @Override
     public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
