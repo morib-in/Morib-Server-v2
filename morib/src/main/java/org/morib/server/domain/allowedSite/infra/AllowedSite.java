@@ -1,13 +1,15 @@
 package org.morib.server.domain.allowedSite.infra;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.morib.server.domain.allowedSite.infra.type.OwnerType;
 import org.morib.server.global.common.BaseTimeEntity;
 
+@Builder
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AllowedSite extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +24,13 @@ public class AllowedSite extends BaseTimeEntity {
     private OwnerType ownerType;
     @Column(nullable = false)
     private Long ownerId;
+
+    public static AllowedSite create(String siteName, String siteUrl, OwnerType ownerType, Long ownerId) {
+        return AllowedSite.builder()
+                .siteName(siteName)
+                .siteUrl(siteUrl)
+                .ownerType(ownerType)
+                .ownerId(ownerId)
+                .build();
+    }
 }

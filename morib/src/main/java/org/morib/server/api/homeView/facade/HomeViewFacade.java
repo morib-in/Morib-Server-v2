@@ -1,16 +1,32 @@
 package org.morib.server.api.homeView.facade;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.morib.server.annotation.Facade;
+import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
+import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.*;
 import org.morib.server.api.homeView.vo.*;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.application.ClassifyTaskService;
+import org.morib.server.domain.task.application.CreateTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.global.common.DataUtils;
 import org.springframework.stereotype.Service;
+import org.morib.server.domain.timer.TimerManager;
+import org.morib.server.domain.timer.application.ClassifyTimerService;
+import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.todo.TodoManager;
+import org.morib.server.domain.todo.application.CreateTodoService;
+import org.morib.server.domain.todo.application.FetchTodoService;
+import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.infra.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,13 +35,24 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @RequiredArgsConstructor
-@Service
+@Facade
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final FetchTaskService fetchTaskService;
     private final ClassifyTaskService classifyTaskService;
     private final FetchTimerService fetchTimerService;
+    private final ClassifyTimerService classifyTimerService;
+    private final ToggleTaskStatusService toggleTaskStatusService;
+    private final CreateTaskService createTaskService;
+    private final FetchUserService fetchUserService;
+    private final FetchTodoService fetchTodoService;
+    private final CreateTodoService createTodoService;
+    private final TodoManager todoManager;
+    private final TimerManager timerManager;
+    private final TaskManager taskManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
         List<Category> categories = fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate());
@@ -87,16 +114,33 @@ public class HomeViewFacade {
 //        aggregateTimerService.aggregate();
     }
 
-    public void createTask() {
-//        createTaskService.create();
+    @Transactional
+    public void createTask(Long mockUserId, Long categoryId,
+        CreateTaskRequestDto requestDto) {
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        Category findCategory = fetchCategoryService.fetchByUserAndCategoryId(findUser,categoryId);
+        createTaskService.createTaskByCategoryAndBetweenDate(findCategory, requestDto.name(),
+            requestDto.startDate(), requestDto.endDate());
     }
 
-    public void toggleTaskStatus() {
-        fetchTaskService.fetch();
+    @Transactional
+    public void toggleTaskStatus(Long taskId) {
+        Task findTask = fetchTaskService.fetchById(taskId);
+        taskManager.toggleTaskStatus(findTask);
     }
 
-    public void startTimer() {
-//        createTodoService.create();
-//        createTimerService.create();
+    @Transactional
+    public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
+        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
+        Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+        todoManager.updateTask(todo, tasks);
+    }
+
+    @Transactional
+    public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long mockUserId, LocalDate targetDate) {
+        User findUser = fetchUserService.fetchByUserId(mockUserId);
+        List<Timer> findTodayTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
+        int sumUserTotalElapsedTime = timerManager.sumUserTotalElapsedTime(findTodayTimer);
+        return FetchMyElapsedTimeResponseDto.of(targetDate, sumUserTotalElapsedTime);
     }
 }

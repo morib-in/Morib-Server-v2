@@ -14,7 +14,7 @@ public class CategoryController {
     // 사용자의 모든 카테고리 조회
     @GetMapping("/categories")
     public ResponseEntity<?> fetch() {
-        modalViewFacade.fetchCategories();
+
         return null;
     }
 

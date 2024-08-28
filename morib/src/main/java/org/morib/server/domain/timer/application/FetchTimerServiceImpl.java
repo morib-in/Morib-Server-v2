@@ -1,12 +1,14 @@
 package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.infra.TimerRepository;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class FetchTimerServiceImpl implements FetchTimerService{
 
     private final TimerManager timerManager;
+    private final TimerRepository timerRepository;
 
     @Override
     public void fetch() {
@@ -37,20 +40,24 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
-    public int sumTasksElapsedTimeByTargetDate(Set<Task> tasks, LocalDate targetDate) {
-        return tasks.stream()
-                .flatMap(t -> t.getTimers().stream())
+    public int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
+        return t.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
                 .mapToInt(Timer::getElapsedTime)
                 .sum();
     }
 
     @Override
-    public int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate) {
-        return t.getTimers().stream()
-                .filter(timer -> timer.getTargetDate().equals(targetDate))
-                .mapToInt(Timer::getElapsedTime)
-                .sum();
+    public int sumElapsedTimeByUser(User user, LocalDate targetDate) {
+        return timerRepository.findByUser(user).stream()
+            .filter(timer -> timer.getTargetDate().equals(targetDate))
+            .mapToInt(Timer::getElapsedTime)
+            .sum();
+    }
+
+    @Override
+    public List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate) {
+        return timerRepository.findByUserAndTargetDate(user, targetDate);
     }
 
 }

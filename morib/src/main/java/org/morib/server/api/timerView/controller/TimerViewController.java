@@ -33,9 +33,10 @@ public class TimerViewController {
     @GetMapping("/timer/todo-card")
     public ResponseEntity<TodoCardResponseDto> getTodoCards(// @AuthenticationPrincipal Long userId,
                                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+        Long mockUserId = 1L;
         if(!targetDate.equals(LocalDate.now()))
             throw new IllegalArgumentException("오늘 당일의 날짜만 확인할 수 있습니다!");
-        return ResponseEntity.ok(timerViewFacade.fetchTodoCard(targetDate));
+        return ResponseEntity.ok(timerViewFacade.fetchTodoCard(mockUserId, targetDate));
     }
 
 
