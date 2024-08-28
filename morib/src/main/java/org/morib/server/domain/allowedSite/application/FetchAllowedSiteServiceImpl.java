@@ -18,4 +18,9 @@ public class FetchAllowedSiteServiceImpl implements FetchAllowedSiteService{
     public List<AllowedSite> fetchByCategoryId(Long categoryId) {
         return allowedSiteRepository.findByOwnerIdAndOwnerType(categoryId, OwnerType.CATEGORY);
     }
+
+    @Override
+    public List<AllowedSite> fetchByTaskId(Long taskId) {
+        return allowedSiteRepository.findByOwnerIdAndOwnerType(taskId, OwnerType.TASK);
+    }
 }
