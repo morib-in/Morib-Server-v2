@@ -9,6 +9,8 @@ import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
@@ -32,9 +34,22 @@ public class ModalViewController {
             fetchAllowedSiteByCategoryId(mockUserId, categoryId));
     }
 
+    @GetMapping("/mset/tasks/{taskId}")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(@PathVariable Long taskId){
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
+            fetchAllowedSiteByTaskId(taskId));
+    }
+
+
+
+
     // 카테고리 삭제
     @DeleteMapping("/categories")
     public ResponseEntity<?> delete() {
         return null;
     }
+
+
+
+
 }

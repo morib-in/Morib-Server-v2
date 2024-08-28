@@ -11,6 +11,7 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.stereotype.Service;
 
 @Service
