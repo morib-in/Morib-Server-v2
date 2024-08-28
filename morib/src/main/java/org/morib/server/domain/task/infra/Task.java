@@ -50,4 +50,7 @@ public class Task extends BaseTimeEntity {
                 .build();
     }
 
+    public void toggleStatus() {
+        this.isComplete = !this.isComplete;
+    }
 }
