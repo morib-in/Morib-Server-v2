@@ -28,14 +28,7 @@ public class HomeViewController {
         Long userId = 1L;
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate)));
     }
-
-    // 오늘 나의 작업시간 조회
-    @GetMapping("/today")
-    public ResponseEntity<?> fetchTotalTimeOfToday() {
-        homeViewFacade.fetchUserTimer();
-        return null;
-    }
-
+    
     // 할일 추가 후 타이머 시작
     @PostMapping("/timer/start")
     public ResponseEntity<BaseResponse<?>> startTimer(//@AuthenticationPrincipal Long userId,
