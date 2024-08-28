@@ -11,6 +11,7 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,6 +48,12 @@ public class FetchTaskServiceImpl implements FetchTaskService {
             tasks.add(findTask);
         }
         return convertUnmmodifiableSet(tasks);
+    }
+
+    @Override
+    public Task fetchByUserAndTaskId(User findUser, Long taskId) {
+        return taskRepository.findByUserAndTaskId(findUser, taskId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
     }
 
     private Set<Task> convertUnmmodifiableSet(Set<Task> tasks) {

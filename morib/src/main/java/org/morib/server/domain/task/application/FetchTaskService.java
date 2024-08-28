@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.domain.user.infra.User;
 
 public interface FetchTaskService {
     void fetch();
@@ -16,4 +17,5 @@ public interface FetchTaskService {
 
     Set<Task> fetchByTaskIds(List<Long> id);
 
+    Task fetchByUserAndTaskId(User findUser, Long taskId);
 }
