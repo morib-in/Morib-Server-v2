@@ -32,9 +32,24 @@ public class ModalViewController {
             fetchAllowedSiteByCategoryId(mockUserId, categoryId));
     }
 
+    @GetMapping("/mset/tasks/{taskId}")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(// @AuthenticationPrincipal Long userId,
+        @PathVariable Long taskId){
+        Long mockUserId = 1L;
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
+            fetchAllowedSiteByTaskId(mockUserId, taskId));
+    }
+
+
+
+
     // 카테고리 삭제
     @DeleteMapping("/categories")
     public ResponseEntity<?> delete() {
         return null;
     }
+
+
+
+
 }
