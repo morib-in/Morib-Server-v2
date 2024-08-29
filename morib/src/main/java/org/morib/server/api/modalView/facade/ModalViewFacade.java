@@ -12,6 +12,7 @@ import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
 import org.morib.server.api.modalView.vo.TaskInfoInAllowedSite;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
+import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.allowedSite.infra.type.OwnerType;
 import org.morib.server.domain.category.application.CreateCategoryService;
@@ -22,18 +23,30 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.springframework.transaction.annotation.Transactional;
+import org.morib.server.api.homeView.vo.CategoryInfo;
+import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
+import org.morib.server.domain.category.application.DeleteCategoryService;
+import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.infra.User;
+import org.springframework.stereotype.Service;
 
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Facade
 public class ModalViewFacade {
-
+    private final FetchUserService fetchUserService;
+    private final FetchCategoryService fetchCategoryService;
+    private final DeleteCategoryService deleteCategoryService;
     private final FetchUserService fetchUserService;
     private final CreateCategoryService createCategoryService;
     private final FetchCategoryService fetchCategoryService;
     private final CreateAllowedSiteService createAllowedSiteService;
     private final FetchAllowedSiteService fetchAllowedSiteService;
     private final FetchTaskService fetchTaskService;
+    private final FetchTabNameService fetchTabNameService;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -87,5 +100,9 @@ public class ModalViewFacade {
         return fetchCategoryService.fetchByUser(user).stream()
                 .map(CategoryInfo::of)
                 .toList();
+    }
+
+    public TabNameByUrlResponse fetchTabNameByUrl(String url) {
+        return TabNameByUrlResponse.of(fetchTabNameService.fetch(url));
     }
 }
