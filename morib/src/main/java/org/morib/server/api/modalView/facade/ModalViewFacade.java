@@ -49,7 +49,7 @@ public class ModalViewFacade {
     public AllowedSiteByCategoryResponseDto fetchAllowedSiteByCategoryId(Long mockUserId,
         Long categoryId) {
         User findUser = fetchUserService.fetchByUserId(mockUserId);
-        Category findCategory = fetchCategoryService.fetchByIdAndUser(categoryId, findUser);
+        Category findCategory = fetchCategoryService.fetchByUserAndCategoryId(findUser, categoryId);
         List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByCategoryId(categoryId);
         CategoryInfoInAllowedSite catgoryInfoInAllowedSite = CategoryInfoInAllowedSite.of(categoryId,
             findCategory);
