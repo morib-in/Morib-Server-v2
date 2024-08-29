@@ -7,6 +7,6 @@ import org.morib.server.domain.task.infra.Task;
 
 public interface CreateTaskService {
 
-    Task createTaskByCategoryAndBetweenDate(Category category, String name, LocalDate startDate, LocalDate endDate);
+    void createTaskByCategoryAndBetweenDate(Category category, String name, LocalDate startDate, LocalDate endDate);
 
 }
