@@ -42,9 +42,10 @@ public class ModalViewController {
 
 
     // 카테고리 삭제
-    @DeleteMapping("/categories")
-    public ResponseEntity<?> delete() {
-        return null;
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<BaseResponse<?>> delete(@PathVariable("categoryId") Long categoryId) {
+        modalViewFacade.deleteCategoryById(categoryId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 
