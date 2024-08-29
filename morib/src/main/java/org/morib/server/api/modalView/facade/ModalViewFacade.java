@@ -78,5 +78,10 @@ public class ModalViewFacade {
         return allowedSites.stream().
                 map(AllowSiteForCalledByTask::of)
                 .toList();
+    public List<CategoryInfo> fetchCategories(Long userId) {
+        User user = fetchUserService.fetchByUserId(userId);
+        return fetchCategoryService.fetchByUser(user).stream()
+                .map(CategoryInfo::of)
+                .toList();
     }
 }

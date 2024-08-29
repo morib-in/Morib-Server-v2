@@ -2,6 +2,9 @@ package org.morib.server.api.modalView.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
+import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.BaseResponse;
+import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,12 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
     private final ModalViewFacade modalViewFacade;
 
-    // 사용자의 모든 카테고리 조회
     @GetMapping("/categories")
-    public ResponseEntity<?> fetch() {
-
-        return null;
+    public ResponseEntity<BaseResponse<?>> fetchCategoriesByUser(//@AuthenticationPrincipal Long userId
+    ) {
+        Long userId = 1L;
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchCategories(userId));
     }
-
-
 }
