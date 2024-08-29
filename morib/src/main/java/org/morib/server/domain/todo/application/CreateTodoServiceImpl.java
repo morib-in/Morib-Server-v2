@@ -14,8 +14,7 @@ public class CreateTodoServiceImpl implements CreateTodoService {
     private final TodoRepository todoRepository;
 
     @Override
-    public Todo saveTodoByTargetDateAndUser(LocalDate targetDate, User user) {
+    public Todo saveTodoByUserAndTargetDate(User user, LocalDate targetDate) {
         return todoRepository.save(Todo.createByTargetDateAndUser(targetDate,user));
     }
-
 }
