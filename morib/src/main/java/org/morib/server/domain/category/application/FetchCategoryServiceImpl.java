@@ -12,17 +12,21 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
 public class FetchCategoryServiceImpl implements FetchCategoryService{
     private final CategoryRepository categoryRepository;
-    private final CategoryManager categoryManager;
-
 
     @Override
     public List<Category> fetchByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate) {
         return categoryRepository.findByUserIdInRange(userId, startDate, endDate);
+    }
+
+    @Override
+    public Set<Category> fetchByUser(User user) {
+        return user.getCategories();
     }
 
     @Override
