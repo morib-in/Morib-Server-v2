@@ -34,11 +34,7 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
         return CategoryWithTasks.of(category, taskWithTimers);
     }
 
-    public Category fetchByIdAndUser(Long categoryId, User user) {
-        return categoryRepository.findByIdAndUser(categoryId, user).orElseThrow(() ->
-                new IllegalArgumentException("해당 카테고리가 존재하지 않습니다."));
-    }
-
+    @Override
     public Category fetchByUserAndCategoryId(User findUser, Long categoryId) {
         return categoryRepository.findByUserAndId(findUser, categoryId).
             orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));

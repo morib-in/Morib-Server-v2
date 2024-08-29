@@ -117,7 +117,15 @@ public class HomeViewFacade {
 
     @Transactional
     public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
-        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
+        Optional<Todo> optionalTodo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
+        optionalTodo.ifPresentOrElse(todo -> updateTaskInTodo(startTimerRequestDto, todo), () -> {
+            User findUser = fetchUserService.fetchByUserId(mockUserId);
+            Todo newTodo = createTodoService.saveTodoByUserAndTargetDate(findUser, targetDate);
+            updateTaskInTodo(startTimerRequestDto, newTodo);
+        });
+    }
+
+    private void updateTaskInTodo(StartTimerRequestDto startTimerRequestDto, Todo todo) {
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
     }
