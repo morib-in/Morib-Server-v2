@@ -13,6 +13,7 @@ public enum ErrorMessage {
      */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "잘못된 형식입니다"),
+    INVALID_URL(HttpStatus.BAD_REQUEST, "요청된 url이 유효하지 않습니다."),
 
     /**
      * 401 Unauthorized
