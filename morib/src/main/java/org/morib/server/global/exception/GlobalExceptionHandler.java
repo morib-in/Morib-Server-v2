@@ -43,6 +43,12 @@ public class GlobalExceptionHandler {
         return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidURLException.class)
+    protected ResponseEntity<BaseResponse<?>> handleInvalidURLException(final InvalidURLException e) {
+        log.error(">>> handle: InvalidURLException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
+
 
 }
 

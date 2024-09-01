@@ -3,6 +3,8 @@ package org.morib.server.domain.category.application;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +15,7 @@ public class DeleteCategoryServiceImpl implements DeleteCategoryService {
     @Override
     public void deleteById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new IllegalArgumentException("삭제하려는 카테고리가 존재하지 않습니다."));
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND));
         categoryRepository.delete(category);
     }
 }
