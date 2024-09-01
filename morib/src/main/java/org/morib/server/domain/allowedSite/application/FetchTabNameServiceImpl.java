@@ -20,5 +20,8 @@ public class FetchTabNameServiceImpl implements FetchTabNameService {
         catch (IOException e) {
             throw new InvalidURLException(ErrorMessage.INVALID_URL);
         }
+        catch (Exception e) {
+            throw new IllegalStateException("요청에 오류가 발생했습니다.");
+        }
     }
 }
