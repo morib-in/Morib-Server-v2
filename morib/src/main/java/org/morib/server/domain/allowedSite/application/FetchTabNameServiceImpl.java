@@ -2,6 +2,8 @@ package org.morib.server.domain.allowedSite.application;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.morib.server.global.exception.InvalidURLException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,7 +18,10 @@ public class FetchTabNameServiceImpl implements FetchTabNameService {
             return doc.title();
         }
         catch (IOException e) {
-            throw new IllegalArgumentException("유효하지 않은 url입니다.");
+            throw new InvalidURLException(ErrorMessage.INVALID_URL);
+        }
+        catch (Exception e) {
+            throw new IllegalStateException("요청에 오류가 발생했습니다.");
         }
     }
 }
