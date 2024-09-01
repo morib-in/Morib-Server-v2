@@ -8,7 +8,7 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.exception.BusinessException;
+import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
         return findTask.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
-                .findFirst().orElseThrow(() -> new BusinessException(ErrorMessage.NOT_FOUND));
+                .findFirst().orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Override

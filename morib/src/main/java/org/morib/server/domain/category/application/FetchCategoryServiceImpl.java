@@ -8,6 +8,7 @@ import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.exception.BusinessException;
+import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,6 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
     @Override
     public Category fetchByUserAndCategoryId(User findUser, Long categoryId) {
         return categoryRepository.findByUserAndId(findUser, categoryId).
-            orElseThrow(() -> new BusinessException(ErrorMessage.NOT_FOUND));
+            orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 }

@@ -43,7 +43,7 @@ public class FetchTaskServiceImpl implements FetchTaskService {
         Set<Task> tasks = new LinkedHashSet<>();
         for (Long taskId : taskIds) {
             Task findTask = taskRepository.findById(taskId)
-                .orElseThrow(() -> new BusinessException(ErrorMessage.NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             tasks.add(findTask);
         }
         return convertUnmmodifiableSet(tasks);
