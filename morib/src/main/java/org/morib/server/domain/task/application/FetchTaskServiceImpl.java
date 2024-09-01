@@ -13,6 +13,9 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;
+import org.morib.server.global.exception.BusinessException;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +26,8 @@ public class FetchTaskServiceImpl implements FetchTaskService {
 
     @Override
     public Task fetchById(Long taskId) {
-        return taskRepository.findById(taskId).orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
+        return taskRepository.findById(taskId).orElseThrow(() ->
+            new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Override
@@ -39,7 +43,7 @@ public class FetchTaskServiceImpl implements FetchTaskService {
         Set<Task> tasks = new LinkedHashSet<>();
         for (Long taskId : taskIds) {
             Task findTask = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 task가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorMessage.NOT_FOUND));
             tasks.add(findTask);
         }
         return convertUnmmodifiableSet(tasks);
