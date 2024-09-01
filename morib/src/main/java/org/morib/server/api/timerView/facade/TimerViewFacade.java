@@ -3,7 +3,6 @@ package org.morib.server.api.timerView.facade;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.timerView.dto.StopTimerRequestDto;
@@ -17,9 +16,6 @@ import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
-import org.morib.server.global.exception.BusinessException;
-import org.morib.server.global.exception.NotFoundException;
-import org.morib.server.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -55,7 +51,7 @@ public class TimerViewFacade {
      */
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long mockUserId, LocalDate targetDate) {
-        Todo todo = fetchTodoService.fetchByUserIdAndTargetDateNotNull(mockUserId, targetDate);
+        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
 
         LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo, targetDate);
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(mockUserId), targetDate);

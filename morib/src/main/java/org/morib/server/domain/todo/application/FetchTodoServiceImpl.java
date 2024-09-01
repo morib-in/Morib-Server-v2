@@ -17,12 +17,12 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     private final TodoRepository todoRepository;
 
     @Override
-    public Optional<Todo> fetchByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
+    public Optional<Todo> fetchOrNullByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
         return todoRepository.findTodoByUserIdAndTargetDate(userId, targetDate);
     }
 
     @Override
-    public Todo fetchByUserIdAndTargetDateNotNull(Long mockUserId, LocalDate targetDate) {
+    public Todo fetchByUserIdAndTargetDate(Long mockUserId, LocalDate targetDate) {
         return todoRepository.findTodoByUserIdAndTargetDate(mockUserId, targetDate)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
