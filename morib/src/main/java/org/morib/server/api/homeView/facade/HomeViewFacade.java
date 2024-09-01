@@ -36,11 +36,11 @@ import java.util.stream.Collectors;
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final FetchTaskService fetchTaskService;
-    private final ClassifyTaskService classifyTaskService;
     private final FetchTimerService fetchTimerService;
-    private final CreateTaskService createTaskService;
     private final FetchUserService fetchUserService;
     private final FetchTodoService fetchTodoService;
+    private final ClassifyTaskService classifyTaskService;
+    private final CreateTaskService createTaskService;
     private final CreateTodoService createTodoService;
     private final TodoManager todoManager;
     private final TimerManager timerManager;

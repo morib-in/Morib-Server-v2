@@ -18,7 +18,7 @@ public class Relationship extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "friend_id")
     private User friend;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
