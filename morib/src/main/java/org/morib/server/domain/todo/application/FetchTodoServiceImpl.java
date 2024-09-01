@@ -6,6 +6,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.todo.infra.TodoRepository;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +19,12 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     @Override
     public Optional<Todo> fetchByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
         return todoRepository.findTodoByUserIdAndTargetDate(userId, targetDate);
+    }
+
+    @Override
+    public Todo fetchByUserIdAndTargetDateNotNull(Long mockUserId, LocalDate targetDate) {
+        return todoRepository.findTodoByUserIdAndTargetDate(mockUserId, targetDate)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
 }
