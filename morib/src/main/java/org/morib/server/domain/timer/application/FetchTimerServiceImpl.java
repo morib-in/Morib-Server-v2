@@ -2,28 +2,27 @@ package org.morib.server.domain.timer.application;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.exception.BusinessException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class FetchTimerServiceImpl implements FetchTimerService{
 
-    private final TimerManager timerManager;
     private final TimerRepository timerRepository;
 
     @Override
     public Timer fetchByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
         return findTask.getTimers().stream()
                 .filter(timer -> timer.getTargetDate().equals(targetDate))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("해당 timer가 없습니다."));
+                .findFirst().orElseThrow(() -> new BusinessException(ErrorMessage.NOT_FOUND));
     }
 
     @Override
