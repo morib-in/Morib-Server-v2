@@ -7,6 +7,8 @@ import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,6 +39,6 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
     @Override
     public Category fetchByUserAndCategoryId(User findUser, Long categoryId) {
         return categoryRepository.findByUserAndId(findUser, categoryId).
-            orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 없습니다."));
+            orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 }
