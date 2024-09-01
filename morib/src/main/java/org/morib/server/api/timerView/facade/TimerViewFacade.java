@@ -52,6 +52,7 @@ public class TimerViewFacade {
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long mockUserId, LocalDate targetDate) {
         Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
+
         LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo, targetDate);
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(mockUserId), targetDate);
 

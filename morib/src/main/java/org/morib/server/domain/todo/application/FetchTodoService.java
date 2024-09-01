@@ -6,5 +6,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface FetchTodoService {
-    Optional<Todo> fetchByUserIdAndTargetDate(Long mockUserId, LocalDate targetDate);
+    Optional<Todo> fetchOrNullByUserIdAndTargetDate(Long mockUserId, LocalDate targetDate);
+    Todo fetchByUserIdAndTargetDate(Long mockUserId, LocalDate targetDate);
 }
