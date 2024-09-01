@@ -1,15 +1,14 @@
 package org.morib.server.api.modalView.facade;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.homeView.vo.CategoryInfo;
 import org.morib.server.api.modalView.dto.AllowedSiteByCategoryResponseDto;
 import org.morib.server.api.modalView.dto.AllowedSiteByTaskResponseDto;
 import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
-import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
-import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
 import org.morib.server.api.modalView.vo.AllowSiteForCalledByTask;
 import org.morib.server.api.modalView.vo.CategoryInfoInAllowedSite;
+import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
 import org.morib.server.api.modalView.vo.TaskInfoInAllowedSite;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
@@ -17,7 +16,6 @@ import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.allowedSite.infra.type.OwnerType;
 import org.morib.server.domain.category.application.CreateCategoryService;
-import org.morib.server.domain.category.application.DeleteCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.application.FetchTaskService;
@@ -25,20 +23,22 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.springframework.transaction.annotation.Transactional;
+import org.morib.server.api.homeView.vo.CategoryInfo;
+import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
+import org.morib.server.domain.category.application.DeleteCategoryService;
 
-import java.util.List;
 
 @RequiredArgsConstructor
 @Facade
 public class ModalViewFacade {
     private final FetchUserService fetchUserService;
     private final FetchCategoryService fetchCategoryService;
+    private final DeleteCategoryService deleteCategoryService;
+    private final CreateCategoryService createCategoryService;
+    private final CreateAllowedSiteService createAllowedSiteService;
     private final FetchAllowedSiteService fetchAllowedSiteService;
     private final FetchTaskService fetchTaskService;
     private final FetchTabNameService fetchTabNameService;
-    private final CreateCategoryService createCategoryService;
-    private final CreateAllowedSiteService createAllowedSiteService;
-    private final DeleteCategoryService deleteCategoryService;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -81,14 +81,12 @@ public class ModalViewFacade {
 
     private List<AllowSiteForCalledByTask> mappedByAllowSiteForCalledByTask(List<AllowedSite> allowedSites) {
         return allowedSites.stream().
-                map(AllowSiteForCalledByTask::of)
-                .toList();
+            map(AllowSiteForCalledByTask::of)
+            .toList();
     }
-
     public void deleteCategoryById(Long categoryId){
             deleteCategoryService.deleteById(categoryId);
-    }
-
+        }
     public List<CategoryInfo> fetchCategories(Long userId) {
         User user = fetchUserService.fetchByUserId(userId);
         return fetchCategoryService.fetchByUser(user).stream()
