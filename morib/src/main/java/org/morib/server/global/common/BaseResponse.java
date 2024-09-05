@@ -14,7 +14,6 @@ import org.morib.server.global.message.SuccessMessage;
 @Getter
 public class BaseResponse<T> {
     private final int status;
-    private final String code;
     private final String message;
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private final T data;
