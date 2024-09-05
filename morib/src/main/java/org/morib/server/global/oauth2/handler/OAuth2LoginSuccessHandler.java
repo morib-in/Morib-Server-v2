@@ -13,7 +13,9 @@ import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.TokenResponseDto;
+import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.jwt.JwtService;
+import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
@@ -42,10 +44,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 response.addHeader(jwtService.getAccessHeader(), "Bearer " + accessToken);
                 jwtService.sendAccessAndRefreshToken(response, accessToken, null);
                 User findUser = userRepository.findById(oAuth2User.getUserId())
-                        .orElseThrow(() -> new IllegalArgumentException("이메일에 해당하는 유저가 없습니다."));
+                        .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                 findUser.authorizeUser();
             } else {
-                loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
+                loginSuccess(response, oAuth2User); 
             }
         } catch (Exception e) {
             throw e;
@@ -53,7 +55,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     }
 
-    // TODO : 소셜 로그인 시에도 무조건 토큰 생성하지 말고 JWT 인증 필터처럼 RefreshToken 유/무에 따라 다르게 처리해보기
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
@@ -61,5 +62,4 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(objectMapper.writeValueAsString(ApiResponseUtil.success(SuccessMessage.SUCCESS, TokenResponseDto.of(accessToken, refreshToken, oAuth2User.getUserId())).getBody()));
     }
-
 }
