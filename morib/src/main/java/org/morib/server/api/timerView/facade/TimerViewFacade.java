@@ -16,6 +16,7 @@ import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.infra.User;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -30,9 +31,8 @@ public class TimerViewFacade {
     private final TimerManager timerManager;
 
     @Transactional
-    public void stopAfterSumElapsedTime(Long taskId, StopTimerRequestDto dto) {
-    //  Long mockUserId = 1L;
-    //  User user = fetchUserService.fetchByUserId(mockUserId);   이후에 user 관련해서 여쭤보고 진행!
+    public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
+        User user = fetchUserService.fetchByUserId(userId);
         Task findTask = fetchTaskService.fetchById(taskId);
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
         timerManager.addElapsedTime(timer, dto.elapsedTime());
@@ -50,12 +50,10 @@ public class TimerViewFacade {
      * @return
      */
     @Transactional
-    public TodoCardResponseDto fetchTodoCard(Long mockUserId, LocalDate targetDate) {
-        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(mockUserId, targetDate);
-
+    public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
+        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(userId, targetDate);
         LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo, targetDate);
-        int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(mockUserId), targetDate);
-
+        int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate);
         List<TaskInTodoCardDto> taskInTodoCardDtos = tasks.stream()
             .map(t -> getTaskInTodoCardDto(targetDate, t))
             .toList();
