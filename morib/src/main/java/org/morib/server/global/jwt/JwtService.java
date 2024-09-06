@@ -106,12 +106,7 @@ public class JwtService {
 
     public Optional<String> extractId(String accessToken) {
         try {
-            Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(accessToken)
-                    .getBody();
+            Claims claims = extractClaimsFromToken(accessToken);
             return Optional.ofNullable(claims.get(ID_CLAIM, String.class));
 
         } catch (Exception e) {
@@ -138,15 +133,19 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+            extractClaimsFromToken(token);
             return true;
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
+    }
+
+    private Claims extractClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
     }
 
     private SecretKey getSigningKey() {
