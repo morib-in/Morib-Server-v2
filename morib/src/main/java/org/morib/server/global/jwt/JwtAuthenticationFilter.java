@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -56,13 +57,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.info("checkAccessTokenAndAuthentication() 호출");
-        jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken ->
-                        jwtService.extractId(accessToken)
-                                .ifPresent(id -> userRepository.findById(Long.valueOf(id))
-                                        .ifPresent(this::saveAuthentication)));
+        Optional<String> accessToken = jwtService.extractAccessToken(request);
+        if (accessToken.isPresent() && jwtService.isTokenValid(accessToken.get())) {
+            handleAccessToken(accessToken.get());
+        }
         filterChain.doFilter(request, response);
+    }
+
+    private void handleAccessToken(String accessToken) {
+        jwtService.extractId(accessToken)
+                .flatMap(id -> userRepository.findById(Long.valueOf(id)))
+                .ifPresent(this::saveAuthentication);
     }
 
     public void saveAuthentication(User myUser) {
