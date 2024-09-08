@@ -5,8 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.timerView.dto.StopTimerRequestDto;
 import org.morib.server.api.timerView.dto.TodoCardResponseDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
+import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.BaseResponse;
+import org.morib.server.global.message.SuccessMessage;
+import org.morib.server.global.userauth.CustomUserDetails;
+import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,24 +25,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v2")
 @RequiredArgsConstructor
 public class TimerViewController {
-
     private final TimerViewFacade timerViewFacade;
+    private final PrincipalHandler principalHandler;
 
     @PostMapping("/timer/stop/{taskId}")
-    public ResponseEntity<String> stopTimerAndFetchAccumulatedTime( // @AuthenticationPrincipal Long userId,
-         @PathVariable Long taskId, @RequestBody StopTimerRequestDto dto){
-        timerViewFacade.stopAfterSumElapsedTime(taskId, dto);
-        return ResponseEntity.status(200).body("요청이 성공했습니다!");
+    public ResponseEntity<BaseResponse<?>> stopTimerAndFetchAccumulatedTime(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                            @PathVariable Long taskId,
+                                                                            @RequestBody StopTimerRequestDto dto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        timerViewFacade.stopAfterSumElapsedTime(userId, taskId, dto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 
     @GetMapping("/timer/todo-card")
-    public ResponseEntity<TodoCardResponseDto> getTodoCards(// @AuthenticationPrincipal Long userId,
-                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
-        Long mockUserId = 1L;
+    public ResponseEntity<BaseResponse<?>> getTodoCards(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         if(!targetDate.equals(LocalDate.now()))
             throw new IllegalArgumentException("오늘 당일의 날짜만 확인할 수 있습니다!");
-        return ResponseEntity.ok(timerViewFacade.fetchTodoCard(mockUserId, targetDate));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.fetchTodoCard(userId, targetDate));
     }
 
 

@@ -6,42 +6,41 @@ import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
+import org.morib.server.global.userauth.CustomUserDetails;
+import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
 public class ModalViewController {
-
     private final ModalViewFacade modalViewFacade;
+    private final PrincipalHandler principalHandler;
 
     @PostMapping("/categories")
-    public ResponseEntity<BaseResponse<?>> create(// @AuthenticationPrincipal Long userId,
-                                                @RequestBody CreateCategoryRequestDto createCategoryRequestDto) {
-        Long userId = 1L;
+    public ResponseEntity<BaseResponse<?>> create(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                  @RequestBody CreateCategoryRequestDto createCategoryRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         modalViewFacade.createCategory(userId, createCategoryRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @GetMapping("/mset/categories/{categoryId}")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByCategory(// @AuthenticationPrincipal Long userId,
-        @PathVariable Long categoryId){
-        Long mockUserId = 1L;
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByCategory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                      @PathVariable Long categoryId) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
-            fetchAllowedSiteByCategoryId(mockUserId, categoryId));
+            fetchAllowedSiteByCategoryId(userId, categoryId));
     }
 
     @GetMapping("/mset/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(@PathVariable Long taskId){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
-            fetchAllowedSiteByTaskId(taskId));
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(@PathVariable Long taskId) {
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
+                modalViewFacade.fetchAllowedSiteByTaskId(taskId));
     }
 
-
-
-
-    // 카테고리 삭제
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<BaseResponse<?>> delete(@PathVariable("categoryId") Long categoryId) {
         modalViewFacade.deleteCategoryById(categoryId);
@@ -51,10 +50,5 @@ public class ModalViewController {
     @GetMapping("/tabName")
     public ResponseEntity<BaseResponse<?>> fetchTabNameByUrl(@RequestParam("url") String url) {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchTabNameByUrl(url));
-
     }
-
-
-
-
 }
