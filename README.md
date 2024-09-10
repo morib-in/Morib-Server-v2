@@ -27,8 +27,23 @@ _당신의 온전한 몰입을 도와줄 작업 공간, **Morib**_
 <br>
 
 ## 🗂️ Foldering
-
-
+```
+┗ 📂main/java/org/morib/server
+┃ ┣ 📂annotation
+┃ ┣ 📂api
+┃ ┃ ┣ 📂homeView
+┃ ┃ ┣ 📂modalView
+┃ ┃ ┗ 📂timerView
+┃ ┣ 📂domain
+┃ ┃ ┣ 📂allowedSite
+┃ ┃ ┣ 📂category
+┃ ┃ ┣ 📂relationship
+┃ ┃ ┣ 📂task
+┃ ┃ ┣ 📂timer
+┃ ┃ ┣ 📂todo
+┃ ┃ ┗ 📂user
+┃ ┣ 📂global
+```
 <br>
 
 ## 📉 Architecture
