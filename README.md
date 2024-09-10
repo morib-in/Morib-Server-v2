@@ -18,10 +18,13 @@ _당신의 온전한 몰입을 도와줄 작업 공간, **Morib**_
 
 ## 🧑🏻‍💻 Contributors
 
-|<img src="https://github.com/HanIpBoy/Documents/blob/master/%EC%9D%B4%EB%AA%A8%EC%A7%80/%EC%9C%A0%EC%98%81%EC%9E%AC%20%EC%9D%B4%EB%AA%A8%EC%A7%80.png" width=200>||
+
+
+
+|<img src="https://github.com/HanIpBoy/Documents/blob/master/%EC%9D%B4%EB%AA%A8%EC%A7%80/%EC%9C%A0%EC%98%81%EC%9E%AC%20%EC%9D%B4%EB%AA%A8%EC%A7%80.png" width=200>|<img src="https://github.com/user-attachments/assets/f862afb7-9f46-4c0e-9488-b67a262f572d" width=200>|
 |:--:|:--:|
 |**영재**|**효준**|
-|[@geniusYoo](https://github.com/geniusYoo)||
+|[@geniusYoo](https://github.com/geniusYoo)|[@khyojun](https://github.com/khyojun)|
 |Backend|Backend| 
 
 <br>
