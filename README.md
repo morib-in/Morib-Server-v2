@@ -47,8 +47,9 @@ _당신의 온전한 몰입을 도와줄 작업 공간, **Morib**_
 <br>
 
 ## 📉 Architecture
+1차 아키텍처
 
-
+![architect](https://github.com/user-attachments/assets/56334adf-d315-49b2-88e1-4f6c26623cdd)
 
 
 
