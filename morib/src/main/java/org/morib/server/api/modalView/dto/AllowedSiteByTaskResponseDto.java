@@ -7,7 +7,7 @@ import java.util.List;
 
 public record AllowedSiteByTaskResponseDto(
     TaskInfoInAllowedSite task,
-    List<AllowSiteForCalledByTask> mSets
+    List<AllowSiteForCalledByTask> msets
 ) {
     public static AllowedSiteByTaskResponseDto of(TaskInfoInAllowedSite taskInfoInAllowedSite, List<AllowSiteForCalledByTask> msets) {
         return new AllowedSiteByTaskResponseDto(taskInfoInAllowedSite, msets);

@@ -13,7 +13,7 @@ public record TaskInTodoCardDto(
     int targetTime
 ) {
 
-    public static TaskInTodoCardDto of(Task task, LocalDate targetDate, int targetTime){
-        return new TaskInTodoCardDto(task.getName(), task.getStartDate(), task.getEndDate(), task.getIsComplete(), targetDate, targetTime);
+    public static TaskInTodoCardDto of(Task task, LocalDate targetDate, int elapsedTime){
+        return new TaskInTodoCardDto(task.getName(), task.getStartDate(), task.getEndDate(), task.getIsComplete(), targetDate, elapsedTime);
     }
 }
