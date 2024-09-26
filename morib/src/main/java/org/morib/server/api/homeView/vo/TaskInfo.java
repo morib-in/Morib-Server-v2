@@ -9,7 +9,7 @@ public record TaskInfo(
         String name,
         LocalDate startDate,
         LocalDate endDate,
-        int targetTime,
+        int elapsedTime,
         boolean isComplete
 ) {
     public static TaskInfo of(Task task, int elapsedTime) {
