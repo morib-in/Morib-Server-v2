@@ -47,28 +47,39 @@ public class HomeViewFacade {
     private final TaskManager taskManager;
 
     public List<HomeViewResponseDto> fetchHome(HomeViewRequestDto request) {
-        List<Category> categories = fetchCategoryService.fetchByUserIdInRange(request.userId(), request.startDate(), request.endDate());
+        // 1. 사용자의 모든 카테고리 가져오기
+        User findUser = fetchUserService.fetchByUserId(request.userId());
+        List<Category> categories = fetchCategoryService.fetchByUser(findUser).stream().toList();
+
+        // 2. 카테고리에 태스크+타이머(TaskWithTimers) 붙이기
         LinkedHashSet<CategoryWithTasks> categoryWithTasks = fetchTasksByCategories(categories);
         return classifyAndBuildHomeViewResponseDto(request.startDate(), request.endDate(), categoryWithTasks);
     }
 
+    /*
+        Category + TaskWithTimers(Task + Set<Timer>)
+     */
+    // 카테고리로 태스크 조회
     private LinkedHashSet<CategoryWithTasks> fetchTasksByCategories(List<Category> categories) {
         return categories.stream()
                 .map(this::convertToCategoryWithTasks)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    // TaskWithTimers -> CategoryWithTasks
     private CategoryWithTasks convertToCategoryWithTasks(Category category) {
         LinkedHashSet<TaskWithTimers> taskWithTimers = convertToTaskWithTimers(classifyTaskService.sortTasksByCreatedAt(category.getTasks()));
         return fetchCategoryService.convertToCategoryWithTasks(category, taskWithTimers);
     }
 
+    // Task -> TaskWithTimers
     private LinkedHashSet<TaskWithTimers> convertToTaskWithTimers(LinkedHashSet<Task> tasks) {
         return tasks.stream()
                 .map(fetchTaskService::convertToTaskWithTimers)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    // 날짜별로 분류해서 최종 Response 만들기
     private List<HomeViewResponseDto> classifyAndBuildHomeViewResponseDto(LocalDate startDate, LocalDate endDate, LinkedHashSet<CategoryWithTasks> categoryWithTasks) {
         List<HomeViewResponseDto> result = new ArrayList<>();
         for (LocalDate idxDate = startDate; !idxDate.isAfter(endDate); idxDate = idxDate.plusDays(1)) {
@@ -81,24 +92,25 @@ public class HomeViewFacade {
         return result;
     }
 
+    // 날짜별로 dto 분리
     private List<CombinedCategoryAndTaskInfo> buildFetchCombinedDtoByDate(LocalDate idxDate, LinkedHashSet<CategoryWithTasks> categoryWithTasks) {
         return categoryWithTasks.stream()
-                .filter(ct -> DataUtils.isInRange(idxDate, ct.category().getStartDate(), ct.category().getEndDate()))
                 .map(ct -> buildFetchCombinedDto(ct, idxDate))
-                .filter(Objects::nonNull)
                 .toList();
     }
 
+    // combinedDto 생성
     private CombinedCategoryAndTaskInfo buildFetchCombinedDto(CategoryWithTasks categoryWithTasks, LocalDate idxDate) {
         List<TaskInfo> taskInfos = categoryWithTasks.taskWithTimers().stream()
-                .filter(twt -> DataUtils.isInRange(idxDate, twt.task().getStartDate(), twt.task().getEndDate()))
+                .filter(twt -> DataUtils.isInRange(idxDate, twt.task().getStartDate(), twt.task().getEndDate())) // Task의 기간만 필터링
                 .map(twt -> TaskInfo.of(twt.task(), fetchTimerService.fetchElapsedTimeOrZeroByTaskAndTargetDate(twt.task(), idxDate)))
                 .toList();
         if (!taskInfos.isEmpty()) {
             return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(categoryWithTasks.category()), taskInfos);
         }
-        return null;
+        return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(categoryWithTasks.category()), Collections.emptyList());
     }
+
 
     @Transactional
     public void createTask(Long mockUserId, Long categoryId,
