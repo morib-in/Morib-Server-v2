@@ -31,11 +31,9 @@ public class Category extends BaseTimeEntity {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Task> tasks = new LinkedHashSet<>();
 
-    public static Category create(String name, LocalDate startDate, LocalDate endDate, User user) {
+    public static Category create(String name, User user) {
         return Category.builder()
                 .name(name)
-                .startDate(startDate)
-                .endDate(endDate)
                 .user(user)
                 .build();
     }

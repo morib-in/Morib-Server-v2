@@ -14,8 +14,8 @@ public class CreateCategoryServiceImpl implements CreateCategoryService{
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Category create(String name, LocalDate startDate, LocalDate endDate, User user) {
-        return categoryRepository.save(Category.create(name, startDate, endDate, user));
+    public Category create(String name, User user) {
+        return categoryRepository.save(Category.create(name, user));
     }
 
 }

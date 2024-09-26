@@ -6,16 +6,12 @@ import java.time.LocalDate;
 
 public record CategoryInfo(
         Long id,
-        String name,
-        LocalDate startDate,
-        LocalDate endDate
+        String name
 ) {
     public static CategoryInfo of(Category category) {
         return new CategoryInfo(
                 category.getId(),
-                category.getName(),
-                category.getStartDate(),
-                category.getEndDate());
+                category.getName());
     }
 }
 
