@@ -43,11 +43,15 @@ public class ModalViewFacade {
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
         User user = fetchUserService.fetchByUserId(userId);
-        Category createdCategory = createCategoryService.create(createCategoryRequestDto.name(),
-            createCategoryRequestDto.startDate(), createCategoryRequestDto.endDate(), user);
-        createCategoryRequestDto.allowedSites().stream().map(
-            allowedSite -> createAllowedSiteService.create(allowedSite.getSiteName(),
-                allowedSite.getSiteUrl(), OwnerType.CATEGORY, createdCategory.getId()));
+        Category createdCategory = createCategoryService.create(createCategoryRequestDto.name(), user);
+        createCategoryRequestDto.msets().stream().forEach(
+                allowedSite -> createAllowedSiteService.create(
+                        allowedSite.name(),
+                        allowedSite.url(),
+                        OwnerType.CATEGORY,
+                        createdCategory.getId()
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -84,9 +88,11 @@ public class ModalViewFacade {
             map(AllowSiteForCalledByTask::of)
             .toList();
     }
+
     public void deleteCategoryById(Long categoryId){
             deleteCategoryService.deleteById(categoryId);
-        }
+    }
+
     public List<CategoryInfo> fetchCategories(Long userId) {
         User user = fetchUserService.fetchByUserId(userId);
         return fetchCategoryService.fetchByUser(user).stream()
