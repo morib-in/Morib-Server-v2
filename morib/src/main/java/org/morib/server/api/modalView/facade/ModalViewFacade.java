@@ -6,10 +6,7 @@ import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.AllowedSiteByCategoryResponseDto;
 import org.morib.server.api.modalView.dto.AllowedSiteByTaskResponseDto;
 import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
-import org.morib.server.api.modalView.vo.AllowSiteForCalledByTask;
-import org.morib.server.api.modalView.vo.CategoryInfoInAllowedSite;
-import org.morib.server.api.modalView.vo.AllowSiteForCalledByCatgory;
-import org.morib.server.api.modalView.vo.TaskInfoInAllowedSite;
+import org.morib.server.api.modalView.vo.*;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
@@ -44,12 +41,16 @@ public class ModalViewFacade {
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
         User user = fetchUserService.fetchByUserId(userId);
         Category createdCategory = createCategoryService.create(createCategoryRequestDto.name(), user);
-        createCategoryRequestDto.msets().stream().forEach(
+        createAllowedSites(createdCategory.getId(), createCategoryRequestDto.msets());
+    }
+
+    private void createAllowedSites(Long id, List<AllowedSiteInfo> allowedSiteInfos) {
+        allowedSiteInfos.stream().forEach(
                 allowedSite -> createAllowedSiteService.create(
                         allowedSite.name(),
                         allowedSite.url(),
                         OwnerType.CATEGORY,
-                        createdCategory.getId()
+                        id
                 )
         );
     }
