@@ -45,82 +45,64 @@ public class JwtService {
     private final UserRepository userRepository;
 
     public String createAccessToken(Long id) {
-        final Claims claims = getClaimsWithId(id, accessTokenExpirationPeriod);
-        return generateJwt(claims, ACCESS_TOKEN_SUBJECT);
+        final Claims claims = getClaimsWithId(id, accessTokenExpirationPeriod, ACCESS_TOKEN_SUBJECT);
+        return generateJwt(claims);
    }
 
     public String createRefreshToken() {
-        final Claims claims = getClaims(refreshTokenExpirationPeriod);
-        return generateJwt(claims, REFRESH_TOKEN_SUBJECT);
+        final Claims claims = getClaims(refreshTokenExpirationPeriod, REFRESH_TOKEN_SUBJECT);
+        return generateJwt(claims);
     }
 
-    private String generateJwt(Claims claims, String subject) {
+    private String generateJwt(Claims claims) {
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // Header
-                .setSubject(subject)
                 .setClaims(claims) // Claim
                 .signWith(getSigningKey()) // Signature
                 .compact();
     }
 
-    private Claims getClaims(final Long tokenExpirationPeriod) {
+    private Claims getClaims(final Long tokenExpirationPeriod, final String subject) {
         final Date now = new Date();
         return Jwts.claims()
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenExpirationPeriod));
+                .setExpiration(new Date(now.getTime() + tokenExpirationPeriod))
+                .setSubject(subject);
     }
 
-    private Claims getClaimsWithId(final Long id, final Long tokenExpirationPeriod) {
+    private Claims getClaimsWithId(final Long id, final Long tokenExpirationPeriod, final String subject) {
         final Date now = new Date();
         Claims claims = Jwts.claims()
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenExpirationPeriod));
+                .setExpiration(new Date(now.getTime() + tokenExpirationPeriod))
+                .setSubject(subject);
         claims.put(ID_CLAIM, id);
         return claims;
-    }
-
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(accessHeader, accessToken);
-        log.info("재발급된 Access Token : {}", accessToken);
-    }
-
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        setAccessTokenHeader(response, accessToken);
-        setRefreshTokenHeader(response, refreshToken);
-        log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(AUTHORIZATION))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
+                .map(refreshToken -> refreshToken.replace(BEARER, ""))
+                .filter(this::isRefreshToken);
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(AUTHORIZATION))
                 .filter(accessToken -> accessToken.startsWith(BEARER))
-                .map(accessToken -> accessToken.replace(BEARER, ""));
+                .map(accessToken -> accessToken.replace(BEARER, ""))
+                .filter(this::isAccessToken);
     }
 
     public Optional<String> extractId(String accessToken) {
         try {
             Claims claims = extractClaimsFromToken(accessToken);
-            return Optional.ofNullable(claims.get(ID_CLAIM, String.class));
+            return Optional.of(claims.get(ID_CLAIM, Integer.class).toString());
 
         } catch (Exception e) {
             log.error("액세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
         }
-    }
-
-    public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader(accessHeader, accessToken);
-    }
-
-    public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader(refreshHeader, refreshToken);
     }
 
     public void updateRefreshToken(Long userId, String refreshToken) {
@@ -149,8 +131,33 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        String encodedKey = Base64.getEncoder().encodeToString(secretKey.getBytes()); //SecretKey 통해 서명 생성
-        return Keys.hmacShaKeyFor(encodedKey.getBytes());   //일반적으로 HMAC (Hash-based Message Authentication Code) 알고리즘 사용
+        String encodedKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        return Keys.hmacShaKeyFor(encodedKey.getBytes());
+    }
+
+    private String getTokenType(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    private boolean isAccessToken(String token) {
+        String tokenType = getTokenType(token);
+        if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) {
+            return true;
+        }
+        else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+    }
+
+    private boolean isRefreshToken(String token) {
+        String tokenType = getTokenType(token);
+        if (REFRESH_TOKEN_SUBJECT.equals(tokenType)) {
+            return true;
+        }
+        else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
     }
 }
 
