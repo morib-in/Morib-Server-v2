@@ -27,42 +27,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String refreshToken = jwtService.extractRefreshToken(request)
+        String accessToken = jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .orElse(null);
-
-        if (refreshToken != null) {
-            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-            return;
-        }
-        checkAccessTokenAndAuthentication(request, response, filterChain);
-    }
-
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getId()),
-                            reIssuedRefreshToken);
-                });
-    }
-
-    private String reIssueRefreshToken(User user) {
-        String reIssuedRefreshToken = jwtService.createRefreshToken();
-        user.updateRefreshToken(reIssuedRefreshToken);
-        userRepository.saveAndFlush(user);
-        return reIssuedRefreshToken;
-    }
-
-    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                                  FilterChain filterChain) throws ServletException, IOException {
-        log.info("checkAccessTokenAndAuthentication() 호출");
-        Optional<String> accessToken = jwtService.extractAccessToken(request);
-        if (accessToken.isPresent() && jwtService.isTokenValid(accessToken.get())) {
-            handleAccessToken(accessToken.get());
-        }
+        handleAccessToken(accessToken);
         filterChain.doFilter(request, response);
     }
+
+//    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+//        userRepository.findByRefreshToken(refreshToken)
+//                .ifPresent(user -> {
+//                    String reIssuedRefreshToken = reIssueRefreshToken(user);
+//                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getId()),
+//                            reIssuedRefreshToken);
+//                });
+//    }
+//
+//    private String reIssueRefreshToken(User user) {
+//        String reIssuedRefreshToken = jwtService.createRefreshToken();
+//        user.updateRefreshToken(reIssuedRefreshToken);
+//        userRepository.saveAndFlush(user);
+//        return reIssuedRefreshToken;
+//    }
+
 
     private void handleAccessToken(String accessToken) {
         jwtService.extractId(accessToken)
