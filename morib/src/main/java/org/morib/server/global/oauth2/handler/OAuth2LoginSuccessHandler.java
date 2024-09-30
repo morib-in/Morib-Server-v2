@@ -60,6 +60,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = jwtService.createRefreshToken();
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiResponseUtil.success(SuccessMessage.SUCCESS, TokenResponseDto.of(accessToken, refreshToken, oAuth2User.getUserId())).getBody()));
+        response.addCookie(new Cookie(REFRESH_TOKEN_SUBJECT, refreshToken));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponseUtil.success(SuccessMessage.SUCCESS, TokenResponseDto.of(accessToken, oAuth2User.getUserId())).getBody()));
     }
 }
