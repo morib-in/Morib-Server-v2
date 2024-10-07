@@ -34,23 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-//    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-//        userRepository.findByRefreshToken(refreshToken)
-//                .ifPresent(user -> {
-//                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-//                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getId()),
-//                            reIssuedRefreshToken);
-//                });
-//    }
-//
-//    private String reIssueRefreshToken(User user) {
-//        String reIssuedRefreshToken = jwtService.createRefreshToken();
-//        user.updateRefreshToken(reIssuedRefreshToken);
-//        userRepository.saveAndFlush(user);
-//        return reIssuedRefreshToken;
-//    }
-
-
     private void handleAccessToken(String accessToken) {
         jwtService.extractId(accessToken)
                 .flatMap(id -> userRepository.findById(Long.valueOf(id)))
