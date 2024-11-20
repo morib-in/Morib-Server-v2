@@ -27,20 +27,6 @@ public class ModalViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @GetMapping("/mset/categories/{categoryId}")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByCategory(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                      @PathVariable Long categoryId) {
-        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.
-            fetchAllowedSiteByCategoryId(userId, categoryId));
-    }
-
-    @GetMapping("/mset/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteByTask(@PathVariable Long taskId) {
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                modalViewFacade.fetchAllowedSiteByTaskId(taskId));
-    }
-
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<BaseResponse<?>> delete(@PathVariable("categoryId") Long categoryId) {
         modalViewFacade.deleteCategoryById(categoryId);
