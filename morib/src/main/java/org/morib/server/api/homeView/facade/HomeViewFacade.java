@@ -57,7 +57,7 @@ public class HomeViewFacade {
     }
 
     /*
-        Category + TaskWithTimers(Task + Set<Timer>)
+    Category + TaskWithTimers(Task + Set<Timer>)
      */
     // 카테고리로 태스크 조회
     private LinkedHashSet<CategoryWithTasks> fetchTasksByCategories(List<Category> categories) {
