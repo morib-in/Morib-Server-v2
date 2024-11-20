@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.userauth.CustomUserAuthentication;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -36,7 +38,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void handleAccessToken(String accessToken) {
         jwtService.extractId(accessToken)
-                .flatMap(id -> userRepository.findById(Long.valueOf(id)))
+                .map(id -> userRepository.findById(Long.valueOf(id)).orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                ))
                 .ifPresent(this::saveAuthentication);
     }
 

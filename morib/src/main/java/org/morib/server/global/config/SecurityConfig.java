@@ -41,7 +41,7 @@ public class SecurityConfig {
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
                 });
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
+                .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.addFilterAfter(jwtAuthenticationFilter(), LogoutFilter.class);
@@ -53,4 +53,5 @@ public class SecurityConfig {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService, userRepository);
         return jwtAuthenticationFilter;
     }
+
 }

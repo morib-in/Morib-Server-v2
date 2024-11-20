@@ -47,6 +47,7 @@ public class Task extends BaseTimeEntity {
                 .startDate(startDate)
                 .endDate(endDate)
                 .category(category)
+                .isComplete(false)
                 .build();
     }
 
