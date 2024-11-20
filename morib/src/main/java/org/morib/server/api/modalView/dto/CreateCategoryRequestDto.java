@@ -7,7 +7,5 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record CreateCategoryRequestDto(
-        String name,
-        List<AllowedSiteInfo> msets
-) {
+        String name) {
 }

@@ -2,7 +2,7 @@ package org.morib.server.domain.allowedSite.infra;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.morib.server.domain.allowedSite.infra.type.OwnerType;
+import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.global.common.BaseTimeEntity;
 
 @Builder
@@ -19,18 +19,16 @@ public class AllowedSite extends BaseTimeEntity {
     private String siteName;
     @Column(nullable = false)
     private String siteUrl;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OwnerType ownerType;
-    @Column(nullable = false)
-    private Long ownerId;
 
-    public static AllowedSite create(String siteName, String siteUrl, OwnerType ownerType, Long ownerId) {
+    @ManyToOne
+    @JoinColumn(name = "allowed_group_id")
+    private AllowedGroup allowedGroup;
+
+
+    public static AllowedSite create(String siteName, String siteUrl) {
         return AllowedSite.builder()
                 .siteName(siteName)
                 .siteUrl(siteUrl)
-                .ownerType(ownerType)
-                .ownerId(ownerId)
                 .build();
     }
 }

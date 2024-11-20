@@ -1,7 +1,9 @@
 package org.morib.server.domain.user.infra;
 
 import jakarta.persistence.*;
+import java.util.LinkedHashSet;
 import lombok.*;
+import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
@@ -31,6 +33,8 @@ public class User extends BaseTimeEntity {
     private String refreshToken;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Category> categories;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AllowedGroup> allowedGroups = new LinkedHashSet<>();
     @Enumerated(EnumType.STRING)
     private Role role;
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
