@@ -28,7 +28,7 @@ public class TaskController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @PatchMapping("/tasks/{taskId}/status")
+    @PostMapping("/tasks/{taskId}/status")
     public ResponseEntity<BaseResponse<?>> toggle(@PathVariable Long taskId) {
         homeViewFacade.toggleTaskStatus(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
