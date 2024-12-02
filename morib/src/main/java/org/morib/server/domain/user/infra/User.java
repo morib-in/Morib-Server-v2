@@ -38,7 +38,7 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
-
+    private boolean isPushEnabled;
     // 유저 권한 설정 메소드
     public void authorizeUser() {
         this.role = Role.USER;
