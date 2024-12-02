@@ -13,6 +13,7 @@ import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.CreateTaskService;
+import org.morib.server.domain.task.application.DeleteTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class HomeViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final FetchTaskService fetchTaskService;
+    private final DeleteTaskService deleteTaskService;
     private final FetchTimerService fetchTimerService;
     private final FetchUserService fetchUserService;
     private final FetchTodoService fetchTodoService;
@@ -148,5 +150,10 @@ public class HomeViewFacade {
         List<Timer> findTodayTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
         int sumUserTotalElapsedTime = timerManager.sumUserTotalElapsedTime(findTodayTimer);
         return FetchMyElapsedTimeResponseDto.of(targetDate, sumUserTotalElapsedTime);
+    }
+
+    @Transactional
+    public void deleteTask(Long taskId) {
+        deleteTaskService.deleteByTaskId(taskId);
     }
 }
