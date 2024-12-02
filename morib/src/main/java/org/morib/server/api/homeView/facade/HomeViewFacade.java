@@ -154,6 +154,6 @@ public class HomeViewFacade {
 
     @Transactional
     public void deleteTask(Long taskId) {
-        deleteTaskService.deleteTask(taskId);
+        deleteTaskService.deleteByTaskId(taskId);
     }
 }

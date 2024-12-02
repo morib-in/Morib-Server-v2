@@ -35,9 +35,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> deleteTask(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-        @PathVariable Long taskId) {
-        principalHandler.isUserDetailsNull(customUserDetails);
+    public ResponseEntity<BaseResponse<?>> deleteTask(@PathVariable Long taskId) {
         homeViewFacade.deleteTask(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
