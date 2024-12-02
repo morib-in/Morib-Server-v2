@@ -56,6 +56,15 @@ public class User extends BaseTimeEntity {
                 .name(oauth2UserInfo.getName())
                 .imageUrl(oauth2UserInfo.getImageUrl())
                 .role(Role.GUEST)
+                .isPushEnabled(false)
                 .build();
     }
+
+    public void updateProfile(String name, String imageUrl, boolean isPushEnabled) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.isPushEnabled = isPushEnabled;
+    }
+
+
 }

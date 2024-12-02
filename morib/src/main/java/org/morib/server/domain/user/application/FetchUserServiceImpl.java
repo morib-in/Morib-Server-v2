@@ -15,7 +15,7 @@ public class FetchUserServiceImpl implements FetchUserService {
     private final UserRepository userRepository;
 
     @Override
-    public User fetchByUserId(Long  userId) {
+    public User fetchByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 }
