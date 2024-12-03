@@ -33,4 +33,10 @@ public class TaskController {
         homeViewFacade.toggleTaskStatus(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    @DeleteMapping("/tasks/{taskId}")
+    public ResponseEntity<BaseResponse<?>> deleteTask(@PathVariable Long taskId) {
+        homeViewFacade.deleteTask(taskId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 }
