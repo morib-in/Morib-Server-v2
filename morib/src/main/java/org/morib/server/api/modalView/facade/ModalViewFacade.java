@@ -14,7 +14,7 @@ import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.relationship.application.FetchFriendsService;
 import org.morib.server.domain.relationship.infra.Relationship;
-import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.api.homeView.vo.CategoryInfo;
 import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
