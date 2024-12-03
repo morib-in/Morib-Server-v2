@@ -4,9 +4,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
+import org.morib.server.api.modalView.dto.UpdateCategoryNameRequestDto;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
+import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.user.application.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.api.homeView.vo.CategoryInfo;
@@ -23,6 +26,7 @@ public class ModalViewFacade {
     private final DeleteCategoryService deleteCategoryService;
     private final CreateCategoryService createCategoryService;
     private final FetchTabNameService fetchTabNameService;
+    private final CategoryManager categoryManager;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -43,5 +47,12 @@ public class ModalViewFacade {
 
     public TabNameByUrlResponse fetchTabNameByUrl(String url) {
         return TabNameByUrlResponse.of(fetchTabNameService.fetch(url));
+    }
+
+    @Transactional
+    public void updateCategoryNameById(Long userId, Long categoryId, UpdateCategoryNameRequestDto updateCategoryNameRequestDto) {
+        User findUser = fetchUserService.fetchByUserId(userId);
+        Category findCategory = fetchCategoryService.fetchByUserAndCategoryId(findUser, categoryId);
+        categoryManager.updateName(findCategory, updateCategoryNameRequestDto.name());
     }
 }
