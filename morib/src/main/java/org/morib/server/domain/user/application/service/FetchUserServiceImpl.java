@@ -1,9 +1,8 @@
-package org.morib.server.domain.user.application;
+package org.morib.server.domain.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
-import org.morib.server.global.exception.BusinessException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;

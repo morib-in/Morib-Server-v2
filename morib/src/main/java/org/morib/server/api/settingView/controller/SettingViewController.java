@@ -1,11 +1,8 @@
 package org.morib.server.api.settingView.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.settingView.dto.FetchUserProfileResponseDto;
 import org.morib.server.api.settingView.dto.UpdateUserProfileRequestDto;
 import org.morib.server.api.settingView.facade.SettingViewFacade;
-import org.morib.server.domain.user.application.FetchUserService;
-import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;

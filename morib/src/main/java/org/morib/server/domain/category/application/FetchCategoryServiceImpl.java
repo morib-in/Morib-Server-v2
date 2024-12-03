@@ -3,7 +3,6 @@ package org.morib.server.domain.category.application;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.vo.CategoryWithTasks;
 import org.morib.server.api.homeView.vo.TaskWithTimers;
-import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.user.infra.User;

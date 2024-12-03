@@ -7,7 +7,7 @@ import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
-import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.api.homeView.vo.CategoryInfo;
 import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
