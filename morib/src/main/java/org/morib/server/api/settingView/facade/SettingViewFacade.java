@@ -6,7 +6,8 @@ import org.morib.server.annotation.Facade;
 import org.morib.server.api.settingView.dto.FetchUserProfileResponseDto;
 import org.morib.server.api.settingView.dto.UpdateUserProfileRequestDto;
 import org.morib.server.domain.user.UserManager;
-import org.morib.server.domain.user.application.FetchUserService;
+import org.morib.server.domain.user.application.dto.UpdateUserProfileServiceDto;
+import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class SettingViewFacade {
     @Transactional
     public void updateUserProfile(Long userId, UpdateUserProfileRequestDto updateUserProfileRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
-        userManager.updateUserProfile(findUser, updateUserProfileRequestDto.name(), updateUserProfileRequestDto.imageUrl(), updateUserProfileRequestDto.isPushEnabled());
+        userManager.updateUserProfile(findUser, UpdateUserProfileServiceDto.of(updateUserProfileRequestDto));
     }
 
 }
