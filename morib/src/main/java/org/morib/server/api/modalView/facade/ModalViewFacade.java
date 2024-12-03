@@ -34,6 +34,7 @@ public class ModalViewFacade {
         createCategoryService.create(createCategoryRequestDto.name(), user);
     }
 
+    @Transactional
     public void deleteCategoryById(Long categoryId){
             deleteCategoryService.deleteById(categoryId);
     }
