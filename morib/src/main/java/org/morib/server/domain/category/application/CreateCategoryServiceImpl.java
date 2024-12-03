@@ -6,8 +6,6 @@ import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.user.infra.User;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-
 @Service
 @RequiredArgsConstructor
 public class CreateCategoryServiceImpl implements CreateCategoryService{
