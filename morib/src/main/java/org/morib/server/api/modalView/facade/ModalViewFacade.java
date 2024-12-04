@@ -6,13 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
 import org.morib.server.api.modalView.dto.UpdateCategoryNameRequestDto;
-import org.morib.server.api.modalView.dto.FetchFriendsResponseDto;
+import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
-import org.morib.server.domain.relationship.application.FetchFriendsService;
+import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
@@ -31,7 +31,7 @@ public class ModalViewFacade {
     private final CreateCategoryService createCategoryService;
     private final FetchTabNameService fetchTabNameService;
     private final CategoryManager categoryManager;
-    private final FetchFriendsService fetchFriendsService;
+    private final FetchRelationshipService fetchRelationshipService;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -62,21 +62,17 @@ public class ModalViewFacade {
         categoryManager.updateName(findCategory, updateCategoryNameRequestDto.name());
     }
 
-    public List<FetchFriendsResponseDto> fetchFriends(Long userId) {
-        return fetchFriendsByRelationships(userId, fetchFriendsService.fetchConnectedRelationship(userId));
+    public List<FetchRelationshipResponseDto> fetchRelationships(Long userId) {
+        return buildFetchRelationshipResponseDto(userId, fetchRelationshipService.fetchConnectedRelationship(userId));
     }
 
-    public List<FetchFriendsResponseDto> fetchFriendsByRelationships(Long userId, List<Relationship> relationships) {
+    public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
         List<User> friends = new ArrayList<>();
         for (Relationship relationship : relationships) {
             if (relationship.getUser().getId().equals(userId)) friends.add(relationship.getFriend());
             else friends.add(relationship.getUser());
         }
-        return buildFetchFriendsResponseDto(friends);
-    }
-
-    public List<FetchFriendsResponseDto> buildFetchFriendsResponseDto(List<User> friends) {
-        return friends.stream().map(FetchFriendsResponseDto::of).toList();
+        return friends.stream().map(FetchRelationshipResponseDto::of).toList();
     }
 
 }

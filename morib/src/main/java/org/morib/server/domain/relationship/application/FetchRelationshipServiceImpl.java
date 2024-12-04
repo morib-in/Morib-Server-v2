@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FetchFriendsServiceImpl implements FetchFriendsService{
+public class FetchRelationshipServiceImpl implements FetchRelationshipService {
 
     private final RelationshipRepository relationshipRepository;
 
