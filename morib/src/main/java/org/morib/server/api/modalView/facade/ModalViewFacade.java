@@ -108,4 +108,19 @@ public class ModalViewFacade {
         return result;
     }
 
+    public FetchUnconnectedRelationshipResponseDto fetchUnconnectedRelationships(Long userId) {
+        return buildFetchUnconnectedRelationshipResponseDto(userId, fetchRelationshipService.fetchUnconnectedRelationship(userId));
+    }
+
+    public FetchUnconnectedRelationshipResponseDto buildFetchUnconnectedRelationshipResponseDto(Long userId, List<Relationship> relationships) {
+        List<User> send = new ArrayList<>();
+        List<User> receive = new ArrayList<>();
+        for (Relationship relationship : relationships) {
+            if (relationship.getUser().getId().equals(userId)) send.add(relationship.getFriend());
+            else receive.add(relationship.getUser());
+        }
+        return FetchUnconnectedRelationshipResponseDto.of(
+                send.stream().map(FetchRelationshipResponseDto::of).toList(),
+                receive.stream().map(FetchRelationshipResponseDto::of).toList());
+    }
 }
