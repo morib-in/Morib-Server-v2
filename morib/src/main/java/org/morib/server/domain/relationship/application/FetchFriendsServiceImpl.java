@@ -15,7 +15,7 @@ public class FetchFriendsServiceImpl implements FetchFriendsService{
     private final RelationshipRepository relationshipRepository;
 
     @Override
-    public List<Relationship> fetch(Long userId) {
+    public List<Relationship> fetchConnectedRelationship(Long userId) {
         return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.CONNECTED);
     }
 }
