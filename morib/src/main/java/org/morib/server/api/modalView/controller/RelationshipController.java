@@ -22,8 +22,8 @@ public class RelationshipController {
     private final ModalViewFacade modalViewFacade;
 
     @GetMapping("/friends")
-    public ResponseEntity<BaseResponse<?>> fetchFriends(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<BaseResponse<?>> fetchRelationships(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchFriends(userId));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchRelationships(userId));
     }
 }
