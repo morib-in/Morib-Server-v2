@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.modalView.dto.CreateCategoryRequestDto;
-import org.morib.server.api.modalView.dto.UpdateCategoryNameRequestDto;
-import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
+import org.morib.server.api.modalView.dto.*;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
@@ -17,7 +15,6 @@ import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.api.homeView.vo.CategoryInfo;
-import org.morib.server.api.modalView.dto.TabNameByUrlResponse;
 import org.morib.server.domain.category.application.DeleteCategoryService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +59,7 @@ public class ModalViewFacade {
         categoryManager.updateName(findCategory, updateCategoryNameRequestDto.name());
     }
 
-    public List<FetchRelationshipResponseDto> fetchRelationships(Long userId) {
+    public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
         return buildFetchRelationshipResponseDto(userId, fetchRelationshipService.fetchConnectedRelationship(userId));
     }
 
@@ -75,4 +72,19 @@ public class ModalViewFacade {
         return friends.stream().map(FetchRelationshipResponseDto::of).toList();
     }
 
+    public FetchUnconnectedRelationshipResponseDto fetchUnconnectedRelationships(Long userId) {
+        return buildFetchUnconnectedRelationshipResponseDto(userId, fetchRelationshipService.fetchUnconnectedRelationship(userId));
+    }
+
+    public FetchUnconnectedRelationshipResponseDto buildFetchUnconnectedRelationshipResponseDto(Long userId, List<Relationship> relationships) {
+        List<User> send = new ArrayList<>();
+        List<User> receive = new ArrayList<>();
+        for (Relationship relationship : relationships) {
+            if (relationship.getUser().getId().equals(userId)) send.add(relationship.getFriend());
+            else receive.add(relationship.getUser());
+        }
+        return FetchUnconnectedRelationshipResponseDto.of(
+                send.stream().map(FetchRelationshipResponseDto::of).toList(),
+                receive.stream().map(FetchRelationshipResponseDto::of).toList());
+    }
 }

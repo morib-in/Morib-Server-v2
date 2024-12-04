@@ -18,4 +18,9 @@ public class FetchRelationshipServiceImpl implements FetchRelationshipService {
     public List<Relationship> fetchConnectedRelationship(Long userId) {
         return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.CONNECTED);
     }
+
+    @Override
+    public List<Relationship> fetchUnconnectedRelationship(Long userId) {
+        return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.UNCONNECTED);
+    }
 }

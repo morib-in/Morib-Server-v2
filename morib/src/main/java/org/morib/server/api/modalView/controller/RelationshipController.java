@@ -24,6 +24,12 @@ public class RelationshipController {
     @GetMapping("/friends")
     public ResponseEntity<BaseResponse<?>> fetchRelationships(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchRelationships(userId));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchConnectedRelationships(userId));
+    }
+
+    @GetMapping("/friends/requests")
+    public ResponseEntity<BaseResponse<?>> fetchRelationshipRequests(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchUnconnectedRelationships(userId));
     }
 }
