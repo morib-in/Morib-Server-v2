@@ -63,7 +63,7 @@ public class ModalViewFacade {
     }
 
     public List<FetchFriendsResponseDto> fetchFriends(Long userId) {
-        return fetchFriendsByRelationships(userId, fetchFriendsService.fetch(userId));
+        return fetchFriendsByRelationships(userId, fetchFriendsService.fetchConnectedRelationship(userId));
     }
 
     public List<FetchFriendsResponseDto> fetchFriendsByRelationships(Long userId, List<Relationship> relationships) {
