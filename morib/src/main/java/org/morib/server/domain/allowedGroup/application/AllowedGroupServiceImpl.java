@@ -20,4 +20,11 @@ public class AllowedGroupServiceImpl implements AllowedGroupService {
                 ErrorMessage.NOT_FOUND));
         allowedGroupRepository.delete(findAllowedGroup);
     }
+
+    @Override
+    public AllowedGroup findById(Long groupId) {
+        return allowedGroupRepository.findById(groupId)
+            .orElseThrow(() -> new NotFoundException(
+                ErrorMessage.NOT_FOUND));
+    }
 }
