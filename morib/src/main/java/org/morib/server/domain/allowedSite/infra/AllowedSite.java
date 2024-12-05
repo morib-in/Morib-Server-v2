@@ -31,4 +31,12 @@ public class AllowedSite extends BaseTimeEntity {
                 .siteUrl(siteUrl)
                 .build();
     }
+
+    public static AllowedSite create(String siteName, String siteUrl, AllowedGroup allowedGroup) {
+        return AllowedSite.builder()
+                .siteName(siteName)
+                .siteUrl(siteUrl)
+                .allowedGroup(allowedGroup)
+                .build();
+    }
 }
