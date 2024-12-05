@@ -41,7 +41,7 @@ public class AllowedGroup {
 
     @OneToMany(mappedBy = "allowedGroup", fetch = FetchType.LAZY,
         cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AllowedSite> allowedSite = new LinkedHashSet<>();
+    private Set<AllowedSite> allowedSites = new LinkedHashSet<>();
 
 
 }
