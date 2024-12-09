@@ -106,43 +106,6 @@ public class ModalViewFacade {
         result.put("receive", receive);
 
         return result;
-        List<User> classifiedRelationships = classifyRelationships(relationships, userId)
-                .values()
-                .stream()
-                .flatMap(List::stream)
-                .toList();
-        return classifiedRelationships.stream().map(FetchRelationshipResponseDto::of).toList();
-    }
-
-    public FetchUnconnectedRelationshipResponseDto fetchUnconnectedRelationships(Long userId) {
-        return buildFetchUnconnectedRelationshipResponseDto(userId, fetchRelationshipService.fetchUnconnectedRelationship(userId));
-    }
-
-    public FetchUnconnectedRelationshipResponseDto buildFetchUnconnectedRelationshipResponseDto(Long userId, List<Relationship> relationships) {
-        Map<String, List<User>> classifiedRelationships = classifyRelationships(relationships, userId);
-
-        return FetchUnconnectedRelationshipResponseDto.of(
-                classifiedRelationships.get("send").stream().map(FetchRelationshipResponseDto::of).toList(),
-                classifiedRelationships.get("receive").stream().map(FetchRelationshipResponseDto::of).toList());
-    }
-
-    public Map<String, List<User>> classifyRelationships(List<Relationship> relationships, Long userId) {
-        List<User> send = new ArrayList<>();
-        List<User> receive = new ArrayList<>();
-
-        for (Relationship relationship : relationships) {
-            if (relationship.getUser().getId().equals(userId)) {
-                send.add(relationship.getFriend());
-            } else {
-                receive.add(relationship.getUser());
-            }
-        }
-
-        Map<String, List<User>> result = new HashMap<>();
-        result.put("send", send);
-        result.put("receive", receive);
-
-        return result;
     }
 
 }
