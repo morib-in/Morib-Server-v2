@@ -2,6 +2,7 @@ package org.morib.server.api.allowGroupView.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
+import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ public class AllowedGroupViewController {
     private final AllowedGroupViewFacade allowedGroupViewFacade;
 
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<BaseResponse<?>> deleteAllowServiceSet(@PathVariable Long groupId){
-        allowedGroupViewFacade.deleteAllowServiceSet(groupId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessMessage.SUCCESS));
+    public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
+        allowedGroupViewFacade.deleteAllowedServiceSet(groupId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 }
