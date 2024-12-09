@@ -1,8 +1,7 @@
 package org.morib.server.domain.allowedSite.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
-import org.morib.server.domain.allowedSite.application.dto.AddAllowSiteInAllowGroupServiceDto;
+import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteInAllowedGroupServiceDto;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.allowedSite.infra.AllowedSiteRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,7 @@ public class CreateAllowedSiteServiceImpl implements CreateAllowedSiteService {
     }
 
     @Override
-    public AllowedSite create(AddAllowSiteInAllowGroupServiceDto dto) {
+    public AllowedSite create(CreateAllowedSiteInAllowedGroupServiceDto dto) {
         return allowedSiteRepository.save(AllowedSite.create(dto.site(), dto.name(), dto.findAllowedGroup()));
     }
 }
