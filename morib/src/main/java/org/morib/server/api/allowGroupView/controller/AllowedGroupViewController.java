@@ -1,7 +1,7 @@
 package org.morib.server.api.allowGroupView.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.allowGroupView.dto.AddAllowSiteInAllowGroupRequestDto;
+import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteInAllowedGroupRequestDto;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/allowServiceSet")
+@RequestMapping("/api/v2/allowedServiceSet")
 public class AllowedGroupViewController {
 
     private final AllowedGroupViewFacade allowedGroupViewFacade;
@@ -29,9 +29,9 @@ public class AllowedGroupViewController {
 
     @PostMapping("/allowedSite")
     public ResponseEntity<BaseResponse<?>> addAllowedSite(@RequestBody
-        AddAllowSiteInAllowGroupRequestDto addAllowSiteInAllowGroupRequestDto){
-        allowedGroupViewFacade.addAllowedSite(addAllowSiteInAllowGroupRequestDto);
-        return ResponseEntity.ok(BaseResponse.of(SuccessMessage.SUCCESS));
+    CreateAllowedSiteInAllowedGroupRequestDto createAllowedSiteInAllowedGroupRequestDto){
+        allowedGroupViewFacade.addAllowedSite(createAllowedSiteInAllowedGroupRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
 
