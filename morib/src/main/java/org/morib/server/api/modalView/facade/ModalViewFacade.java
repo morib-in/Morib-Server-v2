@@ -1,7 +1,11 @@
 package org.morib.server.api.modalView.facade;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.*;
@@ -64,12 +68,12 @@ public class ModalViewFacade {
     }
 
     public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
-        List<User> friends = new ArrayList<>();
-        for (Relationship relationship : relationships) {
-            if (relationship.getUser().getId().equals(userId)) friends.add(relationship.getFriend());
-            else friends.add(relationship.getUser());
-        }
-        return friends.stream().map(FetchRelationshipResponseDto::of).toList();
+        List<User> classifiedRelationships = classifyRelationships(relationships, userId)
+                .values()
+                .stream()
+                .flatMap(List::stream)
+                .toList();
+        return classifiedRelationships.stream().map(FetchRelationshipResponseDto::of).toList();
     }
 
     public FetchUnconnectedRelationshipResponseDto fetchUnconnectedRelationships(Long userId) {
@@ -77,14 +81,30 @@ public class ModalViewFacade {
     }
 
     public FetchUnconnectedRelationshipResponseDto buildFetchUnconnectedRelationshipResponseDto(Long userId, List<Relationship> relationships) {
+        Map<String, List<User>> classifiedRelationships = classifyRelationships(relationships, userId);
+
+        return FetchUnconnectedRelationshipResponseDto.of(
+                classifiedRelationships.get("send").stream().map(FetchRelationshipResponseDto::of).toList(),
+                classifiedRelationships.get("receive").stream().map(FetchRelationshipResponseDto::of).toList());
+    }
+
+    public Map<String, List<User>> classifyRelationships(List<Relationship> relationships, Long userId) {
         List<User> send = new ArrayList<>();
         List<User> receive = new ArrayList<>();
+
         for (Relationship relationship : relationships) {
-            if (relationship.getUser().getId().equals(userId)) send.add(relationship.getFriend());
-            else receive.add(relationship.getUser());
+            if (relationship.getUser().getId().equals(userId)) {
+                send.add(relationship.getFriend());
+            } else {
+                receive.add(relationship.getUser());
+            }
         }
-        return FetchUnconnectedRelationshipResponseDto.of(
-                send.stream().map(FetchRelationshipResponseDto::of).toList(),
-                receive.stream().map(FetchRelationshipResponseDto::of).toList());
+
+        Map<String, List<User>> result = new HashMap<>();
+        result.put("send", send);
+        result.put("receive", receive);
+
+        return result;
     }
+
 }
