@@ -1,6 +1,7 @@
-package org.morib.server.domain.allowedGroup.application;
+package org.morib.server.domain.allowedGroup.application.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroupRepository;
 import org.morib.server.global.exception.NotFoundException;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AllowedGroupServiceImpl implements AllowedGroupService {
+public class DeleteAllowedGroupServiceImpl implements DeleteAllowedGroupService {
 
     private final AllowedGroupRepository allowedGroupRepository;
 
