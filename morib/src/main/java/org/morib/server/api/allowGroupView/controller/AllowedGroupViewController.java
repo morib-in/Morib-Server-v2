@@ -47,7 +47,7 @@ public class AllowedGroupViewController {
             throw new InvalidQueryParameterException(ErrorMessage.BAD_REQUEST);
 
         allowedGroupViewFacade.updateAllowedGroup(groupId, colorCode, name);
-        return ResponseEntity.ok(BaseResponse.of(SuccessMessage.SUCCESS));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     private boolean isParamAllNull(String colorCode, String name) {
