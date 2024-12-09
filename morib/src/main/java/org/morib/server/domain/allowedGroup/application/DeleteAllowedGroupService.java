@@ -1,6 +1,6 @@
 package org.morib.server.domain.allowedGroup.application;
 
-public interface AllowedGroupService {
+public interface DeleteAllowedGroupService {
     void deleteAllowedGroupById(Long groupId);
 
 }
