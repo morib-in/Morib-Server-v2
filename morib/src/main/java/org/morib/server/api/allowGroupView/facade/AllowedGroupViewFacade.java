@@ -1,8 +1,9 @@
 package org.morib.server.api.allowGroupView.facade;
 
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
+import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
 import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
 import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteInAllowedGroupRequestDto;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
@@ -42,26 +43,12 @@ public class AllowedGroupViewFacade {
     }
 
     @Transactional
-    public void updateAllowedGroup(Long groupId, String colorCode, String name) {
-
-        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
-
-        if(hasColorCodeAndName(colorCode, name)) {
-            allowedGroupManager.updateAll(findAllowedGroup, colorCode, name);
-            return;
-        }
-        if(hasColorCode(colorCode)) {
-            allowedGroupManager.updateColorCode(findAllowedGroup, colorCode);
-            return;
-        }
-        allowedGroupManager.updateName(findAllowedGroup, name);
+    public void updateAllowedGroupName(Long groupId, UpdateAllowedGroupNameRequestDto dto) {
+        allowedGroupManager.updateName(fetchAllowedGroupService.findById(groupId), dto.name());
     }
 
-    private boolean hasColorCode(String colorCode) {
-        return Objects.nonNull(colorCode);
-    }
-
-    private boolean hasColorCodeAndName(String colorCode, String name) {
-        return Objects.nonNull(colorCode) && Objects.nonNull(name);
+    @Transactional
+    public void updateAllowedGroupColorCode(Long groupId, UpdateAllowedGroupColorCodeRequestDto dto) {
+        allowedGroupManager.updateColorCode(fetchAllowedGroupService.findById(groupId), dto.colorCode());
     }
 }
