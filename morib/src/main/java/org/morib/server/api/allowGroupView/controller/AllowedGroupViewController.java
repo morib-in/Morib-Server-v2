@@ -41,7 +41,7 @@ public class AllowedGroupViewController {
     }
 
 
-    @PatchMapping("/{groupId}")
+    @PatchMapping("/{groupId}/name")
     public ResponseEntity<BaseResponse<?>> updateAllowedGroupName(@PathVariable Long groupId,
         @RequestBody
         UpdateAllowedGroupNameRequestDto dto) {
@@ -52,10 +52,9 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @PatchMapping("/{groupId}")
+    @PatchMapping("/{groupId}/colorCode")
     public ResponseEntity<BaseResponse<?>> updateAllowedGroupColorCode(@PathVariable Long groupId,
-        @RequestBody
-        UpdateAllowedGroupColorCodeRequestDto dto) {
+        @RequestBody UpdateAllowedGroupColorCodeRequestDto dto) {
         if (Objects.isNull(dto))
             throw new InvalidQueryParameterException(ErrorMessage.BAD_REQUEST);
 
