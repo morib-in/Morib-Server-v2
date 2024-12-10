@@ -44,4 +44,16 @@ public class AllowedGroup {
     private Set<AllowedSite> allowedSites = new LinkedHashSet<>();
 
 
+    public void updateAll(String colorCode, String name) {
+        this.colorCode = colorCode;
+        this.name = name;
+    }
+
+    public void updateColorCode(String colorCode) {
+        this.colorCode = colorCode;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }
