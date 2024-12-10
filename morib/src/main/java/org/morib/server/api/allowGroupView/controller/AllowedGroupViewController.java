@@ -36,7 +36,7 @@ public class AllowedGroupViewController {
     @DeleteMapping("/allowedSite/{allowedSiteId}")
     public ResponseEntity<BaseResponse<?>> deleteAllowedSite(@PathVariable Long allowedSiteId) {
         allowedGroupViewFacade.deleteAllowedSite(allowedSiteId);
-        return ResponseEntity.ok(BaseResponse.of(SuccessMessage.SUCCESS));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
     @PostMapping("/allowedSite")
