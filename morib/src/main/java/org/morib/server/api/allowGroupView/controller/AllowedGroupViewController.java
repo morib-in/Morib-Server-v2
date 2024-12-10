@@ -28,7 +28,7 @@ public class AllowedGroupViewController {
     private final AllowedGroupViewFacade allowedGroupViewFacade;
 
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId) {
+    public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
         allowedGroupViewFacade.deleteAllowedServiceSet(groupId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
