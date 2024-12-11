@@ -1,7 +1,10 @@
 package org.morib.server.api.allowGroupView.facade;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupSetsResponseDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
 import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
@@ -13,6 +16,8 @@ import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteInAllowedGroupServiceDto;
+import org.morib.server.global.common.ConnectType;
+import org.morib.server.global.message.SuccessMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -57,5 +62,21 @@ public class AllowedGroupViewFacade {
     @Transactional
     public void deleteAllowedSite(Long allowedSiteId) {
         deleteAllowedSiteService.deleteAllowedSite(allowedSiteId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroupSets(Long userId, ConnectType connectType) {
+
+        List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
+
+        return all.stream().map(a -> {
+            final List<String> allowIcons = new ArrayList<>();
+            a.getAllowedSites().forEach(b -> {
+                //allowIcons.add(b.ge()); iconUrl 받아올 자리
+            });
+            return FetchAllAllowedGroupSetsResponseDto.of(a.getName(), a.getColorCode(),
+                allowIcons);
+        }).toList();
     }
 }
