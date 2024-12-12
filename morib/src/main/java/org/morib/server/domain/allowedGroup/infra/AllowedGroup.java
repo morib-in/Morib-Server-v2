@@ -35,7 +35,7 @@ public class AllowedGroup {
     @Column(nullable = false)
     private String colorCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
