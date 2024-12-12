@@ -17,7 +17,6 @@ import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteInAllowedGroupServiceDto;
 import org.morib.server.global.common.ConnectType;
-import org.morib.server.global.message.SuccessMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 @Facade
@@ -68,15 +67,20 @@ public class AllowedGroupViewFacade {
     @Transactional(readOnly = true)
     public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroupSets(Long userId, ConnectType connectType) {
 
-        List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
+        List<AllowedGroup> all = fetchAllowedGroupService.findAllFetchJoinByUserId(userId);
 
-        return all.stream().map(a -> {
-            final List<String> allowIcons = new ArrayList<>();
-            a.getAllowedSites().forEach(b -> {
-                //allowIcons.add(b.ge()); iconUrl 받아올 자리
-            });
-            return FetchAllAllowedGroupSetsResponseDto.of(a.getName(), a.getColorCode(),
-                allowIcons);
-        }).toList();
+        return all.stream().map(this::madefetchAllAllowedGroupSetsResponseDto).toList();
+    }
+
+    private  FetchAllAllowedGroupSetsResponseDto madefetchAllAllowedGroupSetsResponseDto(
+        AllowedGroup a) {
+        final List<String> allowIcons = new ArrayList<>();
+        addSiteIcons(a, allowIcons);
+        return FetchAllAllowedGroupSetsResponseDto.of(a.getName(), a.getColorCode(),
+            allowIcons);
+    }
+
+    private void addSiteIcons(AllowedGroup a, List<String> allowIcons) {
+        a.getAllowedSites().forEach(b ->   allowIcons.add(b.getSiteIconUrl()));
     }
 }
