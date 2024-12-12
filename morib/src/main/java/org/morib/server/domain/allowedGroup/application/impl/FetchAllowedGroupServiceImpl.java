@@ -22,8 +22,8 @@ public class FetchAllowedGroupServiceImpl implements FetchAllowedGroupService {
     }
 
     @Override
-    public List<AllowedGroup> findAllByUserId(Long userId) {
-        return allowedGroupRepository.findAllByUserId(userId);
+    public List<AllowedGroup> findAllFetchJoinByUserId(Long userId) {
+        return allowedGroupRepository.findAllFetchJoinByUserId(userId);
     }
 
 }
