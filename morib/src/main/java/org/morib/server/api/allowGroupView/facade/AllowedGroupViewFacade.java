@@ -5,6 +5,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupSetsResponseDto;
+import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupDetailAllowedSiteVo;
+import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupDetailResponseDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
 import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
@@ -65,9 +67,9 @@ public class AllowedGroupViewFacade {
 
 
     @Transactional(readOnly = true)
-    public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroupSets(Long userId, ConnectType connectType) {
-
-        List<AllowedGroup> all = fetchAllowedGroupService.findAllFetchJoinByUserId(userId);
+    public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroups(Long userId, ConnectType connectType) {
+        //
+        List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
 
         return all.stream().map(this::madefetchAllAllowedGroupSetsResponseDto).toList();
     }
@@ -82,5 +84,14 @@ public class AllowedGroupViewFacade {
 
     private void addSiteIcons(AllowedGroup a, List<String> allowIcons) {
         a.getAllowedSites().forEach(b ->   allowIcons.add(b.getSiteIconUrl()));
+    }
+
+    @Transactional(readOnly = true)
+    public FetchAllowedGroupDetailResponseDto getGroup(Long groupId, ConnectType connectType) {
+        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
+        List<FetchAllowedGroupDetailAllowedSiteVo> allowedGroupDetailAllowedSiteVos = findAllowedGroup.getAllowedSites()
+            .stream().map(FetchAllowedGroupDetailAllowedSiteVo::of).toList();
+
+        return FetchAllowedGroupDetailResponseDto.of(findAllowedGroup.getId(), findAllowedGroup.getName(), allowedGroupDetailAllowedSiteVos);
     }
 }

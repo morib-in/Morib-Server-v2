@@ -1,10 +1,8 @@
 package org.morib.server.api.allowGroupView.controller;
 
-import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteInAllowedGroupRequestDto;
-import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupSetsResponseDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
@@ -77,7 +75,12 @@ public class AllowedGroupViewController {
 
     @GetMapping
     public ResponseEntity<BaseResponse<?>> getAllowedGroupSets(@AuthenticationPrincipal CustomUserDetails userDetails,  @RequestParam ConnectType connectType){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroupSets(userDetails.getUserId(), connectType));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroups(userDetails.getUserId(), connectType));
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<BaseResponse<?>> getAllowedGroupSetDetail(@PathVariable Long groupId, @RequestParam ConnectType connectType){
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroup(groupId, connectType));
     }
 
 
