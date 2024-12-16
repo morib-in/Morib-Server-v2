@@ -80,7 +80,7 @@ public class AllowedGroupViewController {
 
     @GetMapping("/{groupId}")
     public ResponseEntity<BaseResponse<?>> getAllowedGroupSetDetail(@PathVariable Long groupId, @RequestParam ConnectType connectType){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroup(groupId, connectType));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroupDetail(groupId, connectType));
     }
 
 

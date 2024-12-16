@@ -87,7 +87,7 @@ public class AllowedGroupViewFacade {
     }
 
     @Transactional(readOnly = true)
-    public FetchAllowedGroupDetailResponseDto getGroup(Long groupId, ConnectType connectType) {
+    public FetchAllowedGroupDetailResponseDto getGroupDetail(Long groupId, ConnectType connectType) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
         List<FetchAllowedGroupDetailAllowedSiteVo> allowedGroupDetailAllowedSiteVos = findAllowedGroup.getAllowedSites()
             .stream().map(FetchAllowedGroupDetailAllowedSiteVo::of).toList();
