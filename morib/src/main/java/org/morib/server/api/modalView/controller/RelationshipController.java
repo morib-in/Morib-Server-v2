@@ -65,4 +65,11 @@ public class RelationshipController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @DeleteMapping("/friends/{friendId}")
+    public ResponseEntity<BaseResponse<?>> deleteFriend(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                        @PathVariable("friendId") Long friendId) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        modalViewFacade.deleteFriend(userId, friendId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 }

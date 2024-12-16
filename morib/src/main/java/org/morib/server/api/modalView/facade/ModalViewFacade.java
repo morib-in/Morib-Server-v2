@@ -140,4 +140,9 @@ public class ModalViewFacade {
         deleteRelationshipService.delete(relationship);
     }
 
+    @Transactional
+    public void deleteFriend(Long userId, Long friendId) {
+        Relationship relationship = fetchRelationshipService.fetchRelationshipByUserIdAndFriendId(friendId, userId, RelationLevel.CONNECTED);
+        deleteRelationshipService.delete(relationship);
+    }
 }
