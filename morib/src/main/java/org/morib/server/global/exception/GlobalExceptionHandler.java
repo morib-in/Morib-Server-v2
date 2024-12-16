@@ -55,5 +55,15 @@ public class GlobalExceptionHandler {
         return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 
-}
+    @ExceptionHandler(AlreadyFriendException.class)
+    protected ResponseEntity<BaseResponse<?>> handleAlreadyFriendException(final AlreadyFriendException e) {
+        log.error(">>> handle: AlreadyFriendException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.ALREADY_FRIEND);
+    }
+
+    @ExceptionHandler(AlreadyFriendRequestException.class)
+    protected ResponseEntity<BaseResponse<?>> handleAlreadyFriendRequestException(final AlreadyFriendRequestException e) {
+        log.error(">>> handle: AlreadyFriendRequestException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.ALREADY_FRIEND_REQUEST);
+    }
 

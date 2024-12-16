@@ -64,6 +64,15 @@ public class ModalViewFacade {
         categoryManager.updateName(findCategory, updateCategoryNameRequestDto.name());
     }
 
+    @Transactional
+    public void createRelationship(Long userId, CreateRelationshipRequestDto createRelationshipRequestDto) {
+        User findUser = fetchUserService.fetchByUserId(userId);
+        User findFriend = fetchUserService.fetchByUserEmail(createRelationshipRequestDto.friendEmail());
+        fetchRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
+        createRelationshipService.create(findUser, findFriend);
+        sseEmitters.pushNotifications(findUser.getName(), findFriend.getId(), ADD_FRIEND_REQUEST_MSG);
+    }
+
     public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
         return buildFetchRelationshipResponseDto(userId, fetchRelationshipService.fetchConnectedRelationship(userId));
     }

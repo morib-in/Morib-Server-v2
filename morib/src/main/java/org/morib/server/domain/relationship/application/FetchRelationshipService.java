@@ -7,4 +7,5 @@ import java.util.List;
 public interface FetchRelationshipService {
     List<Relationship> fetchConnectedRelationship(Long userId);
     List<Relationship> fetchUnconnectedRelationship(Long userId);
+    void validateRelationshipByUserAndFriend(User user, User friend);
 }

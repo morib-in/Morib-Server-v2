@@ -15,4 +15,12 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
     List<Relationship> findByUserIdOrFriendIdAndRelationLevel(
             @Param("userId") Long userId,
             @Param("relationLevel") RelationLevel relationLevel);
+    @Query("SELECT r FROM Relationship r " +
+            "WHERE (r.user.id = :userId AND r.friend.id = :friendId) " +
+            "   OR (r.user.id = :friendId AND r.friend.id = :userId)")
+    Optional<Relationship> findByUserAndFriend(
+            @Param("userId") Long userId,
+            @Param("friendId") Long friendId);
+
+
 }

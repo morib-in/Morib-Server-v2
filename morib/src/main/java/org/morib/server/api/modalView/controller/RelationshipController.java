@@ -32,4 +32,13 @@ public class RelationshipController {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, modalViewFacade.fetchUnconnectedRelationships(userId));
     }
+
+    @PostMapping("/friends/requests")
+    public ResponseEntity<BaseResponse<?>> createRelationship(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                              @RequestBody @Valid CreateRelationshipRequestDto createRelationshipRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        modalViewFacade.createRelationship(userId, createRelationshipRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
 }
