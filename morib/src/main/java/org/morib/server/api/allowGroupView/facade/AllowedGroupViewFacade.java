@@ -10,6 +10,7 @@ import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService
 import org.morib.server.domain.allowedGroup.application.AllowedGroupManager;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
+import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteInAllowedGroupServiceDto;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class AllowedGroupViewFacade {
     private final FetchAllowedGroupService fetchAllowedGroupService;
     private final CreateAllowedSiteService createAllowedSiteService;
     private final AllowedGroupManager allowedGroupManager;
+    private final DeleteAllowedSiteService deleteAllowedSiteService;
 
     @Transactional // 이후 분리 진행했을때는 해당 point에서 분산 트랜잭션 관련해서 고려해볼 수 있는 부분
     public void deleteAllowedServiceSet(Long groupId) {
@@ -50,5 +52,10 @@ public class AllowedGroupViewFacade {
     @Transactional
     public void updateAllowedGroupColorCode(Long groupId, UpdateAllowedGroupColorCodeRequestDto dto) {
         allowedGroupManager.updateColorCode(fetchAllowedGroupService.findById(groupId), dto.colorCode());
+    }
+
+    @Transactional
+    public void deleteAllowedSite(Long allowedSiteId) {
+        deleteAllowedSiteService.deleteAllowedSite(allowedSiteId);
     }
 }

@@ -33,6 +33,12 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @DeleteMapping("/allowedSite/{allowedSiteId}")
+    public ResponseEntity<BaseResponse<?>> deleteAllowedSite(@PathVariable Long allowedSiteId) {
+        allowedGroupViewFacade.deleteAllowedSite(allowedSiteId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
     @PostMapping("/allowedSite")
     public ResponseEntity<BaseResponse<?>> addAllowedSite(@RequestBody
     CreateAllowedSiteInAllowedGroupRequestDto createAllowedSiteInAllowedGroupRequestDto) {
