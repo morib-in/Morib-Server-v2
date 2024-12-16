@@ -4,6 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.RelationshipRepository;
 import org.morib.server.domain.relationship.infra.type.RelationLevel;
+import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.exception.AlreadyFriendException;
+import org.morib.server.global.exception.AlreadyFriendRequestException;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +28,14 @@ public class FetchRelationshipServiceImpl implements FetchRelationshipService {
     public List<Relationship> fetchUnconnectedRelationship(Long userId) {
         return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.UNCONNECTED);
     }
+
+    @Override
+    public Relationship fetchRelationshipByUserIdAndFriendId(Long userId, Long friendId, RelationLevel relationLevel) {
+        return relationshipRepository.findByUserIdAndFriendIdAndRelationLevel(userId, friendId, relationLevel).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
+    }
+
     @Override
     public void validateRelationshipByUserAndFriend(User user, User friend) {
         relationshipRepository.findByUserAndFriend(user.getId(), friend.getId())
