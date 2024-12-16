@@ -18,12 +18,13 @@ public class FetchAllowedGroupServiceImpl implements FetchAllowedGroupService {
     @Override
     public AllowedGroup findById(Long groupId) {
         return allowedGroupRepository.findById(groupId)
-            .orElseThrow(() ->  new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 
     @Override
-    public List<AllowedGroup> findAllFetchJoinByUserId(Long userId) {
-        return allowedGroupRepository.findAllFetchJoinByUserId(userId);
+    public List<AllowedGroup> findAllByUserId(Long userId) {
+        return allowedGroupRepository.findAllByUserId(userId);
     }
+
 
 }

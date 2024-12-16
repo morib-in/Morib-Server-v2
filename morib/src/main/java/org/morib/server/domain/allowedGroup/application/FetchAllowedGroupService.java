@@ -6,5 +6,5 @@ import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 public interface FetchAllowedGroupService {
     AllowedGroup findById(Long groupId);
 
-    List<AllowedGroup> findAllFetchJoinByUserId(Long userId);
+    List<AllowedGroup> findAllByUserId(Long userId);
 }
