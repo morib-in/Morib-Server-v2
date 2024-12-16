@@ -49,6 +49,11 @@ public class GlobalExceptionHandler {
         return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidQueryParameterException.class)
+    protected ResponseEntity<BaseResponse<?>> handleInvalidQueryParameterException(final InvalidQueryParameterException e) {
+        log.error(">>> handle: InvalidQueryParameterException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
 
 }
 
