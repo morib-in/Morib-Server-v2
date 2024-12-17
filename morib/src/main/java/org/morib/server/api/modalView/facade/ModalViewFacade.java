@@ -13,6 +13,7 @@ import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.relationship.application.ValidateRelationshipService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.relationship.RelationshipManager;
 import org.morib.server.domain.relationship.application.CreateRelationshipService;
@@ -42,6 +43,7 @@ public class ModalViewFacade {
     private final FetchRelationshipService fetchRelationshipService;
     private final CreateRelationshipService createRelationshipService;
     private final DeleteRelationshipService deleteRelationshipService;
+    private final ValidateRelationshipService validateRelationshipService;
     private final RelationshipManager relationshipManager;
     private final SseEmitters sseEmitters;
 
@@ -78,7 +80,7 @@ public class ModalViewFacade {
     public void createRelationship(Long userId, CreateRelationshipRequestDto createRelationshipRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
         User findFriend = fetchUserService.fetchByUserEmail(createRelationshipRequestDto.friendEmail());
-        fetchRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
+        validateRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
         createRelationshipService.create(findUser, findFriend);
         sseEmitters.pushNotifications(findUser.getName(), findFriend.getId(), ADD_FRIEND_REQUEST_MSG);
     }
