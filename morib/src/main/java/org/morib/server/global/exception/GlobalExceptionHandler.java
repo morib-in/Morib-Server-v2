@@ -67,3 +67,12 @@ public class GlobalExceptionHandler {
         return ApiResponseUtil.failure(ErrorMessage.ALREADY_FRIEND_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<BaseResponse<?>> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        log.error(">>> handle: MethodArgumentNotValidException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.INVALID_EMAIL);
+
+    }
+
+}
+
