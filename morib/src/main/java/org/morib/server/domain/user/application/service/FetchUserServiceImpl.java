@@ -17,4 +17,11 @@ public class FetchUserServiceImpl implements FetchUserService {
     public User fetchByUserId(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
+
+    @Override
+    public User fetchByUserEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
+
 }
