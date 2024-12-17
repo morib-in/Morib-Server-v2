@@ -37,17 +37,9 @@ public class FetchRelationshipServiceImpl implements FetchRelationshipService {
     }
 
     @Override
-    public void validateRelationshipByUserAndFriend(User user, User friend) {
-        relationshipRepository.findByUserAndFriend(user.getId(), friend.getId())
-                .ifPresent(relationship -> {
-                    if (relationship.getRelationLevel() == RelationLevel.CONNECTED) {
-                        throw new AlreadyFriendException(ErrorMessage.ALREADY_FRIEND);
-                    } else {
-                        throw new AlreadyFriendRequestException(ErrorMessage.ALREADY_FRIEND_REQUEST);
-                    }
-                });
-
+    public Relationship fetchRelationshipByUserIdAndFriendId(Long userId, Long friendId, RelationLevel relationLevel) {
+        return relationshipRepository.findByUserIdAndFriendIdAndRelationLevel(userId, friendId, relationLevel).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
     }
-
-
 }

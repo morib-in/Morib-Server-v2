@@ -33,6 +33,4 @@ public class SettingViewController {
         settingViewFacade.updateUserProfile(userId, updateUserProfileRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
-
 }

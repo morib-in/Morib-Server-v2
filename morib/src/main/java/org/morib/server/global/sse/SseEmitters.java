@@ -40,7 +40,8 @@ public class SseEmitters {
                 emitter.send(
                         SseEmitter.event().name("friendRequest").data(fromName + msg));
             }catch (IOException e) {
-                emitters.remove(toId); // 에러가 발생하면 emitter를 삭제
+                emitter.completeWithError(e);
+                emitters.remove(toId); 
             }
         }
     }
