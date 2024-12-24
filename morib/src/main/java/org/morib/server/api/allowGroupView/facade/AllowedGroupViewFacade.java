@@ -68,7 +68,6 @@ public class AllowedGroupViewFacade {
 
     @Transactional(readOnly = true)
     public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroups(Long userId, ConnectType connectType) {
-        //
         List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
 
         return all.stream().map(this::madefetchAllAllowedGroupSetsResponseDto).toList();
