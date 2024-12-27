@@ -14,7 +14,7 @@ public enum ErrorMessage {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "잘못된 형식입니다"),
     INVALID_URL(HttpStatus.BAD_REQUEST, "요청된 url이 유효하지 않습니다."),
-
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     /**
      * 401 Unauthorized
      */
@@ -41,7 +41,8 @@ public enum ErrorMessage {
     /**
      * 409 Conflict
      */
-
+    ALREADY_FRIEND(HttpStatus.CONFLICT, "이미 친구가 된 사용자입니다."),
+    ALREADY_FRIEND_REQUEST(HttpStatus.CONFLICT, "이미 요청된 사용자입니다."),
     /**
      * 500 Internal Server Error
      */
