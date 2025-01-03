@@ -74,12 +74,12 @@ public class AllowedGroupViewController {
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getAllowedGroupSets(@AuthenticationPrincipal CustomUserDetails userDetails,  @RequestParam ConnectType connectType){
+    public ResponseEntity<BaseResponse<?>> getAllowedGroups(@AuthenticationPrincipal CustomUserDetails userDetails,  @RequestParam ConnectType connectType){
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroups(userDetails.getUserId(), connectType));
     }
 
     @GetMapping("/{groupId}")
-    public ResponseEntity<BaseResponse<?>> getAllowedGroupSetDetail(@PathVariable Long groupId, @RequestParam ConnectType connectType){
+    public ResponseEntity<BaseResponse<?>> getAllowedGroups(@PathVariable Long groupId, @RequestParam ConnectType connectType){
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroupDetail(groupId, connectType));
     }
 

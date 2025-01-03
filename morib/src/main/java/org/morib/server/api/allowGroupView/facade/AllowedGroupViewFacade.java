@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupSetsResponseDto;
-import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupDetailAllowedSiteVo;
+import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupsResponseDto;
+import org.morib.server.api.allowGroupView.dto.AllowedSiteVo;
 import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupDetailResponseDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
@@ -67,17 +67,17 @@ public class AllowedGroupViewFacade {
 
 
     @Transactional(readOnly = true)
-    public List<FetchAllAllowedGroupSetsResponseDto> getAllowedGroups(Long userId, ConnectType connectType) {
+    public List<FetchAllAllowedGroupsResponseDto> getAllowedGroups(Long userId, ConnectType connectType) {
         List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
 
         return all.stream().map(this::madefetchAllAllowedGroupSetsResponseDto).toList();
     }
 
-    private  FetchAllAllowedGroupSetsResponseDto madefetchAllAllowedGroupSetsResponseDto(
+    private FetchAllAllowedGroupsResponseDto madefetchAllAllowedGroupSetsResponseDto(
         AllowedGroup a) {
         final List<String> allowIcons = new ArrayList<>();
         addSiteIcons(a, allowIcons);
-        return FetchAllAllowedGroupSetsResponseDto.of(a.getName(), a.getColorCode(),
+        return FetchAllAllowedGroupsResponseDto.of(a.getName(), a.getColorCode(),
             allowIcons);
     }
 
@@ -88,8 +88,8 @@ public class AllowedGroupViewFacade {
     @Transactional(readOnly = true)
     public FetchAllowedGroupDetailResponseDto getGroupDetail(Long groupId, ConnectType connectType) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
-        List<FetchAllowedGroupDetailAllowedSiteVo> allowedGroupDetailAllowedSiteVos = findAllowedGroup.getAllowedSites()
-            .stream().map(FetchAllowedGroupDetailAllowedSiteVo::of).toList();
+        List<AllowedSiteVo> allowedGroupDetailAllowedSiteVos = findAllowedGroup.getAllowedSites()
+            .stream().map(AllowedSiteVo::of).toList();
 
         return FetchAllowedGroupDetailResponseDto.of(findAllowedGroup.getId(), findAllowedGroup.getName(), allowedGroupDetailAllowedSiteVos);
     }
