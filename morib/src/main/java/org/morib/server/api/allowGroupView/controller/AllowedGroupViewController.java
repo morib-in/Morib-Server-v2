@@ -83,5 +83,10 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroupDetail(groupId, connectType));
     }
 
+    @GetMapping("/recommendSite")
+    public ResponseEntity<BaseResponse<?>> getRecommendSite(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getRecommendSite(userDetails.getUserId()));
+    }
+
 
 }
