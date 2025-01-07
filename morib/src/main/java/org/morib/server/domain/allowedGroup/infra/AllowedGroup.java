@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.user.infra.User;
 
@@ -35,12 +36,13 @@ public class AllowedGroup {
     @Column(nullable = false)
     private String colorCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "allowedGroup", fetch = FetchType.LAZY,
         cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private Set<AllowedSite> allowedSites = new LinkedHashSet<>();
 
 

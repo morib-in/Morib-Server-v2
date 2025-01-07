@@ -1,5 +1,6 @@
 package org.morib.server.domain.allowedGroup.application.impl;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
@@ -17,6 +18,13 @@ public class FetchAllowedGroupServiceImpl implements FetchAllowedGroupService {
     @Override
     public AllowedGroup findById(Long groupId) {
         return allowedGroupRepository.findById(groupId)
-            .orElseThrow(() ->  new NotFoundException(ErrorMessage.NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
+
+    @Override
+    public List<AllowedGroup> findAllByUserId(Long userId) {
+        return allowedGroupRepository.findAllByUserId(userId);
+    }
+
+
 }

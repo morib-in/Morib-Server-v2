@@ -19,6 +19,8 @@ public class AllowedSite extends BaseTimeEntity {
     private String siteName;
     @Column(nullable = false)
     private String siteUrl;
+    @Column
+    private String siteIconUrl;
 
     @ManyToOne
     @JoinColumn(name = "allowed_group_id")
