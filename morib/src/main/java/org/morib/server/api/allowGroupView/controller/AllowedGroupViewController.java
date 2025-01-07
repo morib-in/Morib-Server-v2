@@ -13,6 +13,7 @@ import org.morib.server.global.exception.InvalidQueryParameterException;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
+import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AllowedGroupViewController {
 
     private final AllowedGroupViewFacade allowedGroupViewFacade;
+    private final PrincipalHandler principalHandler;
 
     @DeleteMapping("/{groupId}")
     public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
@@ -75,7 +77,8 @@ public class AllowedGroupViewController {
 
     @GetMapping
     public ResponseEntity<BaseResponse<?>> getAllowedGroups(@AuthenticationPrincipal CustomUserDetails userDetails,  @RequestParam ConnectType connectType){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroups(userDetails.getUserId(), connectType));
+        Long userId = principalHandler.getUserIdFromUserDetails(userDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroups(userId, connectType));
     }
 
     @GetMapping("/{groupId}")
