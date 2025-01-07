@@ -5,6 +5,8 @@ import java.util.LinkedHashSet;
 import lombok.*;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.user.infra.type.InterestArea;
+import org.morib.server.domain.user.infra.type.InterestAreaConverter;
 import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.BaseTimeEntity;
@@ -37,6 +39,9 @@ public class User extends BaseTimeEntity {
     private Set<AllowedGroup> allowedGroups = new LinkedHashSet<>();
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    private InterestArea interestArea;
+
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     private boolean isPushEnabled;
     // 유저 권한 설정 메소드
