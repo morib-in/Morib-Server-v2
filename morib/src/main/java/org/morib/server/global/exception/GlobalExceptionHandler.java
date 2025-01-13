@@ -71,7 +71,12 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<BaseResponse<?>> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error(">>> handle: MethodArgumentNotValidException ", e);
         return ApiResponseUtil.failure(ErrorMessage.INVALID_EMAIL);
+    }
 
+    @ExceptionHandler(SSEConnectionException.class)
+    protected ResponseEntity<BaseResponse<?>> handleSSEConnectionException(final SSEConnectionException e) {
+        log.error(">>> handle: SSEConnectionException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.SSE_CONNECT_FAILED);
     }
 
 }
