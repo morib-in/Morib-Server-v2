@@ -15,12 +15,14 @@ public enum ErrorMessage {
     TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "잘못된 형식입니다"),
     INVALID_URL(HttpStatus.BAD_REQUEST, "요청된 url이 유효하지 않습니다."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
+
     /**
      * 401 Unauthorized
      */
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
     JWT_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자의 로그인 검증을 실패했습니다."),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효한 토큰이 아닙니다"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효한 토큰이 아닙니다."),
+    FAILED_WITHDRAW(HttpStatus.UNAUTHORIZED, "회원 탈퇴에 실패했습니다."),
 
     /**
      * 403 Forbidden
@@ -46,7 +48,8 @@ public enum ErrorMessage {
     /**
      * 500 Internal Server Error
      */
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    SSE_CONNECT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SSE 연결에 실패했습니다.")
     ;
 
     private final HttpStatus httpStatus;

@@ -38,3 +38,6 @@ out/
 
 ## yaml
 *.yaml
+
+## secret properties
+**/src/main/java/org/morib/server/global/common/SecretProperties.java

@@ -11,4 +11,13 @@ public class UserManager {
         findUser.updateProfile(updateUserProfileServiceDto.name(), updateUserProfileServiceDto.imageUrl(), updateUserProfileServiceDto.isPushEnabled());
     }
 
+    public void updateSocialRefreshToken(User findUser, String socialRefreshToken) {
+        findUser.updateSocialRefreshToken(socialRefreshToken);
+    }
+
+    public void invalidateRefreshToken(User findUser) {
+        findUser.invalidateRefreshToken();
+    }
+
+
 }

@@ -13,12 +13,16 @@ public class CustomOAuth2User extends DefaultOAuth2User {
 
     private Role role;
     private Long userId;
+    private String registrationId;
+    private String principalName;
 
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes, String nameAttributeKey,
-                            Role role, Long userId) {
+                            Role role, Long userId, String registrationId, String principalName) {
         super(authorities, attributes, nameAttributeKey);
         this.role = role;
         this.userId = userId;
+        this.registrationId = registrationId;
+        this.principalName = principalName;
     }
 }
