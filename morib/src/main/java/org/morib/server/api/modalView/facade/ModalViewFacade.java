@@ -1,32 +1,33 @@
 package org.morib.server.api.modalView.facade;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.api.homeView.vo.CategoryInfo;
 import org.morib.server.api.modalView.dto.*;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
 import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
+import org.morib.server.domain.category.application.DeleteCategoryService;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
-import org.morib.server.domain.relationship.application.ValidateRelationshipService;
-import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.relationship.RelationshipManager;
 import org.morib.server.domain.relationship.application.CreateRelationshipService;
 import org.morib.server.domain.relationship.application.DeleteRelationshipService;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
+import org.morib.server.domain.relationship.application.ValidateRelationshipService;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.type.RelationLevel;
+import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.api.homeView.vo.CategoryInfo;
-import org.morib.server.domain.category.application.DeleteCategoryService;
 import org.morib.server.global.sse.SseEmitters;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.morib.server.global.common.Constants.*;
 
@@ -46,6 +47,7 @@ public class ModalViewFacade {
     private final ValidateRelationshipService validateRelationshipService;
     private final RelationshipManager relationshipManager;
     private final SseEmitters sseEmitters;
+    private final FetchTimerService fetchTimerService;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -90,12 +92,14 @@ public class ModalViewFacade {
     }
 
     public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
-        List<User> classifiedRelationships = classifyRelationships(relationships, userId)
-                .values()
-                .stream()
+        return classifyRelationships(relationships, userId).values().stream()
                 .flatMap(List::stream)
+                .map(user -> FetchRelationshipResponseDto.of(
+                        user,
+                        sseEmitters.isConnected(user.getId()),
+                        fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now())
+                ))
                 .toList();
-        return classifiedRelationships.stream().map(FetchRelationshipResponseDto::of).toList();
     }
 
     public FetchUnconnectedRelationshipResponseDto fetchUnconnectedRelationships(Long userId) {
@@ -106,8 +110,8 @@ public class ModalViewFacade {
         Map<String, List<User>> classifiedRelationships = classifyRelationships(relationships, userId);
 
         return FetchUnconnectedRelationshipResponseDto.of(
-                classifiedRelationships.get(SEND).stream().map(FetchRelationshipResponseDto::of).toList(),
-                classifiedRelationships.get(RECEIVE).stream().map(FetchRelationshipResponseDto::of).toList());
+                classifiedRelationships.get(SEND).stream().map(FetchRelationshipRequestResponseDto::of).toList(),
+                classifiedRelationships.get(RECEIVE).stream().map(FetchRelationshipRequestResponseDto::of).toList());
     }
 
     public Map<String, List<User>> classifyRelationships(List<Relationship> relationships, Long userId) {
