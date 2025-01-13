@@ -5,6 +5,8 @@ import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.global.jwt.CustomJwtAuthenticationEntryPoint;
 import org.morib.server.global.jwt.JwtAuthenticationFilter;
 import org.morib.server.global.jwt.JwtService;
+import org.morib.server.global.oauth2.handler.CustomLogoutHandler;
+import org.morib.server.global.oauth2.handler.CustomLogoutSuccessHandler;
 import org.morib.server.global.oauth2.handler.OAuth2LoginFailureHandler;
 import org.morib.server.global.oauth2.handler.OAuth2LoginSuccessHandler;
 import org.morib.server.global.oauth2.service.CustomOAuth2UserService;
@@ -27,6 +29,9 @@ public class SecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
+    private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,11 +40,19 @@ public class SecurityConfig {
                 .requestCache(RequestCacheConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(customJwtAuthenticationEntryPoint))
+                .logout(logout -> {
+                    logout.logoutUrl("/api/v2/users/logout");
+                    logout.addLogoutHandler(customLogoutHandler);
+                    logout.logoutSuccessHandler(customLogoutSuccessHandler);
+                })
                 .oauth2Login(oauth2 -> {
                     oauth2.successHandler(oAuth2LoginSuccessHandler);
                     oauth2.failureHandler(oAuth2LoginFailureHandler);
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
+                    oauth2.authorizationEndpoint(auth -> auth
+                                    .authorizationRequestResolver(customAuthorizationRequestResolver));
                 });
+
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/**").permitAll()
                 .anyRequest().authenticated()
