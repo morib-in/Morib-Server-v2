@@ -81,4 +81,22 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         User createdUser = User.createByOAuth2UserInfo(platform, attributes.getOauth2UserInfo());
         return userRepository.saveAndFlush(createdUser);
     }
+
+    public void withdrawInGoogle(String refreshToken) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        String requestBody = "token=" + refreshToken;
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                GOOGLE_REVOKE_URL,
+                HttpMethod.POST,
+                new HttpEntity<>(requestBody, headers),
+                String.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
+        }
+    }
 }
