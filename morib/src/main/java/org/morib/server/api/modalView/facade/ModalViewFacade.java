@@ -110,8 +110,8 @@ public class ModalViewFacade {
         Map<String, List<User>> classifiedRelationships = classifyRelationships(relationships, userId);
 
         return FetchUnconnectedRelationshipResponseDto.of(
-                classifiedRelationships.get(SEND).stream().map(FetchRelationshipRequestResponseDto::of).toList(),
-                classifiedRelationships.get(RECEIVE).stream().map(FetchRelationshipRequestResponseDto::of).toList());
+                classifiedRelationships.get(SEND).stream().map(FetchRelationshipRequestsResponseDto::of).toList(),
+                classifiedRelationships.get(RECEIVE).stream().map(FetchRelationshipRequestsResponseDto::of).toList());
     }
 
     public Map<String, List<User>> classifyRelationships(List<Relationship> relationships, Long userId) {
