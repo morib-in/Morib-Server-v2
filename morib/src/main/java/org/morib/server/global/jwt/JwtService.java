@@ -100,8 +100,7 @@ public class JwtService {
             return Optional.of(claims.get(ID_CLAIM, Integer.class).toString());
 
         } catch (Exception e) {
-            log.error("액세스 토큰이 유효하지 않습니다.");
-            return Optional.empty();
+            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
     }
 
