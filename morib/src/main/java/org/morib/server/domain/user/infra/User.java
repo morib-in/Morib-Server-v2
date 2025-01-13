@@ -11,6 +11,7 @@ import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.BaseTimeEntity;
 import org.morib.server.global.oauth2.userinfo.OAuth2UserInfo;
+import static org.morib.server.global.common.Constants.INVALID_REFRESH_TOKEN;
 
 import java.util.Set;
 
@@ -43,6 +44,7 @@ public class User extends BaseTimeEntity {
     private InterestArea interestArea;
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    private String social_refreshToken;
     private boolean isPushEnabled;
     // 유저 권한 설정 메소드
     public void authorizeUser() {
@@ -62,6 +64,7 @@ public class User extends BaseTimeEntity {
                 .imageUrl(oauth2UserInfo.getImageUrl())
                 .role(Role.GUEST)
                 .isPushEnabled(false)
+                .social_refreshToken(null)
                 .build();
     }
 
@@ -71,5 +74,11 @@ public class User extends BaseTimeEntity {
         this.isPushEnabled = isPushEnabled;
     }
 
+    public void updateSocialRefreshToken(String socialRefreshToken) {
+        this.social_refreshToken = socialRefreshToken;
+    }
 
+    public void invalidateRefreshToken() {
+        this.refreshToken = INVALID_REFRESH_TOKEN;
+    }
 }
