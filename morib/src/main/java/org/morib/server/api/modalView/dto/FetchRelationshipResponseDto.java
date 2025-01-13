@@ -6,9 +6,11 @@ public record FetchRelationshipResponseDto(
         Long id,
         String name,
         String email,
-        String imageUrl
+        String imageUrl,
+        boolean isOnline,
+        int elapsedTime
 ) {
-    public static FetchRelationshipResponseDto of (User user) {
-        return new FetchRelationshipResponseDto(user.getId(), user.getName(), user.getEmail(), user.getImageUrl());
+    public static FetchRelationshipResponseDto of (User user, boolean isOnline, int elapsedTime) {
+        return new FetchRelationshipResponseDto(user.getId(), user.getName(), user.getEmail(), user.getImageUrl(), isOnline, elapsedTime);
     }
 }

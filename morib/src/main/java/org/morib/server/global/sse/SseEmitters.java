@@ -29,6 +29,7 @@ public class SseEmitters {
             emitter.complete();
         });
 
+
         return emitter;
     }
 
@@ -44,5 +45,9 @@ public class SseEmitters {
                 emitters.remove(toId); 
             }
         }
+    }
+
+    public boolean isConnected(Long userId) {
+        return emitters.containsKey(userId);
     }
 }
