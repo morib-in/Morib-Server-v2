@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
+import org.morib.server.domain.allowedGroup.infra.type.ColorCode;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.user.infra.User;
 
@@ -45,6 +46,13 @@ public class AllowedGroup {
     @BatchSize(size = 20)
     private Set<AllowedSite> allowedSites = new LinkedHashSet<>();
 
+    public static AllowedGroup create(User user, int nameIndex) {
+        return AllowedGroup.builder()
+                .name("내 허용 서비스 세트 " + nameIndex)
+                .colorCode(ColorCode.ALLOWED_SERVICE_COLOR_CODE_GREY.getHexCode())
+                .user(user)
+                .build();
+    }
 
     public void updateAll(String colorCode, String name) {
         this.colorCode = colorCode;

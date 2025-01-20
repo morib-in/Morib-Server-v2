@@ -45,6 +45,7 @@ public enum ErrorMessage {
      */
     ALREADY_FRIEND(HttpStatus.CONFLICT, "이미 친구가 된 사용자입니다."),
     ALREADY_FRIEND_REQUEST(HttpStatus.CONFLICT, "이미 요청된 사용자입니다."),
+    DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "이미 존재하는 리소스입니다."),
     /**
      * 500 Internal Server Error
      */
