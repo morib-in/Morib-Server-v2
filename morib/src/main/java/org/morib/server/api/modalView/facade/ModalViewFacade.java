@@ -20,7 +20,7 @@ import org.morib.server.domain.relationship.infra.type.RelationLevel;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.sse.SseEmitters;
+import org.morib.server.global.sse.SseRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -46,7 +46,7 @@ public class ModalViewFacade {
     private final DeleteRelationshipService deleteRelationshipService;
     private final ValidateRelationshipService validateRelationshipService;
     private final RelationshipManager relationshipManager;
-    private final SseEmitters sseEmitters;
+    private final SseRepository sseRepository;
     private final FetchTimerService fetchTimerService;
 
     @Transactional
@@ -84,7 +84,7 @@ public class ModalViewFacade {
         User findFriend = fetchUserService.fetchByUserEmail(createRelationshipRequestDto.friendEmail());
         validateRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
         createRelationshipService.create(findUser, findFriend);
-        sseEmitters.pushNotifications(findUser.getName(), findFriend.getId(), ADD_FRIEND_REQUEST_MSG);
+        sseRepository.pushNotifications(findUser.getName(), findFriend.getId(), ADD_FRIEND_REQUEST_MSG);
     }
 
     public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
@@ -96,7 +96,7 @@ public class ModalViewFacade {
                 .flatMap(List::stream)
                 .map(user -> FetchRelationshipResponseDto.of(
                         user,
-                        sseEmitters.isConnected(user.getId()),
+                        sseRepository.isConnected(user.getId()),
                         fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now())
                 ))
                 .toList();

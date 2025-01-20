@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Manager;
 import org.morib.server.domain.timer.infra.Timer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Manager
@@ -16,6 +17,11 @@ public class TimerManager {
             .sum();
     }
 
+    @Transactional
+    public void setElapsedTime(Timer timer, int elapsedTime) {
+        timer.setElapsedTime(elapsedTime);
+    }
+    @Transactional
     public void addElapsedTime(Timer timer, int elapsedTime){
         timer.addElapsedTime(elapsedTime);
     }

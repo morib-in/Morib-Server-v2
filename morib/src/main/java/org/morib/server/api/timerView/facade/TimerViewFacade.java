@@ -1,13 +1,18 @@
 package org.morib.server.api.timerView.facade;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.timerView.dto.StopTimerRequestDto;
-import org.morib.server.api.timerView.dto.TaskInTodoCardDto;
-import org.morib.server.api.timerView.dto.TodoCardResponseDto;
+import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
+import org.morib.server.api.modalView.facade.ModalViewFacade;
+import org.morib.server.api.timerView.dto.*;
+import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.relationship.application.FetchRelationshipService;
+import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
@@ -17,7 +22,14 @@ import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.sse.SseFacade;
+import org.morib.server.global.sse.SseService;
+import org.morib.server.global.sse.UserInfoDtoForSseUserInfoWrapper;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import static org.morib.server.global.common.Constants.SSE_EVENT_REFRESH;
+import static org.morib.server.global.common.Constants.SSE_EVENT_USER_INFO_UPDATE;
 
 
 @Facade
@@ -29,15 +41,35 @@ public class TimerViewFacade {
     private final FetchTodoService fetchTodoService;
     private final FetchUserService fetchUserService;
     private final TimerManager timerManager;
+    private final FetchRelationshipService fetchRelationshipService;
+    private final SseService sseService;
+    private final ModalViewFacade modalViewFacade;
+    private final SseFacade sseFacade;
 
-    @Transactional
+    public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
+        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = sseFacade.updateWhenTimerStart(userId, UserInfoDtoForSseUserInfoWrapper.of(userId, runTimerRequestDto.elapsedTime(), runTimerRequestDto.runningCategoryName(), runTimerRequestDto.taskId()));
+        SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
+        sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
+        List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
+        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_USER_INFO_UPDATE, relationships);
+    }
+
     public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
-        User user = fetchUserService.fetchByUserId(userId);
         Task findTask = fetchTaskService.fetchById(taskId);
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
         timerManager.addElapsedTime(timer, dto.elapsedTime());
+        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = sseFacade.update(
+                userId,
+                UserInfoDtoForSseUserInfoWrapper.of(
+                        userId,
+                        dto.elapsedTime(),
+                        fetchTaskService.fetchById(taskId).getCategory().getName(),
+                        taskId));
+        SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
+        sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
+        List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
+        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_USER_INFO_UPDATE, relationships);
     }
-
 
     /**
      *
@@ -63,6 +95,24 @@ public class TimerViewFacade {
 
     private TaskInTodoCardDto getTaskInTodoCardDto(LocalDate targetDate, Task task) {
         return TaskInTodoCardDto.of(task, targetDate, fetchTimerService.sumOneTaskElapsedTimeInTargetDate(task, targetDate));
+    }
+
+    /**
+     * 타이머 하단 친구 정보 불러오기
+     * 0. 해당 시점의 다른 친구들 정보를 최신화 하기 위한 API 필요할 듯 -> 이는 Timeout 줄여서 간극 줄입시다.
+     * 1. 친구 목록 조회 (온, 오프라인 모두)
+     * 2. Emitter Repository 에서 실행중인 categoryName 받아와서 FriendsInTimerResponseDto Build
+     */
+    public List<FriendsInTimerResponseDto> fetchFriendsInfo(Long userId) {
+        List<FetchRelationshipResponseDto> fetchRelationshipResponseDtos = modalViewFacade.fetchConnectedRelationships(userId);
+        List<FriendsInTimerResponseDto> friendsInTimerResponseDtos = fetchRelationshipResponseDtos.stream().map(dto ->
+                FriendsInTimerResponseDto.of(
+                        dto,
+                        sseService.fetchFriendsRunningCategoryNameBySseEmitters(dto.id())
+                )
+        ).collect(Collectors.toList()); // mutable list
+        friendsInTimerResponseDtos.sort(Comparator.comparing(FriendsInTimerResponseDto::name));
+        return friendsInTimerResponseDtos;
     }
 
 }

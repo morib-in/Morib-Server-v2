@@ -2,6 +2,8 @@ package org.morib.server.api.timerView.controller;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.morib.server.api.homeView.dto.StartTimerRequestDto;
+import org.morib.server.api.timerView.dto.RunTimerRequestDto;
 import org.morib.server.api.timerView.dto.StopTimerRequestDto;
 import org.morib.server.api.timerView.dto.TodoCardResponseDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
@@ -28,6 +30,14 @@ public class TimerViewController {
     private final TimerViewFacade timerViewFacade;
     private final PrincipalHandler principalHandler;
 
+    @PostMapping("/timer/run")
+    public ResponseEntity<BaseResponse<?>> startTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                      @RequestBody RunTimerRequestDto runTimerRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        timerViewFacade.runTimer(userId, runTimerRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
     @PostMapping("/timer/stop/{taskId}")
     public ResponseEntity<BaseResponse<?>> stopTimerAndFetchAccumulatedTime(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                             @PathVariable Long taskId,
@@ -45,6 +55,12 @@ public class TimerViewController {
         if(!targetDate.equals(LocalDate.now()))
             throw new IllegalArgumentException("오늘 당일의 날짜만 확인할 수 있습니다!");
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.fetchTodoCard(userId, targetDate));
+    }
+
+    @GetMapping("/timer/friends")
+    public ResponseEntity<BaseResponse<?>> getFriendsInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.fetchFriendsInfo(userId));
     }
 
 
