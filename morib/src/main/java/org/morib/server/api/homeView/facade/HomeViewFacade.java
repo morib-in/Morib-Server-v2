@@ -145,8 +145,8 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long mockUserId, LocalDate targetDate) {
-        User findUser = fetchUserService.fetchByUserId(mockUserId);
+    public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long userId, LocalDate targetDate) {
+        User findUser = fetchUserService.fetchByUserId(userId);
         List<Timer> findTodayTimer = fetchTimerService.fetchByUserAndTargetDate(findUser, targetDate);
         int sumUserTotalElapsedTime = timerManager.sumUserTotalElapsedTime(findTodayTimer);
         return FetchMyElapsedTimeResponseDto.of(targetDate, sumUserTotalElapsedTime);
