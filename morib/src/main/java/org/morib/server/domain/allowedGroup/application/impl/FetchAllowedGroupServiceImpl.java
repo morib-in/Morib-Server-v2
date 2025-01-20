@@ -26,5 +26,8 @@ public class FetchAllowedGroupServiceImpl implements FetchAllowedGroupService {
         return allowedGroupRepository.findAllByUserId(userId);
     }
 
-
+    @Override
+    public int getCounts(Long userId) {
+        return allowedGroupRepository.countByUserId(userId);
+    }
 }

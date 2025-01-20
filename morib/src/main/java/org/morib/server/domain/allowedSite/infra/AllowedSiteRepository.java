@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AllowedSiteRepository extends JpaRepository<AllowedSite, Long> {
-
+    boolean existsBySiteUrl(String siteUrl);
 }

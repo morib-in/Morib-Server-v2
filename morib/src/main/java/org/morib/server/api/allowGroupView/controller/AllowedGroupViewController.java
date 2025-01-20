@@ -28,8 +28,12 @@ public class AllowedGroupViewController {
     private final PrincipalHandler principalHandler;
 
     // 허용 서비스 세트 관련 api
-    public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
-        allowedGroupViewFacade.deleteAllowedServiceSet(groupId);
+    @PostMapping("/allowedGroup")
+    public ResponseEntity<BaseResponse<?>> createAllowedGroup(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.createAllowedGroup(userId));
+    }
+
     @GetMapping("/allowedGroupList")
     public ResponseEntity<BaseResponse<?>> fetchAllowedGroupList(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                  @RequestParam ConnectType connectType){
@@ -82,15 +86,14 @@ public class AllowedGroupViewController {
         allowedGroupViewFacade.deleteAllowedSite(allowedSiteId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
-    @PostMapping("/allowedSite")
-    public ResponseEntity<BaseResponse<?>> addAllowedSite(@RequestBody
-    CreateAllowedSiteInAllowedGroupRequestDto createAllowedSiteInAllowedGroupRequestDto) {
-        allowedGroupViewFacade.addAllowedSite(createAllowedSiteInAllowedGroupRequestDto);
+  
+    // 온보딩
+    @PostMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> onboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                   @RequestParam("interestArea") String interestArea,
+                                                   @RequestBody List<AllowedSiteVo> onboardRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        allowedGroupViewFacade.onboard(userId, interestArea, onboardRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }
-
 }

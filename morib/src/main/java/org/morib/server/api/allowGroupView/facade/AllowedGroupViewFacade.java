@@ -1,24 +1,21 @@
 package org.morib.server.api.allowGroupView.facade;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
-import org.morib.server.api.allowGroupView.dto.AllowedSiteVo;
-import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteInAllowedGroupRequestDto;
-import org.morib.server.api.allowGroupView.dto.FetchAllAllowedGroupsResponseDto;
-import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupDetailResponseDto;
-import org.morib.server.api.allowGroupView.dto.InterestAreaSiteResponseDto;
-import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
-import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
+import org.morib.server.api.allowGroupView.dto.*;
 import org.morib.server.domain.allowedGroup.application.AllowedGroupManager;
+import org.morib.server.domain.allowedGroup.application.CreateAllowedGroupService;
 import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
+import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchTabNameService;
-import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteInAllowedGroupServiceDto;
+import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteServiceDto;
+import org.morib.server.domain.allowedSite.infra.AllowedSite;
+import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.ConnectType;
@@ -35,23 +32,39 @@ public class AllowedGroupViewFacade {
     private final AllowedGroupManager allowedGroupManager;
     private final DeleteAllowedSiteService deleteAllowedSiteService;
     private final FetchUserService fetchUserService;
+    private final UserManager userManager;
+    private final CreateAllowedGroupService createAllowedGroupService;
+    private final FetchAllowedSiteService fetchAllowedSiteService;
 
-    @Transactional // 이후 분리 진행했을때는 해당 point에서 분산 트랜잭션 관련해서 고려해볼 수 있는 부분
-    public void deleteAllowedServiceSet(Long groupId) {
-        deleteAllowedGroupService.deleteAllowedGroupById(groupId);
+    public CreateAllowedGroupResponse createAllowedGroup(Long userId) {
+        User findUser = fetchUserService.fetchByUserId(userId);
+        return CreateAllowedGroupResponse.of(createAllowedGroupService.create(findUser, fetchAllowedGroupService.getCounts(userId) + 1));
     }
 
-    @Transactional
-    public void addAllowedSite(
-        CreateAllowedSiteInAllowedGroupRequestDto createAllowedSiteInAllowedGroupRequestDto) {
+    @Transactional(readOnly = true)
+    public List<FetchAllowedGroupListResponseDto> fetchAllowedGroupList(Long userId, ConnectType connectType) {
+        List<AllowedGroup> allowedGroups = fetchAllowedGroupService.findAllByUserId(userId);
+        return allowedGroups.stream().map(this::buildFetchAllowedGroupListResponseDto).toList();
+    }
 
-        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(
-            createAllowedSiteInAllowedGroupRequestDto.groupId());
-        String site = createAllowedSiteInAllowedGroupRequestDto.allowedSiteUrl();
-        String name = fetchTabNameService.fetch(site);
+    private FetchAllowedGroupListResponseDto buildFetchAllowedGroupListResponseDto(AllowedGroup allowedGroup) {
+        return FetchAllowedGroupListResponseDto.of(allowedGroup.getName(), allowedGroup.getColorCode(), getTop5SiteUrlsInAllowedGroup(allowedGroup));
+    }
 
-        createAllowedSiteService.create(
-            CreateAllowedSiteInAllowedGroupServiceDto.of(findAllowedGroup, site, name));
+    private List<String> getTop5SiteUrlsInAllowedGroup(AllowedGroup allowedGroup) {
+        return allowedGroup.getAllowedSites().stream()
+                .limit(6)
+                .map(AllowedSite::getSiteUrl)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public FetchAllowedGroupResponseDto fetchAllowedGroup(Long groupId, ConnectType connectType) {
+        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
+        List<AllowedSiteVo> allowedGroupDetailAllowedSiteVos =
+                findAllowedGroup.getAllowedSites().stream().map(AllowedSiteVo::of).toList();
+        return FetchAllowedGroupResponseDto.of(findAllowedGroup.getId(),
+                findAllowedGroup.getName(), findAllowedGroup.getColorCode(), allowedGroupDetailAllowedSiteVos);
     }
 
     @Transactional
@@ -61,9 +74,29 @@ public class AllowedGroupViewFacade {
 
     @Transactional
     public void updateAllowedGroupColorCode(Long groupId,
-        UpdateAllowedGroupColorCodeRequestDto dto) {
+                                            UpdateAllowedGroupColorCodeRequestDto dto) {
         allowedGroupManager.updateColorCode(fetchAllowedGroupService.findById(groupId),
-            dto.colorCode());
+                dto.colorCode());
+    }
+
+    @Transactional // 이후 분리 진행했을때는 해당 point에서 분산 트랜잭션 관련해서 고려해볼 수 있는 부분
+    public void deleteAllowedGroup(Long groupId) {
+        deleteAllowedGroupService.deleteAllowedGroupById(groupId);
+    }
+
+    @Transactional(readOnly = true)
+    public InterestAreaSiteResponseDto fetchRecommendSites(Long userId) {
+        User user = fetchUserService.fetchByUserId(userId);
+        return InterestAreaSiteResponseDto.of(user.getInterestArea().getAreaSiteVos());
+    }
+
+    @Transactional
+    public void createAllowedSite(Long allowedGroupId, CreateAllowedSiteRequestDto createAllowedSiteRequestDto) {
+        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
+        String siteUrl = createAllowedSiteRequestDto.siteUrl();
+        fetchAllowedSiteService.isExist(siteUrl);
+        String siteName = fetchTabNameService.fetch(siteUrl);
+        createAllowedSiteService.create(CreateAllowedSiteServiceDto.of(findAllowedGroup, siteUrl, siteName));
     }
 
     @Transactional
@@ -71,41 +104,14 @@ public class AllowedGroupViewFacade {
         deleteAllowedSiteService.deleteAllowedSite(allowedSiteId);
     }
 
-
-    @Transactional(readOnly = true)
-    public List<FetchAllAllowedGroupsResponseDto> getAllowedGroups(Long userId,
-        ConnectType connectType) {
-        List<AllowedGroup> all = fetchAllowedGroupService.findAllByUserId(userId);
-
-        return all.stream().map(this::madefetchAllAllowedGroupSetsResponseDto).toList();
+    public void onboard(Long userId, String interestArea, List<AllowedSiteVo> onboardRequestDto) {
+        User findUser = fetchUserService.fetchByUserId(userId);
+        userManager.updateUserInterestArea(findUser, interestArea);
+        AllowedGroup createdAllowedGroup = createAllowedGroupService.create(findUser, fetchAllowedGroupService.getCounts(userId) + 1);
+        createAllowedSiteService.createAll(createdAllowedGroup, onboardRequestDto);
     }
 
-    private FetchAllAllowedGroupsResponseDto madefetchAllAllowedGroupSetsResponseDto(
-        AllowedGroup a) {
-        final List<String> allowIcons = new ArrayList<>();
-        addSiteIcons(a, allowIcons);
-        return FetchAllAllowedGroupsResponseDto.of(a.getName(), a.getColorCode(),
-            allowIcons);
-    }
 
-    private void addSiteIcons(AllowedGroup a, List<String> allowIcons) {
-        a.getAllowedSites().forEach(b -> allowIcons.add(b.getSiteIconUrl()));
-    }
 
-    @Transactional(readOnly = true)
-    public FetchAllowedGroupDetailResponseDto getGroupDetail(Long groupId,
-        ConnectType connectType) {
-        AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
-        List<AllowedSiteVo> allowedGroupDetailAllowedSiteVos = findAllowedGroup.getAllowedSites()
-            .stream().map(AllowedSiteVo::of).toList();
 
-        return FetchAllowedGroupDetailResponseDto.of(findAllowedGroup.getId(),
-            findAllowedGroup.getName(), allowedGroupDetailAllowedSiteVos);
-    }
-
-    @Transactional(readOnly = true)
-    public InterestAreaSiteResponseDto getRecommendSite(Long userId) {
-        User user = fetchUserService.fetchByUserId(userId);
-        return InterestAreaSiteResponseDto.of(user.getInterestArea().getAreaSiteVos());
-    }
 }

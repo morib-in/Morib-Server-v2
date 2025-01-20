@@ -81,4 +81,8 @@ public class User extends BaseTimeEntity {
     public void invalidateRefreshToken() {
         this.refreshToken = INVALID_REFRESH_TOKEN;
     }
+
+    public void updateUserInterestArea(InterestArea interestArea) {
+        this.interestArea = interestArea;
+    }
 }

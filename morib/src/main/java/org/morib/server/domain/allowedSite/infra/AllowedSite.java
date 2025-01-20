@@ -19,20 +19,10 @@ public class AllowedSite extends BaseTimeEntity {
     private String siteName;
     @Column(nullable = false)
     private String siteUrl;
-    @Column
-    private String siteIconUrl;
 
     @ManyToOne
     @JoinColumn(name = "allowed_group_id")
     private AllowedGroup allowedGroup;
-
-
-    public static AllowedSite create(String siteName, String siteUrl) {
-        return AllowedSite.builder()
-                .siteName(siteName)
-                .siteUrl(siteUrl)
-                .build();
-    }
 
     public static AllowedSite create(String siteName, String siteUrl, AllowedGroup allowedGroup) {
         return AllowedSite.builder()
