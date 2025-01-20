@@ -1,43 +1,80 @@
 package org.morib.server.api.allowGroupView.controller;
 
-import java.util.Objects;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteInAllowedGroupRequestDto;
+import org.morib.server.api.allowGroupView.dto.AllowedSiteVo;
+import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
 import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
-import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
-import org.morib.server.global.exception.InvalidQueryParameterException;
-import org.morib.server.global.message.ErrorMessage;
+import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/allowedServiceSet")
+@RequestMapping("/api/v2")
 public class AllowedGroupViewController {
 
     private final AllowedGroupViewFacade allowedGroupViewFacade;
     private final PrincipalHandler principalHandler;
 
-    @DeleteMapping("/{groupId}")
+    // 허용 서비스 세트 관련 api
     public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
         allowedGroupViewFacade.deleteAllowedServiceSet(groupId);
+    @GetMapping("/allowedGroupList")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedGroupList(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                 @RequestParam ConnectType connectType){
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchAllowedGroupList(userId, connectType));
+    }
+
+    @GetMapping("/allowedGroup/{allowedGroupId}")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedGroup(@PathVariable Long allowedGroupId,
+                                                             @RequestParam ConnectType connectType){
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchAllowedGroup(allowedGroupId, connectType));
+    }
+
+    @PatchMapping("/allowedGroup/{allowedGroupId}/name")
+    public ResponseEntity<BaseResponse<?>> updateAllowedGroupName(@PathVariable Long allowedGroupId,
+                                                                  @Valid @RequestBody UpdateAllowedGroupNameRequestDto dto) {
+        allowedGroupViewFacade.updateAllowedGroupName(allowedGroupId, dto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @PatchMapping("/allowedGroup/{allowedGroupId}/colorCode")
+    public ResponseEntity<BaseResponse<?>> updateAllowedGroupColorCode(@PathVariable Long allowedGroupId,
+                                                                       @Valid @RequestBody UpdateAllowedGroupColorCodeRequestDto dto) {
+        allowedGroupViewFacade.updateAllowedGroupColorCode(allowedGroupId, dto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @DeleteMapping("/allowedGroup/{allowedGroupId}")
+    public ResponseEntity<BaseResponse<?>> deleteAllowedGroup(@PathVariable Long allowedGroupId){
+        allowedGroupViewFacade.deleteAllowedGroup(allowedGroupId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    // 허용 서비스 관련 api
+    @PostMapping("/allowedSite/{allowedGroupId}")
+    public ResponseEntity<BaseResponse<?>> createAllowedSite(@PathVariable Long allowedGroupId,
+                                                             @Valid @RequestBody CreateAllowedSiteRequestDto createAllowedSiteRequestDto) {
+        allowedGroupViewFacade.createAllowedSite(allowedGroupId, createAllowedSiteRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping("/recommendSite")
+    public ResponseEntity<BaseResponse<?>> fetchRecommendSites(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchRecommendSites(userId));
     }
 
     @DeleteMapping("/allowedSite/{allowedSiteId}")
@@ -53,43 +90,7 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-
-    @PatchMapping("/{groupId}/name")
-    public ResponseEntity<BaseResponse<?>> updateAllowedGroupName(@PathVariable Long groupId,
-        @RequestBody
-        UpdateAllowedGroupNameRequestDto dto) {
-        if (Objects.isNull(dto))
-            throw new InvalidQueryParameterException(ErrorMessage.BAD_REQUEST);
-
-        allowedGroupViewFacade.updateAllowedGroupName(groupId,dto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
-    @PatchMapping("/{groupId}/colorCode")
-    public ResponseEntity<BaseResponse<?>> updateAllowedGroupColorCode(@PathVariable Long groupId,
-        @RequestBody UpdateAllowedGroupColorCodeRequestDto dto) {
-        if (Objects.isNull(dto))
-            throw new InvalidQueryParameterException(ErrorMessage.BAD_REQUEST);
-
-        allowedGroupViewFacade.updateAllowedGroupColorCode(groupId,dto);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }
-
-    @GetMapping
-    public ResponseEntity<BaseResponse<?>> getAllowedGroups(@AuthenticationPrincipal CustomUserDetails userDetails,  @RequestParam ConnectType connectType){
-        Long userId = principalHandler.getUserIdFromUserDetails(userDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getAllowedGroups(userId, connectType));
-    }
-
-    @GetMapping("/{groupId}")
-    public ResponseEntity<BaseResponse<?>> getAllowedGroups(@PathVariable Long groupId, @RequestParam ConnectType connectType){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroupDetail(groupId, connectType));
-    }
-
-    @GetMapping("/recommendSite")
-    public ResponseEntity<BaseResponse<?>> getRecommendSite(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getRecommendSite(userDetails.getUserId()));
-    }
-
 
 }
