@@ -34,10 +34,18 @@ public class AllowedGroupViewController {
     private final AllowedGroupViewFacade allowedGroupViewFacade;
     private final PrincipalHandler principalHandler;
 
-    @DeleteMapping("/{groupId}")
-    public ResponseEntity<BaseResponse<?>> deleteAllowedServiceSet(@PathVariable Long groupId){
-        allowedGroupViewFacade.deleteAllowedServiceSet(groupId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    // 허용 서비스 세트 관련 api
+    @PostMapping("/allowedGroup")
+    public ResponseEntity<BaseResponse<?>> createAllowedGroup(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.createAllowedGroup(userId));
+    }
+
+    @GetMapping("/allowedGroupList")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedGroupList(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                 @RequestParam ConnectType connectType){
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchAllowedGroupList(userId, connectType));
     }
 
     @DeleteMapping("/allowedSite/{allowedSiteId}")
@@ -86,10 +94,14 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getGroupDetail(groupId, connectType));
     }
 
-    @GetMapping("/recommendSite")
-    public ResponseEntity<BaseResponse<?>> getRecommendSite(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.getRecommendSite(userDetails.getUserId()));
+    // 온보딩
+    @PostMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> onboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                   @RequestParam("interestArea") String interestArea,
+                                                   @RequestBody List<AllowedSiteVo> onboardRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        allowedGroupViewFacade.onboard(userId, interestArea, onboardRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
 
 }
