@@ -41,4 +41,5 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
         return categoryRepository.findByUserAndId(findUser, categoryId).
             orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
+
 }

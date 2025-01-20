@@ -32,7 +32,7 @@ public class HomeViewController {
                 homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate)));
     }
 
-    @PostMapping("/timer/start")
+    @PostMapping("/timer/enter")
     public ResponseEntity<BaseResponse<?>> startTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
                                                       @RequestBody StartTimerRequestDto startTimerRequestDto) {

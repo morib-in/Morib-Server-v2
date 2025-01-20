@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidURLException.class)
     protected ResponseEntity<BaseResponse<?>> handleInvalidURLException(final InvalidURLException e) {
         log.error(">>> handle: InvalidURLException ", e);
-        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+        return ApiResponseUtil.failure(ErrorMessage.TYPE_MISMATCH);
     }
 
     @ExceptionHandler(InvalidQueryParameterException.class)
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<BaseResponse<?>> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error(">>> handle: MethodArgumentNotValidException ", e);
-        return ApiResponseUtil.failure(ErrorMessage.INVALID_EMAIL);
+        return ApiResponseUtil.failure(ErrorMessage.TYPE_MISMATCH);
     }
 
     @ExceptionHandler(SSEConnectionException.class)
@@ -79,5 +79,10 @@ public class GlobalExceptionHandler {
         return ApiResponseUtil.failure(ErrorMessage.SSE_CONNECT_FAILED);
     }
 
+    @ExceptionHandler(DuplicateResourceException.class)
+    protected ResponseEntity<BaseResponse<?>> handleDuplicateResourceException(final DuplicateResourceException e) {
+        log.error(">>> handle: DuplicateResourceException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.DUPLICATE_RESOURCE);
+    }
 }
 
