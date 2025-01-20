@@ -1,6 +1,12 @@
 package org.morib.server.api.allowGroupView.dto;
 
-public record UpdateAllowedGroupNameRequestDto(String name) {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateAllowedGroupNameRequestDto(
+        @NotBlank
+        String name
+)
+{
     public static UpdateAllowedGroupNameRequestDto of(String name) {
         return new UpdateAllowedGroupNameRequestDto(name);
     }
