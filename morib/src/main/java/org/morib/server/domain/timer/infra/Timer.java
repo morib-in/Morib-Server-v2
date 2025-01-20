@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 
@@ -13,6 +14,7 @@ import org.morib.server.global.common.BaseTimeEntity;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Timer extends BaseTimeEntity {
     @Id
