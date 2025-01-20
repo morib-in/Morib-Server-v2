@@ -2,7 +2,8 @@ package org.morib.server.global.common;
 
 public final class Constants {
 
-    private Constants() {}
+    private Constants() {
+    }
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
@@ -17,5 +18,9 @@ public final class Constants {
     public static final String GOOGLE_REGISTRATION_ID = "google";
     public static final String INVALID_REFRESH_TOKEN = "invalid";
     public static final String GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
+    public static final String SSE_EVENT_CONNECT = "connect";
+    public static final String SSE_EVENT_COMPLETION = "completion";
+    public static final String SSE_EVENT_REFRESH = "refresh";
+    public static final String SSE_EVENT_USER_INFO_UPDATE = "update";
 
 }
