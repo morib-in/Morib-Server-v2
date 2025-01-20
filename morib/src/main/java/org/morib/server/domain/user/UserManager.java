@@ -3,6 +3,7 @@ package org.morib.server.domain.user;
 import org.morib.server.annotation.Manager;
 import org.morib.server.domain.user.application.dto.UpdateUserProfileServiceDto;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.domain.user.infra.type.InterestArea;
 
 @Manager
 public class UserManager {
@@ -19,5 +20,7 @@ public class UserManager {
         findUser.invalidateRefreshToken();
     }
 
-
+    public void updateUserInterestArea(User findUser, String interestArea) {
+        findUser.updateUserInterestArea(InterestArea.fromValue(interestArea));
+    }
 }
