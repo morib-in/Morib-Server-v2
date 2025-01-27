@@ -1,16 +1,22 @@
-package org.morib.server.global.sse;
+package org.morib.server.global.sse.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.global.exception.SSEConnectionException;
 import org.morib.server.global.message.ErrorMessage;
+import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
+import org.morib.server.global.sse.application.event.SseDisconnectEvent;
+import org.morib.server.global.sse.application.repository.SseRepository;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.morib.server.global.common.Constants.SSE_EVENT_CONNECT;
 
@@ -19,25 +25,14 @@ import static org.morib.server.global.common.Constants.SSE_EVENT_CONNECT;
 public class SseService {
 
     private final SseRepository sseRepository;
-    private final FetchRelationshipService fetchRelationshipService;
+
 
     public SseEmitter create() {
         return sseRepository.create();
     }
 
-    public SseEmitter init(Long userId) {
-        SseEmitter emitter = sseRepository.create();
-        sseRepository.add(userId, emitter, 0, "", null);
-        try {
-            emitter.send(SseEmitter.event()
-                    .name(SSE_EVENT_CONNECT)
-                    .data(("[id : " + userId + "] 가 연결되었습니다.")));
-        } catch (IOException e) {
-            throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
-        }
-        List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
-        sseRepository.broadcast(userId, "[id : " + userId + "] 가 연결되었습니다.", SSE_EVENT_CONNECT, relationships);
-        return emitter;
+    public SseEmitter add(Long userId, SseEmitter emitter) {
+        return sseRepository.add(userId, emitter, 0, "", null);
     }
 
     public void saveSseUserInfo(Long userId, SseEmitter emitter, UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper) {
@@ -49,8 +44,15 @@ public class SseService {
                 calculatedSseUserInfoWrapper.taskId());
     }
 
+    public List<SseEmitter> fetchConnectedSseEmittersById(List<Long> ids) {
+        return ids.stream()
+                .filter(sseRepository::isConnected)
+                .map(sseRepository::getSseEmitterById)
+                .toList();
+    }
+
     public SseEmitter fetchSseEmitterByUserId(Long userId) {
-        return Optional.ofNullable(sseRepository.emitters.get(userId).getSseEmitter()).orElseThrow(
+        return Optional.ofNullable(sseRepository.getSseEmitterById(userId)).orElseThrow(
                 () -> new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED)
         );
     }
@@ -70,4 +72,9 @@ public class SseService {
     public void broadcast(Long userId, Object data, String eventName, List<Relationship> relationships) {
         sseRepository.broadcast(userId, data, eventName, relationships);
     }
+
+    public boolean validateConnection(Long userId) {
+        return sseRepository.isConnected(userId);
+    }
+
 }

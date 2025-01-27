@@ -1,4 +1,4 @@
-package org.morib.server.global.sse;
+package org.morib.server.global.sse.application.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

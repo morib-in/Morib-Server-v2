@@ -20,8 +20,12 @@ import org.morib.server.domain.relationship.infra.type.RelationLevel;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.sse.SseRepository;
+import org.morib.server.global.message.SseMessageBuilder;
+import org.morib.server.global.sse.application.repository.SseRepository;
+import org.morib.server.global.sse.application.service.SseSender;
+import org.morib.server.global.sse.application.service.SseService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,8 +50,10 @@ public class ModalViewFacade {
     private final DeleteRelationshipService deleteRelationshipService;
     private final ValidateRelationshipService validateRelationshipService;
     private final RelationshipManager relationshipManager;
-    private final SseRepository sseRepository;
     private final FetchTimerService fetchTimerService;
+    private final SseSender sseSender;
+    private final SseService sseService;
+    private final SseMessageBuilder sseMessageBuilder;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -84,7 +90,8 @@ public class ModalViewFacade {
         User findFriend = fetchUserService.fetchByUserEmail(createRelationshipRequestDto.friendEmail());
         validateRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
         createRelationshipService.create(findUser, findFriend);
-        sseRepository.pushNotifications(findUser.getName(), findFriend.getId(), ADD_FRIEND_REQUEST_MSG);
+        SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(findFriend.getId());
+        sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST, sseMessageBuilder.buildFriendRequestMessage(findUser.getName()));
     }
 
     public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
@@ -96,7 +103,7 @@ public class ModalViewFacade {
                 .flatMap(List::stream)
                 .map(user -> FetchRelationshipResponseDto.of(
                         user,
-                        sseRepository.isConnected(user.getId()),
+                        sseService.validateConnection(user.getId()),
                         fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now())
                 ))
                 .toList();
@@ -132,6 +139,9 @@ public class ModalViewFacade {
     public void acceptPendingFriendRequest(Long userId, Long friendId) {
         Relationship relationship = fetchRelationshipService.fetchRelationshipByUserIdAndFriendId(friendId, userId, RelationLevel.UNCONNECTED);
         relationshipManager.updateRelationLevelToConnect(relationship);
+        User friend = fetchUserService.fetchByUserId(friendId);
+        SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(friendId);
+        sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST_ACCEPT, sseMessageBuilder.buildFriendRequestAcceptMessage(friend.getName()));
     }
 
     @Transactional

@@ -1,7 +1,6 @@
-package org.morib.server.global.sse;
+package org.morib.server.global.sse.application.repository;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,6 +10,9 @@ import org.morib.server.domain.relationship.application.FetchRelationshipService
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.global.exception.SSEConnectionException;
 import org.morib.server.global.message.ErrorMessage;
+import org.morib.server.global.sse.application.event.SseDisconnectEvent;
+import org.morib.server.global.sse.application.event.SseTimeoutEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -22,8 +24,8 @@ import static org.morib.server.global.common.Constants.SSE_TIMEOUT;
 @RequiredArgsConstructor
 public class SseRepository {
 
-    protected static final ConcurrentHashMap<Long, SseUserInfoWrapper> emitters = new ConcurrentHashMap<>();
-    private final FetchRelationshipService fetchRelationshipService;
+    public static final ConcurrentHashMap<Long, SseUserInfoWrapper> emitters = new ConcurrentHashMap<>();
+    private final ApplicationEventPublisher eventPublisher;
 
     public SseEmitter create() {
         return new SseEmitter(SSE_TIMEOUT);
@@ -31,21 +33,27 @@ public class SseRepository {
 
     public SseEmitter add(Long userId, SseEmitter emitter, int elapsedTime, String runningCategoryName, Long taskId) {
         emitters.put(userId, new SseUserInfoWrapper(emitter, elapsedTime, runningCategoryName, taskId));
-
         log.info("new emitter added: {}", emitter);
         log.info("emitter list size: {}", emitters.size());
         log.info("emitter list: {}", emitters);
 
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
-            sendEventOnCompletion(userId);
             emitters.remove(userId);
+            eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
         });
+
         emitter.onTimeout(() -> {
             log.info("onTimeout callback");
             emitter.complete();
+            eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
         });
+
         return emitter;
+    }
+
+    public SseEmitter getSseEmitterById(Long id) {
+        return emitters.get(id).getSseEmitter();
     }
 
     public void pushNotifications(String fromName, Long toId, String msg) {
@@ -64,11 +72,6 @@ public class SseRepository {
 
     public boolean isConnected(Long userId) {
         return emitters.containsKey(userId);
-    }
-
-    public void sendEventOnCompletion(Long userId) {
-        List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
-        broadcast(userId, "[id : " + userId + "] 과의 연결이 종료되었습니다.", SSE_EVENT_COMPLETION, relationships);
     }
 
     public void broadcast(Long userId, Object data, String eventName, List<Relationship> relationships) {

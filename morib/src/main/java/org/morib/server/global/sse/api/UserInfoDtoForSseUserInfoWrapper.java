@@ -1,4 +1,4 @@
-package org.morib.server.global.sse;
+package org.morib.server.global.sse.api;
 
 public record UserInfoDtoForSseUserInfoWrapper(
         Long id,
