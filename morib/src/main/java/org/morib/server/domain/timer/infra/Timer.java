@@ -1,13 +1,11 @@
 package org.morib.server.domain.timer.infra;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.BaseTimeEntity;
@@ -15,6 +13,8 @@ import org.morib.server.global.common.BaseTimeEntity;
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Timer extends BaseTimeEntity {
     @Id
@@ -36,5 +36,13 @@ public class Timer extends BaseTimeEntity {
 
     public void addElapsedTime(int i) {
         this.elapsedTime += i;
+    }
+
+    public static Timer create(User user, LocalDate targetDate, Task task) {
+        return Timer.builder()
+                .user(user)
+                .targetDate(targetDate)
+                .task(task)
+                .build();
     }
 }
