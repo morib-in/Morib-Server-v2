@@ -9,8 +9,6 @@ import org.morib.server.annotation.Facade;
 import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.api.timerView.dto.*;
-import org.morib.server.domain.category.application.FetchCategoryService;
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.FetchTaskService;
@@ -21,15 +19,13 @@ import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
-import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.sse.SseFacade;
-import org.morib.server.global.sse.SseService;
-import org.morib.server.global.sse.UserInfoDtoForSseUserInfoWrapper;
+import org.morib.server.global.sse.api.SseFacade;
+import org.morib.server.global.sse.application.service.SseService;
+import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static org.morib.server.global.common.Constants.SSE_EVENT_REFRESH;
-import static org.morib.server.global.common.Constants.SSE_EVENT_USER_INFO_UPDATE;
+import static org.morib.server.global.common.Constants.*;
 
 
 @Facade
@@ -51,7 +47,7 @@ public class TimerViewFacade {
         SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
         sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
         List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
-        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_USER_INFO_UPDATE, relationships);
+        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_TIMER_START, relationships);
     }
 
     public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
@@ -68,7 +64,7 @@ public class TimerViewFacade {
         SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
         sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
         List<Relationship> relationships = fetchRelationshipService.fetchConnectedRelationship(userId);
-        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_USER_INFO_UPDATE, relationships);
+        sseService.broadcast(userId, calculatedSseUserInfoWrapper, SSE_EVENT_TIMER_STOP_ACTION, relationships);
     }
 
     /**
