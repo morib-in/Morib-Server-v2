@@ -11,7 +11,9 @@ import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +37,15 @@ public class FetchRelationshipServiceImpl implements FetchRelationshipService {
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
     }
+
+    @Override
+    public List<Long> fetchConnectedRelationshipAndClassify(Long userId) {
+        return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.CONNECTED)
+                .stream()
+                .map(relationship -> relationship.getUser().getId().equals(userId)
+                        ? relationship.getFriend().getId()
+                        : relationship.getUser().getId())
+                .toList();
+    }
+
 }

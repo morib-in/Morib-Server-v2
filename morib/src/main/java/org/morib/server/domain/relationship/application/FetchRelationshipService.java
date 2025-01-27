@@ -10,6 +10,5 @@ public interface FetchRelationshipService {
     List<Relationship> fetchConnectedRelationship(Long userId);
     List<Relationship> fetchUnconnectedRelationship(Long userId);
     Relationship fetchRelationshipByUserIdAndFriendId(Long userId, Long friendId, RelationLevel relationLevel);
-
-
+    List<Long> fetchConnectedRelationshipAndClassify(Long userId);
 }

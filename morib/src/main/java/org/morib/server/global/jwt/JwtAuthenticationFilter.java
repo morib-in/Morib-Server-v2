@@ -29,15 +29,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = jwtService.extractAccessToken(request)
-                .filter(jwtService::isTokenValid)
-                .orElse(null);
-        handleAccessToken(accessToken);
+        String requestUri = request.getRequestURI();
+        if (requestUri.contains("reissue")) {
+            jwtService.extractRefreshToken(request)
+                    .filter(jwtService::isTokenValid);
+        }
+        else {
+            String accessToken = jwtService.extractAccessToken(request)
+                    .filter(jwtService::isTokenValid)
+                    .orElse(null);
+            handleAccessToken(accessToken);
+        }
         filterChain.doFilter(request, response);
     }
 
     private void handleAccessToken(String accessToken) {
         jwtService.extractId(accessToken)
+                .map(id -> userRepository.findById(Long.valueOf(id)).orElseThrow(
+                        () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+                ))
+                .ifPresent(this::saveAuthentication);
+    }
+
+    private void handleRefreshToken(String refreshToken) {
+        jwtService.extractId(refreshToken)
                 .map(id -> userRepository.findById(Long.valueOf(id)).orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
                 ))

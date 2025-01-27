@@ -17,6 +17,7 @@ import org.morib.server.domain.task.application.DeleteTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
+import org.morib.server.domain.timer.application.CreateTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.TodoManager;
@@ -44,6 +45,7 @@ public class HomeViewFacade {
     private final ClassifyTaskService classifyTaskService;
     private final CreateTaskService createTaskService;
     private final CreateTodoService createTodoService;
+    private final CreateTimerService createTimerService;
     private final TodoManager todoManager;
     private final TimerManager timerManager;
     private final TaskManager taskManager;
@@ -130,19 +132,32 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public void startTimer(Long mockUserId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
-        Optional<Todo> optionalTodo = fetchTodoService.fetchOrNullByUserIdAndTargetDate(mockUserId, targetDate);
-        optionalTodo.ifPresentOrElse(todo -> updateTaskInTodo(startTimerRequestDto, todo), () -> {
-            User findUser = fetchUserService.fetchByUserId(mockUserId);
-            Todo newTodo = createTodoService.saveTodoByUserAndTargetDate(findUser, targetDate);
-            updateTaskInTodo(startTimerRequestDto, newTodo);
-        });
+    public void startTimer(Long userId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
+        // 사용자 조회 (한 번만)
+        User findUser = fetchUserService.fetchByUserId(userId);
+
+        // Todo 조회 및 생성 (필요한 경우에만)
+        Todo todo = fetchTodoService.fetchOrNullByUserIdAndTargetDate(userId, targetDate)
+                .orElseGet(() -> createTodoService.saveTodoByUserAndTargetDate(findUser, targetDate));
+
+        // Task ID 리스트 조회 (Batch 조회)
+        Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+
+        // 타이머가 존재하는 Task 조회 (Batch 조회)
+        Set<Long> existingTimerTaskIds = fetchTimerService.fetchExistingTaskIdsByTargetDate(tasks, targetDate);
+
+        // Task 업데이트 & 타이머 생성 (존재하지 않는 타이머만)
+        updateTaskInTodo(startTimerRequestDto, todo);
+        tasks.stream()
+                .filter(task -> !existingTimerTaskIds.contains(task.getId())) // 이미 존재하는 타이머는 제외
+                .forEach(task -> createTimerService.createTimer(findUser, targetDate, task));
     }
 
     private void updateTaskInTodo(StartTimerRequestDto startTimerRequestDto, Todo todo) {
         Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
     }
+
 
     @Transactional
     public FetchMyElapsedTimeResponseDto fetchTotalElapsedTimeTodayByUser(Long userId, LocalDate targetDate) {
