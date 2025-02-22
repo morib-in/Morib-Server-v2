@@ -31,7 +31,7 @@ jobs:
 
       - name: docker image 빌드 및 푸시
         run: |
-          cd ./Morib-Server-v2/morib
+          cd ./morib
           docker build --platform linux/amd64 -t moribweb/morib_prod .
           docker push moribweb/morib_prod:latest
         working-directory: ${{ env.working-directory }}
