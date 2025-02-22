@@ -28,8 +28,15 @@ public class HomeViewController {
                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS,
-                homeViewFacade.fetchHome(HomeViewRequestDto.of(userId, startDate, endDate)));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, homeViewFacade.fetchHome(userId, startDate, endDate));
+    }
+
+    @GetMapping("/home/deprecated")
+    public ResponseEntity<BaseResponse<?>> fetchHomeDeprecated(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, homeViewFacade.fetchHomeDeprecated(HomeViewRequestDto.of(userId, startDate, endDate)));
     }
 
     @PostMapping("/timer/enter")
