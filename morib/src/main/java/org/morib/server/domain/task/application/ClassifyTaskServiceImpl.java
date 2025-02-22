@@ -23,4 +23,10 @@ public class ClassifyTaskServiceImpl implements ClassifyTaskService {
                 .sorted(Comparator.comparing(Task::getCreatedAt)) // createdAt 필드를 기준으로 정렬
                 .collect(Collectors.toCollection(LinkedHashSet::new)); // LinkedHashSet으로 수집
     }
+
+    @Override
+    public boolean isTaskInDateRange(Task task, LocalDate date) {
+        return (task.getStartDate().isBefore(date.plusDays(1))) &&
+                (task.getEndDate() == null || task.getEndDate().isAfter(date.minusDays(1)));
+    }
 }
