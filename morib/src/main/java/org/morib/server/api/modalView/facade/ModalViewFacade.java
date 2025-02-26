@@ -91,7 +91,7 @@ public class ModalViewFacade {
         validateRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
         createRelationshipService.create(findUser, findFriend);
         SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(findFriend.getId());
-        sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST, sseMessageBuilder.buildFriendRequestMessage(findUser.getName()));
+        if (findFriendEmitter != null) sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST, sseMessageBuilder.buildFriendRequestMessage(findUser.getName()));
     }
 
     public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
@@ -141,7 +141,7 @@ public class ModalViewFacade {
         relationshipManager.updateRelationLevelToConnect(relationship);
         User friend = fetchUserService.fetchByUserId(friendId);
         SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(friendId);
-        sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST_ACCEPT, sseMessageBuilder.buildFriendRequestAcceptMessage(friend.getName()));
+        if (findFriendEmitter != null) sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST_ACCEPT, sseMessageBuilder.buildFriendRequestAcceptMessage(friend.getName()));
     }
 
     @Transactional
