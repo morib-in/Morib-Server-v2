@@ -52,8 +52,12 @@ public class SseRepository {
         return emitter;
     }
 
+    public void remove(SseEmitter emitter) {
+        emitter.complete();
+    }
+
     public SseEmitter getSseEmitterById(Long id) {
-        return emitters.get(id).getSseEmitter();
+        return emitters.get(id) == null ? null : emitters.get(id).getSseEmitter();
     }
 
     public void pushNotifications(String fromName, Long toId, String msg) {

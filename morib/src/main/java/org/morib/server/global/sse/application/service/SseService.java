@@ -26,13 +26,16 @@ public class SseService {
 
     private final SseRepository sseRepository;
 
-
     public SseEmitter create() {
         return sseRepository.create();
     }
 
     public SseEmitter add(Long userId, SseEmitter emitter) {
         return sseRepository.add(userId, emitter, 0, "", null);
+    }
+
+    public void remove(SseEmitter emitter) {
+        sseRepository.remove(emitter);
     }
 
     public void saveSseUserInfo(Long userId, SseEmitter emitter, UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper) {
@@ -52,9 +55,7 @@ public class SseService {
     }
 
     public SseEmitter fetchSseEmitterByUserId(Long userId) {
-        return Optional.ofNullable(sseRepository.getSseEmitterById(userId)).orElseThrow(
-                () -> new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED)
-        );
+        return sseRepository.getSseEmitterById(userId);
     }
 
     // SseEmitter hashMap에 들어있는 친구들의 카테고리 이름 조회 (온라인인 친구만 조회됨)
