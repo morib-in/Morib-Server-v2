@@ -57,23 +57,55 @@ public class AllowedGroupViewFacade {
     }
 
     private FetchAllowedGroupListResponseDto buildFetchAllowedGroupListResponseDto(AllowedGroup allowedGroup) {
-        return FetchAllowedGroupListResponseDto.of(allowedGroup.getName(), allowedGroup.getColorCode(), getTop5SiteUrlsInAllowedGroup(allowedGroup));
+        return FetchAllowedGroupListResponseDto.of(
+                allowedGroup.getId(),
+                allowedGroup.getName(),
+                allowedGroup.getColorCode(),
+                getTop5SiteUrlsInAllowedGroup(allowedGroup),
+                getExtraCountByAllowedService(allowedGroup.getAllowedSites().size())
+                );
     }
 
     private List<String> getTop5SiteUrlsInAllowedGroup(AllowedGroup allowedGroup) {
         return allowedGroup.getAllowedSites().stream()
-                .limit(6)
+                .limit(MAX_VISIBLE_ALLOWED_SERVICES)
                 .map(AllowedSite::getSiteUrl)
                 .toList();
+    }
+
+    private int getExtraCountByAllowedService(int size) {
+        return Math.max(size - MAX_VISIBLE_ALLOWED_SERVICES, 0);
     }
 
     @Transactional(readOnly = true)
     public FetchAllowedGroupResponseDto fetchAllowedGroup(Long groupId, ConnectType connectType) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(groupId);
-        List<AllowedSiteVo> allowedGroupDetailAllowedSiteVos =
-                findAllowedGroup.getAllowedSites().stream().map(AllowedSiteVo::of).toList();
-        return FetchAllowedGroupResponseDto.of(findAllowedGroup.getId(),
-                findAllowedGroup.getName(), findAllowedGroup.getColorCode(), allowedGroupDetailAllowedSiteVos);
+
+        List<AllowedSiteWithIdVo> allowedSiteVoList = filterByTopDomainAndGetAllowedSiteWithIdVo(findAllowedGroup);
+
+        return FetchAllowedGroupResponseDto.of(
+                findAllowedGroup.getId(),
+                findAllowedGroup.getName(),
+                findAllowedGroup.getColorCode(),
+                allowedSiteVoList);
+    }
+
+    public List<AllowedSiteWithIdVo> filterByTopDomainAndGetAllowedSiteWithIdVo(AllowedGroup findAllowedGroup) {
+        TreeMap<String, List<AllowedSite>> filteredAllowedSites = new TreeMap<>();
+        for (AllowedSite allowedSite : findAllowedGroup.getAllowedSites()) {
+            String domainForKey = fetchSiteInfoService.getTopDomain(allowedSite.getSiteUrl());
+            filteredAllowedSites
+                    .computeIfAbsent(domainForKey, k -> new ArrayList<>())
+                    .add(allowedSite);
+        }
+
+        filteredAllowedSites.values().forEach(
+                list -> list.sort(Comparator.comparing(AllowedSite::getSiteUrl)));
+
+        return filteredAllowedSites.values().stream()
+                .flatMap(List::stream)
+                .map(AllowedSiteWithIdVo::of)
+                .toList();
     }
 
     @Transactional
