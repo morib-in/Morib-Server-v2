@@ -38,6 +38,7 @@ out/
 
 ## yaml
 *.yaml
+**/src/main/resources/logback-spring.xml
 
 ## secret properties
 **/src/main/java/org/morib/server/global/common/SecretProperties.java
