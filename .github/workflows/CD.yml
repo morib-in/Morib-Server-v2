@@ -19,6 +19,40 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+ 
+      - name: secretProperties.java 생성
+        run: |
+          cd ./morib/src/main/java/org/morib/server/global/common
+          touch ./secretProperties.java
+          echo "${{ secrets.SECRET_PROPERTIES }}" >> ./secretProperties.java
+        working-directory: ${{ env.working-directory }}
+
+          
+      - name: application.yml 생성
+        run: |
+          mkdir -p ./morib/src/main/resources && cd $_
+          touch ./application.yml
+          echo "${{ secrets.CD_APPLICATION }}" > ./application.yml
+          cat ./application.yml
+        working-directory: ${{ env.working-directory }}
+        
+      - name: logback-spring.xml 생성
+        run: |
+          cd ./morib/src/main/resources
+          touch ./logback-spring.xml
+          echo "${{ secrets.LOG_CONFIGURATION }}" >> ./logback-spring.xml
+          cat ./logback-spring.xml
+        working-directory: ${{ env.working-directory }}
+
+
+      - name: 빌드
+        run: |
+          cd ./morib
+          chmod +x gradlew
+          ./gradlew build -x test
+        working-directory: ${{ env.working-directory }}
+        shell: bash
+
 
       - name: docker 로그인
         uses: docker/setup-buildx-action@v2.9.1
@@ -28,13 +62,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_LOGIN_USERNAME }}
           password: ${{ secrets.DOCKER_LOGIN_ACCESSTOKEN }}
-
-      - name: docker image 빌드 및 푸시
-        run: |
-          cd ./morib
-          docker build --platform linux/amd64 -t moribweb/morib_prod .
-          docker push moribweb/morib_prod:latest
-        working-directory: ${{ env.working-directory }}
 
   cd:
     needs: ci
