@@ -1,32 +1,35 @@
 package org.morib.server.api.allowGroupView.facade;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.allowGroupView.dto.*;
-import org.morib.server.domain.allowedGroup.application.AllowedGroupManager;
 import org.morib.server.domain.allowedGroup.application.CreateAllowedGroupService;
 import org.morib.server.domain.allowedGroup.application.DeleteAllowedGroupService;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
+import org.morib.server.domain.allowedGroup.infra.AllowedGroupManager;
+import org.morib.server.domain.allowedSite.AllowedSiteManager;
 import org.morib.server.domain.allowedSite.application.CreateAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
-import org.morib.server.domain.allowedSite.application.FetchTabNameService;
-import org.morib.server.domain.allowedSite.application.dto.CreateAllowedSiteServiceDto;
+import org.morib.server.domain.allowedSite.application.FetchSiteInfoService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.global.common.ConnectType;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
+
+import static org.morib.server.global.common.Constants.MAX_VISIBLE_ALLOWED_SERVICES;
 
 @Facade
 @RequiredArgsConstructor
 public class AllowedGroupViewFacade {
 
     private final DeleteAllowedGroupService deleteAllowedGroupService;
-    private final FetchTabNameService fetchTabNameService;
+    private final FetchSiteInfoService fetchSiteInfoService;
     private final FetchAllowedGroupService fetchAllowedGroupService;
     private final CreateAllowedSiteService createAllowedSiteService;
     private final AllowedGroupManager allowedGroupManager;
@@ -35,10 +38,16 @@ public class AllowedGroupViewFacade {
     private final UserManager userManager;
     private final CreateAllowedGroupService createAllowedGroupService;
     private final FetchAllowedSiteService fetchAllowedSiteService;
+    private final AllowedSiteManager allowedSiteManager;
 
     public CreateAllowedGroupResponse createAllowedGroup(Long userId) {
         User findUser = fetchUserService.fetchByUserId(userId);
         return CreateAllowedGroupResponse.of(createAllowedGroupService.create(findUser, fetchAllowedGroupService.getCounts(userId) + 1));
+    }
+
+    public CreateAllowedGroupResponse createAllowedGroupWithBody(Long userId, CreateAllowedGroupRequestDto createAllowedGroupRequestDto) {
+        User findUser = fetchUserService.fetchByUserId(userId);
+        return CreateAllowedGroupResponse.of(createAllowedGroupService.createWithBody(findUser, createAllowedGroupRequestDto.name(), createAllowedGroupRequestDto.colorCode()));
     }
 
     @Transactional(readOnly = true)
