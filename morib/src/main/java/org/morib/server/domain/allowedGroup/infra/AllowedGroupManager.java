@@ -1,4 +1,4 @@
-package org.morib.server.domain.allowedGroup.application;
+package org.morib.server.domain.allowedGroup.infra;
 
 import org.morib.server.annotation.Manager;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;

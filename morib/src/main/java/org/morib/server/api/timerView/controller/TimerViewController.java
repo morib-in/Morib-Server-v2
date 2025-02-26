@@ -3,6 +3,7 @@ package org.morib.server.api.timerView.controller;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
+import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
 import org.morib.server.api.timerView.dto.RunTimerRequestDto;
 import org.morib.server.api.timerView.dto.StopTimerRequestDto;
 import org.morib.server.api.timerView.dto.TodoCardResponseDto;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v2")
 @RequiredArgsConstructor
 public class TimerViewController {
+
     private final TimerViewFacade timerViewFacade;
     private final PrincipalHandler principalHandler;
 
@@ -47,7 +49,6 @@ public class TimerViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-
     @GetMapping("/timer/todo-card")
     public ResponseEntity<BaseResponse<?>> getTodoCards(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
@@ -63,5 +64,20 @@ public class TimerViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.fetchFriendsInfo(userId));
     }
 
+    // 허용 서비스 조회
+    @GetMapping("/timer/allowedGroups")
+    public ResponseEntity<BaseResponse<?>> getAllowedGroupsAndAllowedSites(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.fetchAllowedGroupsInTimer(userId));
+    }
+
+    // 허용 서비스 등록
+    @PostMapping("/timer/allowedGroups")
+    public ResponseEntity<BaseResponse<?>> assignAllowedGroupsInTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                      @RequestBody AssignAllowedGroupsRequestDto assignAllowedGroupsRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        timerViewFacade.assignAllowedGroupsInTimer(userId, assignAllowedGroupsRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
 
 }
