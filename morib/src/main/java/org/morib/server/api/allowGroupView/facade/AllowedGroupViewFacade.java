@@ -128,7 +128,8 @@ public class AllowedGroupViewFacade {
     @Transactional(readOnly = true)
     public InterestAreaSiteResponseDto fetchRecommendSites(Long userId) {
         User user = fetchUserService.fetchByUserId(userId);
-        return InterestAreaSiteResponseDto.of(user.getInterestArea().getAreaSiteVos());
+        if (user.getInterestArea() == null) return InterestAreaSiteResponseDto.of(InterestArea.OTHERS.getAreaSiteVos());
+        else return InterestAreaSiteResponseDto.of(user.getInterestArea().getAreaSiteVos());
     }
 
     @Transactional
