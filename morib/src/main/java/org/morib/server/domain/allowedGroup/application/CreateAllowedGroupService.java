@@ -5,4 +5,5 @@ import org.morib.server.domain.user.infra.User;
 
 public interface CreateAllowedGroupService {
     AllowedGroup create(User user, int nameIdx);
+    AllowedGroup createWithBody (User user, String name, String colorCode);
 }

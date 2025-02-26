@@ -9,10 +9,10 @@ public record FetchAllowedGroupResponseDto(
     String name,
     String colorCode,
     @JsonProperty("allowedSites")
-    List<AllowedSiteVo> allowedSiteVos
+    List<AllowedSiteWithIdVo> allowedSiteVos
 ) {
-   public static FetchAllowedGroupResponseDto of(Long id, String name, String colorCode, List<AllowedSiteVo> allowedSiteVos){
-         return new FetchAllowedGroupResponseDto(id, name, colorCode, allowedSiteVos);
+   public static FetchAllowedGroupResponseDto of(Long id, String name, String colorCode, List<AllowedSiteWithIdVo> allowedSiteWithIdVos){
+         return new FetchAllowedGroupResponseDto(id, name, colorCode, allowedSiteWithIdVos);
    }
 
 }

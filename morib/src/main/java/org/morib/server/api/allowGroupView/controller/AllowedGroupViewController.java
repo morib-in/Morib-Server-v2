@@ -70,8 +70,10 @@ public class AllowedGroupViewController {
     // 허용 서비스 관련 api
     @PostMapping("/allowedSite/{allowedGroupId}")
     public ResponseEntity<BaseResponse<?>> createAllowedSite(@PathVariable Long allowedGroupId,
-                                                             @Valid @RequestBody CreateAllowedSiteRequestDto createAllowedSiteRequestDto) {
+                                                             @Valid @RequestBody AllowedSiteRequestDto allowedSiteRequestDto) {
         allowedGroupViewFacade.createAllowedSite(allowedGroupId, createAllowedSiteRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -91,7 +93,7 @@ public class AllowedGroupViewController {
     @PostMapping("/onboard")
     public ResponseEntity<BaseResponse<?>> onboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                    @RequestParam("interestArea") String interestArea,
-                                                   @RequestBody List<AllowedSiteVo> onboardRequestDto) {
+                                                   @RequestBody OnboardRequestDto onboardRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         allowedGroupViewFacade.onboard(userId, interestArea, onboardRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
