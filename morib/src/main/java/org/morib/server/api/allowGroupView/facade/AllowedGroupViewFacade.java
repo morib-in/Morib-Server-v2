@@ -133,12 +133,13 @@ public class AllowedGroupViewFacade {
     }
 
     @Transactional
-    public void createAllowedSite(Long allowedGroupId, CreateAllowedSiteRequestDto createAllowedSiteRequestDto) {
+    public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
-        String siteUrl = createAllowedSiteRequestDto.siteUrl();
-        fetchAllowedSiteService.isExist(siteUrl);
-        String siteName = fetchTabNameService.fetch(siteUrl);
-        createAllowedSiteService.create(CreateAllowedSiteServiceDto.of(findAllowedGroup, siteUrl, siteName));
+        String siteUrl = allowedSiteRequestDto.siteUrl();
+        fetchAllowedSiteService.isExist(siteUrl, allowedGroupId);
+        AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
+        createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
+    }
     }
 
     @Transactional
