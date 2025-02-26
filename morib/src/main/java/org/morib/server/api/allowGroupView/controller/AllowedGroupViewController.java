@@ -70,8 +70,10 @@ public class AllowedGroupViewController {
     // 허용 서비스 관련 api
     @PostMapping("/allowedSite/{allowedGroupId}")
     public ResponseEntity<BaseResponse<?>> createAllowedSite(@PathVariable Long allowedGroupId,
-                                                             @Valid @RequestBody CreateAllowedSiteRequestDto createAllowedSiteRequestDto) {
+                                                             @Valid @RequestBody AllowedSiteRequestDto allowedSiteRequestDto) {
         allowedGroupViewFacade.createAllowedSite(allowedGroupId, createAllowedSiteRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
