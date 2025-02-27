@@ -16,7 +16,11 @@ public class AllowedSite extends BaseTimeEntity {
     @Column(name = "allowed_site_id")
     private Long id;
     @Column(nullable = false)
+    private String favicon;
+    @Column(nullable = false)
     private String siteName;
+    @Column(nullable = false)
+    private String pageName;
     @Column(nullable = false)
     private String siteUrl;
 
@@ -24,11 +28,24 @@ public class AllowedSite extends BaseTimeEntity {
     @JoinColumn(name = "allowed_group_id")
     private AllowedGroup allowedGroup;
 
-    public static AllowedSite create(String siteName, String siteUrl, AllowedGroup allowedGroup) {
+    public static AllowedSite create(AllowedGroup allowedGroup, String favicon, String siteName, String pageName, String siteUrl) {
         return AllowedSite.builder()
-                .siteName(siteName)
-                .siteUrl(siteUrl)
                 .allowedGroup(allowedGroup)
+                .favicon(favicon)
+                .siteName(siteName)
+                .pageName(pageName)
+                .siteUrl(siteUrl)
                 .build();
+    }
+
+    public void updateSiteUrl(String siteUrl) {
+        this.siteUrl = siteUrl;
+    }
+
+    public void updateAllowedSiteInfo(String favicon, String siteName, String pageName, String siteUrl) {
+        this.favicon = favicon;
+        this.siteName = siteName;
+        this.pageName = pageName;
+        this.siteUrl = siteUrl;
     }
 }

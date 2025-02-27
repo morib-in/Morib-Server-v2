@@ -140,21 +140,44 @@ public class AllowedGroupViewFacade {
         AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
         createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
     }
+
+    public void updateAllowedSiteUrl(Long allowedGroupId, Long allowedSiteId, AllowedSiteRequestDto allowedSiteRequestDto) {
+        fetchAllowedSiteService.isExist(allowedSiteRequestDto.siteUrl(), allowedGroupId);
+        AllowedSite findAllowedSite = fetchAllowedSiteService.fetchById(allowedSiteId);
+        allowedSiteManager.updateAllowedSiteUrl(findAllowedSite, allowedSiteRequestDto.siteUrl());
     }
 
     @Transactional
     public void deleteAllowedSite(Long allowedSiteId) {
-        deleteAllowedSiteService.deleteAllowedSite(allowedSiteId);
+        deleteAllowedSiteService.delete(allowedSiteId);
     }
 
-    public void onboard(Long userId, String interestArea, List<AllowedSiteVo> onboardRequestDto) {
+    @Transactional
+    public void mergeToTopDomain(Long allowedGroupId, String siteUrl) {
+        String topDomainUrl = fetchSiteInfoService.getTopDomainUrl(siteUrl);
+        String topDomain = fetchSiteInfoService.getTopDomain(siteUrl);
+        List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByDomainContaining(allowedGroupId, topDomain);
+        if (findAllowedSites.size() > 1) mergeToOne(topDomainUrl, findAllowedSites);
+    }
+
+    public void mergeToOne(String topDomainUrl, List<AllowedSite> targetAllowedSites) {
+        List<AllowedSite> sortedTargetAllowedSites = targetAllowedSites.stream().sorted(Comparator.comparing(AllowedSite::getSiteUrl)).toList();
+        AllowedSite baseAllowedSite = sortedTargetAllowedSites.get(0);
+        allowedSiteManager.updateAllowedSiteInfo(baseAllowedSite, fetchSiteInfoService.fetch(topDomainUrl));
+        for (int i = 1; i < sortedTargetAllowedSites.size(); i++) {
+            deleteAllowedSiteService.delete(sortedTargetAllowedSites.get(i).getId());
+        }
+    }
+
+    @Transactional
+    public void onboard(Long userId, String interestArea, OnboardRequestDto onboardRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
         userManager.updateUserInterestArea(findUser, interestArea);
-        AllowedGroup createdAllowedGroup = createAllowedGroupService.create(findUser, fetchAllowedGroupService.getCounts(userId) + 1);
-        createAllowedSiteService.createAll(createdAllowedGroup, onboardRequestDto);
+        AllowedGroup createdAllowedGroup = createAllowedGroupService.createWithBody(findUser, onboardRequestDto.name(), onboardRequestDto.colorCode());
+        createAllowedSiteService.createAll(createdAllowedGroup, onboardRequestDto.allowedSiteVos());
     }
 
-
-
-
+    public AllowedSiteVo fetchAllowedSiteInfoForOnBoard(String siteUrl) {
+        return fetchSiteInfoService.fetch(siteUrl);
+    }
 }
