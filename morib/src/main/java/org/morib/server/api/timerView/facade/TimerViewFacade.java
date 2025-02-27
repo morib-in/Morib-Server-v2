@@ -6,12 +6,20 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.api.allowGroupView.dto.AllowedSiteWithIdVo;
+import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupResponseDto;
+import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.api.timerView.dto.*;
+import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
+import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
+import org.morib.server.domain.recentAllowedGroup.application.CreateRecentAllowedGroupService;
+import org.morib.server.domain.recentAllowedGroup.application.DeleteRecentAllowedGroupService;
+import org.morib.server.domain.recentAllowedGroup.application.FetchRecentAllowedGroupService;
+import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
-import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
@@ -20,8 +28,8 @@ import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
-import org.morib.server.global.message.SseMessageBuilder;
-import org.morib.server.global.sse.api.SseFacade;
+import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
 import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
@@ -45,10 +53,14 @@ public class TimerViewFacade {
     private final SseSender sseSender;
     private final ModalViewFacade modalViewFacade;
     private final HomeViewFacade homeViewFacade;
-    private final SseFacade sseFacade;
+    private final AllowedGroupViewFacade allowedGroupViewFacade;
+    private final FetchRecentAllowedGroupService fetchRecentAllowedGroupService;
+    private final DeleteRecentAllowedGroupService deleteRecentAllowedGroupService;
+    private final CreateRecentAllowedGroupService createRecentAllowedGroupService;
+    private final FetchAllowedGroupService fetchAllowedGroupService;
 
     public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
-        Task findTask = fetchTaskService.fetchById(runTimerRequestDto.taskId());
+        Task findTask = fetchTaskService.fetchByIdAndTimer(runTimerRequestDto.taskId());
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, LocalDate.now());
         timerManager.setElapsedTime(timer, runTimerRequestDto.elapsedTime());
         int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
@@ -61,11 +73,11 @@ public class TimerViewFacade {
     }
 
     public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
-        Task findTask = fetchTaskService.fetchById(taskId);
+        Task findTask = fetchTaskService.fetchByIdAndTimer(taskId);
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
         timerManager.addElapsedTime(timer, dto.elapsedTime());
         int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
-        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, dto.runningCategoryName(), dto.taskId());
+        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, dto.runningCategoryName(), taskId);
         SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
         sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
         List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(userId);
@@ -91,7 +103,6 @@ public class TimerViewFacade {
         List<TaskInTodoCardDto> taskInTodoCardDtos = tasks.stream()
             .map(t -> getTaskInTodoCardDto(targetDate, t))
             .toList();
-
         return new TodoCardResponseDto(totalTimeOfToday, taskInTodoCardDtos);
     }
 
@@ -115,6 +126,38 @@ public class TimerViewFacade {
         ).collect(Collectors.toList()); // mutable list
         friendsInTimerResponseDtos.sort(Comparator.comparing(FriendsInTimerResponseDto::name));
         return friendsInTimerResponseDtos;
+    }
+
+    public void assignAllowedGroupsInTimer(Long userId, AssignAllowedGroupsRequestDto assignAllowedGroupsRequestDto) {
+        List<Long> currentIdList = fetchRecentAllowedGroupService.findAllByUserId(userId).stream().map(recentAllowedGroup -> recentAllowedGroup.getSelectedAllowedGroup().getId()).toList();
+        List<Long> targetIdList = assignAllowedGroupsRequestDto.allowedGroupIdList();
+
+        List<Long> toDelete = currentIdList.stream().filter(i -> !targetIdList.contains(i)).toList();
+        List<Long> toInsert = targetIdList.stream().filter(i -> !currentIdList.contains(i)).toList();
+
+        toDelete.forEach(deleteRecentAllowedGroupService::deleteByAllowedGroupId);
+        createRecentAllowedGroupService.create(buildRecentAllowedGroups(userId, toInsert));
+    }
+
+    public List<RecentAllowedGroup> buildRecentAllowedGroups(Long userId, List<Long> allowedGroupIdList) {
+        User user = fetchUserService.fetchByUserId(userId);
+        List<AllowedGroup> allowedGroupList = allowedGroupIdList.stream().map(fetchAllowedGroupService::findById).toList();
+        return allowedGroupList.stream().map(
+                allowedGroup -> RecentAllowedGroup.create(user, allowedGroup)).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FetchAllowedGroupInTimerResponseDto> fetchAllowedGroupsInTimer(Long userId) {
+        List<AllowedGroup> findAllowedGroups = fetchAllowedGroupService.findAllByUserId(userId);
+        Set<Long> findRecentAllowedGroupIdSet = fetchRecentAllowedGroupService.findAllByUserId(userId).stream().map(recentAllowedGroup -> recentAllowedGroup.getSelectedAllowedGroup().getId()).collect(Collectors.toUnmodifiableSet());
+
+        return findAllowedGroups.stream().map(
+                allowedGroup -> {
+                    List<AllowedSiteWithIdVo> allowedGroupDetailAllowedSiteVos = allowedGroupViewFacade.filterByTopDomainAndGetAllowedSiteWithIdVo(allowedGroup);
+                    return FetchAllowedGroupInTimerResponseDto.of(allowedGroup.getId(),
+                            allowedGroup.getName(), allowedGroup.getColorCode(), findRecentAllowedGroupIdSet.contains(allowedGroup.getId()), allowedGroupDetailAllowedSiteVos);
+                }).toList();
+
     }
 
 }
