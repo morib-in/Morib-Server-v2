@@ -19,12 +19,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Service
 public class FetchCategoryServiceImpl implements FetchCategoryService{
-    private final CategoryRepository categoryRepository;
 
-    @Override
-    public List<Category> fetchByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate) {
-        return categoryRepository.findByUserIdInRange(userId, startDate, endDate);
-    }
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Set<Category> fetchByUser(User user) {
@@ -40,6 +36,11 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
     public Category fetchByUserAndCategoryId(User findUser, Long categoryId) {
         return categoryRepository.findByUserAndId(findUser, categoryId).
             orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
+    @Override
+    public List<Category> fetchByUserIdWithFilteredTasksAndTimers(Long userId, LocalDate startDate, LocalDate endDate) {
+        return categoryRepository.findByUserIdWithFilteredTasksAndTimers(userId, startDate, endDate);
     }
 
 }
