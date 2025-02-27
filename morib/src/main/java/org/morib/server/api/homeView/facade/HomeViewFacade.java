@@ -105,7 +105,7 @@ public class HomeViewFacade {
                 .orElseGet(() -> createTodoService.saveTodoByUserAndTargetDate(findUser, targetDate));
 
         // Task ID 리스트 조회 (Batch 조회)
-        Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+        List<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
 
         // 타이머가 존재하는 Task 조회 (Batch 조회)
         Set<Long> existingTimerTaskIds = fetchTimerService.fetchExistingTaskIdsByTargetDate(tasks, targetDate);
@@ -118,7 +118,7 @@ public class HomeViewFacade {
     }
 
     private void updateTaskInTodo(StartTimerRequestDto startTimerRequestDto, Todo todo) {
-        Set<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+        List<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
         todoManager.updateTask(todo, tasks);
     }
 

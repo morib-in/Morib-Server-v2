@@ -12,8 +12,8 @@ import org.morib.server.domain.user.infra.User;
 import java.util.Set;
 
 public interface FetchCategoryService {
-    List<Category> fetchByUserIdInRange(Long userId, LocalDate startDate, LocalDate endDate);
     Set<Category> fetchByUser(User user);
     CategoryWithTasks convertToCategoryWithTasks(Category category, LinkedHashSet<TaskWithTimers> taskWithTimers);
     Category fetchByUserAndCategoryId(User findUser, Long categoryId);
+    List<Category> fetchByUserIdWithFilteredTasksAndTimers(Long userId, LocalDate startDate, LocalDate endDate);
 }

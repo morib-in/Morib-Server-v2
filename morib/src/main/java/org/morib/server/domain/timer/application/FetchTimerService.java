@@ -15,5 +15,5 @@ public interface FetchTimerService {
     int sumOneTaskElapsedTimeInTargetDate(Task t, LocalDate targetDate);
     List<Timer> fetchByUserAndTargetDate(User user, LocalDate targetDate);
     int sumElapsedTimeByUser(User user, LocalDate targetDate);
-    Set<Long> fetchExistingTaskIdsByTargetDate(Set<Task> tasks, LocalDate targetDate);
+    Set<Long> fetchExistingTaskIdsByTargetDate(List<Task> tasks, LocalDate targetDate);
 }
