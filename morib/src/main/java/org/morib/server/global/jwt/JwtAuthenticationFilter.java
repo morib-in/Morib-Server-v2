@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
+        System.out.println("requestUri = " + requestUri);
         if (requestUri.contains("reissue")) {
             jwtService.extractRefreshToken(request)
                     .filter(jwtService::isTokenValid);
