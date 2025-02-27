@@ -13,6 +13,7 @@ import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +61,7 @@ public class FetchTimerServiceImpl implements FetchTimerService{
     }
 
     @Override
-    public Set<Long> fetchExistingTaskIdsByTargetDate(Set<Task> tasks, LocalDate targetDate) {
+    public Set<Long> fetchExistingTaskIdsByTargetDate(List<Task> tasks, LocalDate targetDate) {
         List<Long> taskIds = tasks.stream()
                 .map(Task::getId)
                 .toList(); // Task ID 리스트 변환

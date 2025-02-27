@@ -3,10 +3,7 @@ package org.morib.server.domain.task.application;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.vo.TaskWithTimers;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.morib.server.domain.category.infra.Category;
@@ -32,26 +29,27 @@ public class FetchTaskServiceImpl implements FetchTaskService {
     }
 
     @Override
+    public Task fetchByIdAndTimer(Long taskId) {
+        return taskRepository.findTaskWithTimers(taskId).orElseThrow(() ->
+                new NotFoundException(ErrorMessage.NOT_FOUND));
+    }
+
+    @Override
     public LinkedHashSet<Task> fetchByTodoAndSameTargetDate(Todo todo, LocalDate targetDate) {
-        Set<Task> tasks = todo.getTasks();
-        return tasks.stream().
+        return todo.getTasks().stream().
             filter(task -> isTimerInTaskPresentTargetDate(task, targetDate))
             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
-    public Set<Task> fetchByTaskIds(List<Long> taskIds) {
-        Set<Task> tasks = new LinkedHashSet<>();
+    public List<Task> fetchByTaskIds(List<Long> taskIds) {
+        List<Task> tasks = new ArrayList<>();
         for (Long taskId : taskIds) {
             Task findTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             tasks.add(findTask);
         }
-        return convertUnmmodifiableSet(tasks);
-    }
-
-    private Set<Task> convertUnmmodifiableSet(Set<Task> tasks) {
-        return Collections.unmodifiableSet(tasks);
+        return tasks;
     }
 
     private boolean isTimerInTaskPresentTargetDate(Task task, LocalDate targetDate) {

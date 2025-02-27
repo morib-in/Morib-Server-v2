@@ -12,7 +12,8 @@ import org.morib.server.domain.todo.infra.Todo;
 
 public interface FetchTaskService {
     Task fetchById(Long taskId);
+    Task fetchByIdAndTimer(Long taskId);
     LinkedHashSet<Task> fetchByTodoAndSameTargetDate(Todo todo, LocalDate targetDate);
     TaskWithTimers convertToTaskWithTimers(Task task);
-    Set<Task> fetchByTaskIds(List<Long> id);
+    List<Task> fetchByTaskIds(List<Long> id);
 }
