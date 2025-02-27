@@ -10,7 +10,9 @@ import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,7 +36,8 @@ public class Todo extends BaseTimeEntity {
             joinColumns = @JoinColumn(name = "todo_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id")
     )
-    private Set<Task> tasks = new LinkedHashSet<>();
+    @OrderColumn(name = "task_order")
+    private List<Task> tasks = new ArrayList<>();
 
     @Builder
     public Todo(LocalDate targetDate, User user) {
@@ -49,7 +52,7 @@ public class Todo extends BaseTimeEntity {
             .build();
     }
 
-    public void updateTasks(Set<Task> tasks) {
+    public void updateTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
 
