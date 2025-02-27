@@ -39,6 +39,13 @@ public class FetchRelationshipServiceImpl implements FetchRelationshipService {
     }
 
     @Override
+    public Relationship fetchRelationshipByUserIdAndFriendIdBothSide(Long userId, Long friendId, RelationLevel relationLevel) {
+        return relationshipRepository.findByUserAndFriendBothSide(userId, friendId, relationLevel).orElseThrow(
+                () -> new NotFoundException(ErrorMessage.NOT_FOUND)
+        );
+    }
+
+    @Override
     public List<Long> fetchConnectedRelationshipAndClassify(Long userId) {
         return relationshipRepository.findByUserIdOrFriendIdAndRelationLevel(userId, RelationLevel.CONNECTED)
                 .stream()
