@@ -8,6 +8,6 @@ import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import java.util.List;
 
 public interface CreateAllowedSiteService {
-    AllowedSite create(CreateAllowedSiteServiceDto createAllowedSiteServiceDto);
-    void createAll(AllowedGroup allowedGroup, List<AllowedSiteVo> onboardRequestDto);
+    AllowedSite create(AllowedGroup allowedGroup, AllowedSiteVo allowedSiteVo);
+    void createAll(AllowedGroup allowedGroup, List<AllowedSiteVo> allowedSiteVos);
 }
