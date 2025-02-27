@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import java.util.LinkedHashSet;
 import lombok.*;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
+import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.user.infra.type.InterestArea;
-import org.morib.server.domain.user.infra.type.InterestAreaConverter;
 import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.BaseTimeEntity;
@@ -38,6 +38,8 @@ public class User extends BaseTimeEntity {
     private Set<Category> categories;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<AllowedGroup> allowedGroups = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<RecentAllowedGroup> recentAllowedGroups = new LinkedHashSet<>();
     @Enumerated(EnumType.STRING)
     private Role role;
 
