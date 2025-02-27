@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.vo.CategoryInfo;
 import org.morib.server.api.modalView.dto.*;
-import org.morib.server.domain.allowedSite.application.FetchTabNameService;
+import org.morib.server.domain.allowedSite.application.FetchSiteInfoService;
 import org.morib.server.domain.category.CategoryManager;
 import org.morib.server.domain.category.application.CreateCategoryService;
 import org.morib.server.domain.category.application.DeleteCategoryService;
@@ -21,7 +21,6 @@ import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.message.SseMessageBuilder;
-import org.morib.server.global.sse.application.repository.SseRepository;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ public class ModalViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final DeleteCategoryService deleteCategoryService;
     private final CreateCategoryService createCategoryService;
-    private final FetchTabNameService fetchTabNameService;
+    private final FetchSiteInfoService fetchSiteInfoService;
     private final CategoryManager categoryManager;
     private final FetchRelationshipService fetchRelationshipService;
     private final CreateRelationshipService createRelationshipService;
@@ -73,9 +72,10 @@ public class ModalViewFacade {
                 .toList();
     }
 
-    public TabNameByUrlResponse fetchTabNameByUrl(String url) {
-        return TabNameByUrlResponse.of(fetchTabNameService.fetch(url));
-    }
+// deprecated
+//    public TabNameByUrlResponse fetchTabNameByUrl(String url) {
+//        return TabNameByUrlResponse.of(fetchSiteInfoService.fetch(url));
+//    }
 
     @Transactional
     public void updateCategoryNameById(Long userId, Long categoryId, UpdateCategoryNameRequestDto updateCategoryNameRequestDto) {
@@ -158,7 +158,7 @@ public class ModalViewFacade {
 
     @Transactional
     public void deleteFriend(Long userId, Long friendId) {
-        Relationship relationship = fetchRelationshipService.fetchRelationshipByUserIdAndFriendId(friendId, userId, RelationLevel.CONNECTED);
+        Relationship relationship = fetchRelationshipService.fetchRelationshipByUserIdAndFriendIdBothSide(friendId, userId, RelationLevel.CONNECTED);
         deleteRelationshipService.delete(relationship);
     }
 }
