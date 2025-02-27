@@ -2,10 +2,7 @@ package org.morib.server.api.allowGroupView.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.allowGroupView.dto.AllowedSiteVo;
-import org.morib.server.api.allowGroupView.dto.CreateAllowedSiteRequestDto;
-import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupColorCodeRequestDto;
-import org.morib.server.api.allowGroupView.dto.UpdateAllowedGroupNameRequestDto;
+import org.morib.server.api.allowGroupView.dto.*;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -16,8 +13,6 @@ import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +27,13 @@ public class AllowedGroupViewController {
     public ResponseEntity<BaseResponse<?>> createAllowedGroup(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.createAllowedGroup(userId));
+    }
+
+    @PostMapping("/allowedGroup/customized")
+    public ResponseEntity<BaseResponse<?>> createAllowedGroupWithBody(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                      @RequestBody CreateAllowedGroupRequestDto createAllowedGroupRequestDto) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.createAllowedGroupWithBody(userId, createAllowedGroupRequestDto));
     }
 
     @GetMapping("/allowedGroupList")
@@ -71,9 +73,15 @@ public class AllowedGroupViewController {
     @PostMapping("/allowedSite/{allowedGroupId}")
     public ResponseEntity<BaseResponse<?>> createAllowedSite(@PathVariable Long allowedGroupId,
                                                              @Valid @RequestBody AllowedSiteRequestDto allowedSiteRequestDto) {
-        allowedGroupViewFacade.createAllowedSite(allowedGroupId, createAllowedSiteRequestDto);
+        allowedGroupViewFacade.createAllowedSite(allowedGroupId, allowedSiteRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    @PatchMapping("/allowedSite/{allowedGroupId}/{allowedSiteId}")
+    public ResponseEntity<BaseResponse<?>> updateAllowedSiteUrl(@PathVariable Long allowedGroupId,
+                                                                @PathVariable Long allowedSiteId,
+                                                                @Valid @RequestBody AllowedSiteRequestDto allowedSiteRequestDto) {
+        allowedGroupViewFacade.updateAllowedSiteUrl(allowedGroupId, allowedSiteId, allowedSiteRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
@@ -88,6 +96,14 @@ public class AllowedGroupViewController {
         allowedGroupViewFacade.deleteAllowedSite(allowedSiteId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    // 상위 도메인 허용
+    @PostMapping("/allowedSite/merge/{allowedGroupId}")
+    public ResponseEntity<BaseResponse<?>> mergeToTopDomain(@RequestParam String siteUrl,
+                                                            @PathVariable Long allowedGroupId) {
+        allowedGroupViewFacade.mergeToTopDomain(allowedGroupId, siteUrl);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
   
     // 온보딩
     @PostMapping("/onboard")
@@ -98,4 +114,11 @@ public class AllowedGroupViewController {
         allowedGroupViewFacade.onboard(userId, interestArea, onboardRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
+
+    @GetMapping("/onboard/allowedSite/info")
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteInfoForOnboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                          @RequestParam("siteUrl") String siteUrl) {
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchAllowedSiteInfoForOnBoard(siteUrl));
+    }
+
 }
