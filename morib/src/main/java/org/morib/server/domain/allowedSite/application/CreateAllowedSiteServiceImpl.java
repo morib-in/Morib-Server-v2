@@ -18,18 +18,21 @@ public class CreateAllowedSiteServiceImpl implements CreateAllowedSiteService {
     private final AllowedSiteRepository allowedSiteRepository;
 
     @Override
-    public AllowedSite create(CreateAllowedSiteServiceDto dto) {
-        return allowedSiteRepository.save(AllowedSite.create(dto.siteName(), dto.siteUrl(), dto.findAllowedGroup()));
+    public AllowedSite create(AllowedGroup allowedGroup, AllowedSiteVo allowedSiteVo) {
+        return allowedSiteRepository.save(
+                AllowedSite.create(allowedGroup, allowedSiteVo.favicon(), allowedSiteVo.siteName(), allowedSiteVo.pageName(), allowedSiteVo.siteUrl()));
     }
 
     @Override
     @Transactional
-    public void createAll(AllowedGroup allowedGroup, List<AllowedSiteVo> onboardRequestDto) {
-        allowedSiteRepository.saveAll(onboardRequestDto.stream()
+    public void createAll(AllowedGroup allowedGroup, List<AllowedSiteVo> allowedSiteVos) {
+        allowedSiteRepository.saveAll(allowedSiteVos.stream()
                 .map(allowedSites -> AllowedSite.create(
+                        allowedGroup,
+                        allowedSites.favicon(),
                         allowedSites.siteName(),
-                        allowedSites.siteUrl(),
-                        allowedGroup
+                        allowedSites.pageName(),
+                        allowedSites.siteUrl()
                 ))
                 .toList());
     }

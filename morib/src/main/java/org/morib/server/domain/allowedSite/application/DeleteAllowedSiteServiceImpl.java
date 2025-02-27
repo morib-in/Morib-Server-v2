@@ -14,7 +14,7 @@ public class DeleteAllowedSiteServiceImpl implements
     private final AllowedSiteRepository allowedSiteRepository;
 
     @Override
-    public void deleteAllowedSite(Long id) {
+    public void delete(Long id) {
         allowedSiteRepository.findById(id).ifPresentOrElse(
             allowedSiteRepository::delete,
             () -> {

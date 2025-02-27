@@ -17,7 +17,6 @@ public final class Constants {
     public static final String GOOGLE_REGISTRATION_ID = "google";
     public static final String INVALID_REFRESH_TOKEN = "invalid";
     public static final String GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
-
     public static final String SSE_EVENT_CONNECT = "connect";
     public static final String SSE_EVENT_COMPLETION = "completion";
     public static final String SSE_EVENT_REFRESH = "refresh";
@@ -26,7 +25,7 @@ public final class Constants {
     public static final String SSE_EVENT_TIMER_STOP_ACTION = "timerStopAction";
     public static final String SSE_EVENT_FRIEND_REQUEST = "friendRequest";
     public static final String SSE_EVENT_FRIEND_REQUEST_ACCEPT = "friendRequestAccept";
-
+    public static final int MAX_VISIBLE_ALLOWED_SERVICES = 5;
 
 
 }
