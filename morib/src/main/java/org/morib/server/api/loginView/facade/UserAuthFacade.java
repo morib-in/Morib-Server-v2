@@ -9,6 +9,7 @@ import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.application.service.ReissueTokenService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.exception.UnauthorizedException;
+import org.morib.server.global.jwt.JwtService;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.service.CustomOAuth2UserService;
 import org.springframework.http.HttpEntity;
@@ -27,8 +28,10 @@ public class UserAuthFacade {
     private final DeleteUserService deleteUserService;
     private final UserManager userManager;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final JwtService jwtService;
 
-    public ReissueTokenServiceDto reissue(String refreshToken) {
+    public ReissueTokenServiceDto reissue(String accessToken, String refreshToken) {
+        jwtService.isTokenValidWhenExpired(accessToken);
         return reissueTokenService.reissue(refreshToken);
     }
 
