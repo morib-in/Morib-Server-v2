@@ -16,8 +16,9 @@ public class ReissueTokenServiceImpl implements ReissueTokenService{
     private final UserRepository userRepository;
 
     public ReissueTokenServiceDto reissue(String refreshToken) {
-        jwtService.isTokenValid(refreshToken);
-        User findUser = userRepository.findByRefreshToken(refreshToken).orElseThrow(
+        String splitedRefreshToken = refreshToken.split(" ")[1].toString();
+        jwtService.isTokenValid(splitedRefreshToken);
+        User findUser = userRepository.findByRefreshToken(splitedRefreshToken).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
         );
         String newRefreshToken = jwtService.createRefreshToken();
