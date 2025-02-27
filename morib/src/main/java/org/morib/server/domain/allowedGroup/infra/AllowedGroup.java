@@ -21,13 +21,14 @@ import org.hibernate.annotations.BatchSize;
 import org.morib.server.domain.allowedGroup.infra.type.ColorCode;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.BaseTimeEntity;
 
 @Builder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AllowedGroup {
+public class AllowedGroup extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +51,14 @@ public class AllowedGroup {
         return AllowedGroup.builder()
                 .name("내 허용 서비스 세트 " + nameIndex)
                 .colorCode(ColorCode.ALLOWED_SERVICE_COLOR_CODE_GREY.getHexCode())
+                .user(user)
+                .build();
+    }
+
+    public static AllowedGroup createWithBody(User user, String name, String colorCode) {
+        return AllowedGroup.builder()
+                .name(name)
+                .colorCode(colorCode)
                 .user(user)
                 .build();
     }
