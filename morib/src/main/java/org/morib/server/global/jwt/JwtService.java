@@ -1,6 +1,7 @@
 package org.morib.server.global.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -100,7 +101,9 @@ public class JwtService {
             return Optional.of(claims.get(ID_CLAIM, Integer.class).toString());
 
         } catch (Exception e) {
-            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+//            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+            log.error("invalid access token");
+            return Optional.empty();
         }
     }
 
@@ -117,6 +120,19 @@ public class JwtService {
             extractClaimsFromToken(token);
             return true;
         } catch (Exception e) {
+            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+        }
+    }
+
+    public boolean isTokenValidWhenExpired(String token) {
+        try {
+            extractClaimsFromToken(token);
+            return true;
+        }
+        catch (ExpiredJwtException e){
+            return true;
+        }
+        catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
     }
@@ -144,11 +160,14 @@ public class JwtService {
     }
 
     private boolean isAccessToken(String token) {
-        String tokenType = getTokenType(token);
-        if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) {
-            return true;
+        try {
+            String tokenType = getTokenType(token);
+            if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) {
+                return true;
+            } else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
-        else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
     }
 
     private boolean isRefreshToken(String token) {
