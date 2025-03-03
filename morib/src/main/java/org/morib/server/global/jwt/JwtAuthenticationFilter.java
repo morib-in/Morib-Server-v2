@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,10 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
-        System.out.println("requestUri = " + requestUri);
         if (requestUri.contains("reissue")) {
-            jwtService.extractRefreshToken(request)
-                    .filter(jwtService::isTokenValid);
+            jwtService.isTokenValidWhenReissueToken(request);
         }
         else {
             String accessToken = jwtService.extractAccessToken(request)

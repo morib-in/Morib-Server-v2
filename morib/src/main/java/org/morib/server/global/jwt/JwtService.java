@@ -6,7 +6,6 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
@@ -81,11 +78,24 @@ public class JwtService {
         return claims;
     }
 
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
+    public Optional<String> extractRefreshTokenByRequest(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(AUTHORIZATION))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""))
                 .filter(this::isRefreshToken);
+    }
+
+    public Optional<String> extractAccessTokenByRequestWhenReissueToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(AUTHORIZATION))
+                .filter(accessToken -> accessToken.startsWith(BEARER))
+                .map(accessToken -> accessToken.replace(BEARER, ""))
+                .filter(this::isValidatedExpiredAccessToken);
+    }
+
+    public String extractRefreshTokenByTokenString(String refreshToken) {
+        refreshToken = refreshToken.replace(BEARER, "");
+        if (isRefreshToken(refreshToken)) return refreshToken;
+        else throw new UnauthorizedException(ErrorMessage.EXPIRED_TOKEN);
     }
 
     public Optional<String> extractAccessToken(HttpServletRequest request) {
@@ -124,9 +134,9 @@ public class JwtService {
         }
     }
 
-    public boolean isTokenValidWhenExpired(String token) {
+    public boolean isTokenValidWhenReissueToken(HttpServletRequest request) {
         try {
-            extractClaimsFromToken(token);
+            extractAccessTokenByRequestWhenReissueToken(request);
             return true;
         }
         catch (ExpiredJwtException e){
@@ -162,11 +172,20 @@ public class JwtService {
     private boolean isAccessToken(String token) {
         try {
             String tokenType = getTokenType(token);
-            if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) {
-                return true;
-            } else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+            if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) return true;
+            else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+            throw new UnauthorizedException(ErrorMessage.EXPIRED_TOKEN);
+        }
+    }
+
+    private boolean isValidatedExpiredAccessToken(String token) {
+        try {
+            String tokenType = getTokenType(token);
+            if (ACCESS_TOKEN_SUBJECT.equals(tokenType)) return true;
+            else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            return true;
         }
     }
 
