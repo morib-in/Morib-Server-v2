@@ -28,7 +28,6 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.DataUtils;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -54,13 +53,12 @@ public class HomeViewFacade {
     private final TaskManager taskManager;
 
     public List<HomeViewResponseDto> fetchHome(Long userId, LocalDate startDate, LocalDate endDate) {
-        List<Category> findCategories = fetchCategoryService.fetchByUserIdWithFilteredTasksAndTimers(userId, startDate, endDate);
+        List<Category> findCategories = fetchCategoryService.fetchByUserIdAndTasksAndTimers(userId);
         return buildHomeViewResponseDto(startDate, endDate, findCategories);
     }
 
     private List<HomeViewResponseDto> buildHomeViewResponseDto(LocalDate startDate, LocalDate endDate, List<Category> findCategories) {
         List<HomeViewResponseDto> homeViewList = new ArrayList<>();
-
         // 날짜 범위별로 데이터를 분류
         for (LocalDate idxDate = startDate; !idxDate.isAfter(endDate); idxDate = idxDate.plusDays(1)) {
             LocalDate currentIdxDate = idxDate;
@@ -70,8 +68,8 @@ public class HomeViewFacade {
                         List<TaskInfo> taskInfos = category.getTasks().stream()
                                 .filter(task -> classifyTaskService.isTaskInDateRange(task, currentIdxDate))
                                 .map(task -> TaskInfo.of(task, fetchTimerService.fetchElapsedTimeOrZeroByTaskAndTargetDate(task, currentIdxDate)))
+                                .sorted(Comparator.comparing(TaskInfo::createdAt))
                                 .toList();
-
                         // Task가 없어도 Category는 표시해야 하므로 빈 리스트라도 포함
                         return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(category), !taskInfos.isEmpty() ? taskInfos : Collections.emptyList());
                     }).toList();
