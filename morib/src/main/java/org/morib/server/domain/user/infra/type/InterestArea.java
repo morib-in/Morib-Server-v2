@@ -12,15 +12,7 @@ public enum InterestArea {
         new InterestAreaSiteVo("Salesforce", "https://www.salesforce.com/kr/?ir=1"),
         new InterestAreaSiteVo("Slack", "https://slack.com/intl/ko-kr/"),
         new InterestAreaSiteVo("Dropbox", "https://www.dropbox.com/business")
-    )
-        ),
-//    CREATOR("Creator", List.of(
-//        new InterestAreaSiteVo("브런치스토리", "https://brunch.co.kr/"),
-//        new InterestAreaSiteVo("위키피디아", "https://www.wikipedia.org/"),
-//        new InterestAreaSiteVo("ChatGPT", "https://openai.com/index/chatgpt/"),
-//        new InterestAreaSiteVo("한국어 맞춤법/문법 검사기", "https://nara-speller.co.kr/speller/"),
-//        new InterestAreaSiteVo("포스타입", "https://www.postype.com/")
-//    )),
+    )),
     DESIGNER("Designer", List.of(
         new InterestAreaSiteVo("피그마", "https://www.figma.com/"),
         new InterestAreaSiteVo("언스플레쉬", "https://unsplash.com/ko"),
@@ -58,13 +50,6 @@ public enum InterestArea {
         new InterestAreaSiteVo("Google Drive", "https://drive.google.com/"),
         new InterestAreaSiteVo("Google Workspace", "https://meet.google.com/")
     )),
-//    ENGINEER("Engineer", List.of(
-//        new InterestAreaSiteVo("Wolfram Alpha", "https://www.wolframalpha.com/"),
-//        new InterestAreaSiteVo("ChatGPT", "https://chatgpt.com/"),
-//        new InterestAreaSiteVo("iLovePDF", "https://www.ilovepdf.com/ko"),
-//        new InterestAreaSiteVo("반도체설계교육센터", "http://www.idec.or.kr/"),
-//        new InterestAreaSiteVo("Wcalc", "https://wcalc.sourceforge.net/")
-//    )),
     OTHERS("Others", List.of(
         new InterestAreaSiteVo("네이버 파파고", "https://papago.naver.com/"),
         new InterestAreaSiteVo("ChatGPT", "https://chatgpt.com/"),

@@ -22,8 +22,8 @@ public class FetchTodoServiceImpl implements FetchTodoService {
     }
 
     @Override
-    public Todo fetchByUserIdAndTargetDate(Long mockUserId, LocalDate targetDate) {
-        return todoRepository.findTodoByUserIdAndTargetDate(mockUserId, targetDate)
+    public Todo fetchByUserIdAndTargetDate(Long userId, LocalDate targetDate) {
+        return todoRepository.findTodoByUserIdAndTargetDate(userId, targetDate)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
     }
 

@@ -18,6 +18,7 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
     @Override
     public AllowedSiteVo fetch(String url) {
         try {
+
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
                             "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
@@ -43,8 +44,6 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
 
             Element faviconElement = doc.selectFirst("link[rel~=(?i)^(shortcut icon|icon|shortcut)$]");
             String favicon = (faviconElement != null) ? faviconElement.absUrl("href") : "";
-
-
 
             if (favicon.isEmpty()) {
                 favicon = url + "/favicon.ico"; // 기본 파비콘 경로
