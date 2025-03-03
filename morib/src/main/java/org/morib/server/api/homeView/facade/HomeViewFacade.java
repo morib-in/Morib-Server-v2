@@ -70,8 +70,8 @@ public class HomeViewFacade {
                         List<TaskInfo> taskInfos = category.getTasks().stream()
                                 .filter(task -> classifyTaskService.isTaskInDateRange(task, currentIdxDate))
                                 .map(task -> TaskInfo.of(task, fetchTimerService.fetchElapsedTimeOrZeroByTaskAndTargetDate(task, currentIdxDate)))
+                                .sorted(Comparator.comparing(TaskInfo::createdAt))
                                 .toList();
-
                         // Task가 없어도 Category는 표시해야 하므로 빈 리스트라도 포함
                         return CombinedCategoryAndTaskInfo.of(CategoryInfo.of(category), !taskInfos.isEmpty() ? taskInfos : Collections.emptyList());
                     }).toList();
