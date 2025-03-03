@@ -21,7 +21,8 @@ public class TimerManager {
     public void setElapsedTime(Timer timer, int elapsedTime) {
         timer.setElapsedTime(elapsedTime);
     }
-    @Transactional
+
+
     public void addElapsedTime(Timer timer, int elapsedTime){
         timer.addElapsedTime(elapsedTime);
     }
