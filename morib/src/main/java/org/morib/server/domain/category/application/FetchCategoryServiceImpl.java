@@ -39,8 +39,8 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
     }
 
     @Override
-    public List<Category> fetchByUserIdWithFilteredTasksAndTimers(Long userId, LocalDate startDate, LocalDate endDate) {
-        return categoryRepository.findByUserIdWithFilteredTasksAndTimers(userId, startDate, endDate);
+    public List<Category> fetchByUserIdAndTasksAndTimers(Long userId) {
+        return categoryRepository.findByUserIdAndFetchTasksAndTimers(userId);
     }
 
 }
