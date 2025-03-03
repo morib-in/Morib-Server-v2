@@ -29,7 +29,6 @@ public class FetchTimerServiceImpl implements FetchTimerService{
                 .orElse(null); // Timer가 없으면 null 반환
     }
 
-
     @Override
     public int fetchElapsedTimeOrZeroByTaskAndTargetDate(Task findTask, LocalDate targetDate) {
         return findTask.getTimers().stream()

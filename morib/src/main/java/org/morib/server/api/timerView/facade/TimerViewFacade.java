@@ -1,13 +1,8 @@
 package org.morib.server.api.timerView.facade;
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.allowGroupView.dto.AllowedSiteWithIdVo;
-import org.morib.server.api.allowGroupView.dto.FetchAllowedGroupResponseDto;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
@@ -29,15 +24,21 @@ import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.common.ConnectType;
+import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
-import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static org.morib.server.global.common.Constants.*;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.morib.server.global.common.Constants.SSE_EVENT_TIMER_START;
+import static org.morib.server.global.common.Constants.SSE_EVENT_TIMER_STOP_ACTION;
 
 @Facade
 @RequiredArgsConstructor
@@ -60,9 +61,6 @@ public class TimerViewFacade {
     private final FetchAllowedGroupService fetchAllowedGroupService;
 
     public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
-        Task findTask = fetchTaskService.fetchByIdAndTimer(runTimerRequestDto.taskId());
-        Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, LocalDate.now());
-        timerManager.setElapsedTime(timer, runTimerRequestDto.elapsedTime());
         int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
         UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, runTimerRequestDto.runningCategoryName(), runTimerRequestDto.taskId());
         SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
@@ -72,6 +70,7 @@ public class TimerViewFacade {
         sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_START, calculatedSseUserInfoWrapper);
     }
 
+    @Transactional
     public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
         Task findTask = fetchTaskService.fetchByIdAndTimer(taskId);
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
