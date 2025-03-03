@@ -36,8 +36,8 @@ public class SseFacade {
     private final SseMessageBuilder sseMessageBuilder;
 
     public SseEmitter init(Long userId) {
-        SseEmitter findEmitter = sseService.fetchSseEmitterByUserId(userId);
-        if (findEmitter != null) sseService.remove(findEmitter);
+//        SseEmitter findEmitter = sseService.fetchSseEmitterByUserId(userId);
+//        if (findEmitter != null) sseService.remove(findEmitter);
         SseEmitter createdEmitter = sseService.create();
         sseService.add(userId, createdEmitter);
         return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_CONNECT);
@@ -45,8 +45,10 @@ public class SseFacade {
 
     public SseEmitter refresh(Long userId, UserInfoDtoForSseUserInfoWrapper userInfoDtoForSseUserInfoWrapper) {
         SseEmitter createdEmitter = sseService.create();
-        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = update(userId, userInfoDtoForSseUserInfoWrapper);
-        sseService.saveSseUserInfo(userId, createdEmitter, calculatedSseUserInfoWrapper);
+        if (userInfoDtoForSseUserInfoWrapper.taskId() != null) {
+            UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = update(userId, userInfoDtoForSseUserInfoWrapper);
+            sseService.saveSseUserInfo(userId, createdEmitter, calculatedSseUserInfoWrapper);
+        }
         return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_REFRESH);
     }
 
@@ -58,21 +60,11 @@ public class SseFacade {
         return createdEmitter;
     }
 
-    public UserInfoDtoForSseUserInfoWrapper updateWhenTimerStart(Long userId, UserInfoDtoForSseUserInfoWrapper wrapper) {
-        Task findTask = fetchTaskService.fetchById(wrapper.taskId());
-        Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, LocalDate.now());
-        timerManager.setElapsedTime(timer, wrapper.elapsedTime());
-        int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
-        return UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, wrapper.runningCategoryName(), wrapper.taskId());
-    }
-
     public UserInfoDtoForSseUserInfoWrapper update(Long userId, UserInfoDtoForSseUserInfoWrapper wrapper) {
-        Task findTask = fetchTaskService.fetchById(wrapper.taskId());
+        Task findTask = fetchTaskService.fetchByIdAndTimer(wrapper.taskId());
         Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, LocalDate.now());
         timerManager.addElapsedTime(timer, wrapper.elapsedTime());
         int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
         return UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, wrapper.runningCategoryName(), wrapper.taskId());
     }
-
-
 }
