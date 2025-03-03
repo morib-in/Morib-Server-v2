@@ -2,6 +2,10 @@ package org.morib.server.api.loginView.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
+import org.morib.server.domain.relationship.application.DeleteRelationshipService;
+import org.morib.server.domain.relationship.application.FetchRelationshipService;
+import org.morib.server.domain.relationship.infra.Relationship;
+import org.morib.server.domain.relationship.infra.RelationshipRepository;
 import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
 import org.morib.server.domain.user.application.service.DeleteUserService;
@@ -19,6 +23,9 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Facade
 public class UserAuthFacade {
@@ -28,10 +35,11 @@ public class UserAuthFacade {
     private final DeleteUserService deleteUserService;
     private final UserManager userManager;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final JwtService jwtService;
+    private final DeleteRelationshipService deleteRelationshipService;
+    private final FetchRelationshipService fetchRelationshipService;
+    private final RelationshipRepository relationshipRepository;
 
-    public ReissueTokenServiceDto reissue(String accessToken, String refreshToken) {
-        jwtService.isTokenValidWhenExpired(accessToken);
+    public ReissueTokenServiceDto reissue(String refreshToken) {
         return reissueTokenService.reissue(refreshToken);
     }
 
@@ -45,7 +53,11 @@ public class UserAuthFacade {
     @Transactional
     public void withdraw(Long userId) {
         User findUser = fetchUserService.fetchByUserId(userId);
-        customOAuth2UserService.withdrawInGoogle(findUser.getRefreshToken());
+        customOAuth2UserService.withdrawInGoogle(findUser.getSocial_refreshToken());
+        List<Relationship> toDelete = new ArrayList<>();
+        toDelete.addAll(fetchRelationshipService.fetchUnconnectedRelationship(userId));
+        toDelete.addAll(fetchRelationshipService.fetchConnectedRelationship(userId));
+        relationshipRepository.deleteAll(toDelete);
         deleteUserService.delete(userId);
     }
 
