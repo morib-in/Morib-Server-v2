@@ -14,6 +14,7 @@ import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.DataUtils;
 import org.morib.server.global.common.SecretProperties;
 import org.morib.server.global.common.TokenResponseDto;
 import org.morib.server.global.exception.NotFoundException;
@@ -40,12 +41,12 @@ import static org.morib.server.global.common.Constants.*;
 public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
-    private final FetchUserService fetchUserService;
-    private final UserManager userManager;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
     private final SecretProperties secretProperties;
+    private final DataUtils dataUtils;
+    private final FetchUserService fetchUserService;
+    private final UserManager userManager;
 
     @Override
     @Transactional
@@ -64,36 +65,49 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
-
     }
 
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isSignUp) throws IOException {
+        log.info("login success 진입");
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
         jwtService.updateRefreshToken(oAuth2User.getUserId(), refreshToken);
-        userManager.updateSocialRefreshToken(
-                fetchUserService.fetchByUserId(
-                        oAuth2User.getUserId()), getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName()));
+        log.info("oAuthUser.getUserId() : " + oAuth2User.getUserId());
+        log.info("refreshToken : " + refreshToken);
+        log.info("1 : User 파싱");
+//         prod
+        User user = fetchUserService.fetchByUserId(oAuth2User.getUserId());
+        log.info("2 : Social Refresh Token Build");
+        String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
+        log.info("3 : SocialRefreshToken Update");
+        userManager.updateSocialRefreshToken(user, socialRefreshToken);
         StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriProd());
+
+        // dev
+//        StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriDev());
+
+        // common
         redirectUri.append(IS_SIGN_UP_QUERYSTRING).append(isSignUp);
-        response.addCookie(getCookieForToken(ACCESS_TOKEN_SUBJECT, accessToken));
-        response.addCookie(getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
+        redirectUri.append("&accessToken=").append(accessToken);
+        log.info("redirectUri : " + redirectUri.toString());
+        response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
+        log.info("Response Cookies: " + response.getHeaders("Set-Cookie"));
         response.sendRedirect(redirectUri.toString());
     }
 
     private String getSocialRefreshTokenByAuthorizedClient(String registrationId, String principalName) {
+        log.info("getSocialRefreshTokenByAuthorizedClient 진입");
         OAuth2AuthorizedClient user = oAuth2AuthorizedClientService.loadAuthorizedClient(registrationId, principalName);
+        if (user == null) {
+            log.error("OAuth2AuthorizedClient is null! The client might not be registered.");
+            return null;
+        }
         OAuth2RefreshToken refreshToken = user.getRefreshToken();
+        if (refreshToken == null) {
+            log.error("Refresh token is null. The provider may not have issued one.");
+        }
         return refreshToken.getTokenValue();
     }
 
-    private Cookie getCookieForToken(String sub, String token) {
-        Cookie cookie = new Cookie(sub, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setDomain(secretProperties.getClientRedirectUriProd()); // 쿠키를 사용할 도메인
-        cookie.setAttribute("SameSite", "None");
-        return cookie;
-    }
+
 }
