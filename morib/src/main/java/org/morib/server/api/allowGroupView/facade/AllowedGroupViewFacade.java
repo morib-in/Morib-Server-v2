@@ -61,15 +61,15 @@ public class AllowedGroupViewFacade {
                 allowedGroup.getId(),
                 allowedGroup.getName(),
                 allowedGroup.getColorCode(),
-                getTop5SiteUrlsInAllowedGroup(allowedGroup),
+                getTop5FaviconInAllowedGroup(allowedGroup),
                 getExtraCountByAllowedService(allowedGroup.getAllowedSites().size())
                 );
     }
 
-    private List<String> getTop5SiteUrlsInAllowedGroup(AllowedGroup allowedGroup) {
+    private List<String> getTop5FaviconInAllowedGroup(AllowedGroup allowedGroup) {
         return allowedGroup.getAllowedSites().stream()
                 .limit(MAX_VISIBLE_ALLOWED_SERVICES)
-                .map(AllowedSite::getSiteUrl)
+                .map(AllowedSite::getFavicon)
                 .toList();
     }
 
@@ -136,9 +136,21 @@ public class AllowedGroupViewFacade {
     public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
         String siteUrl = allowedSiteRequestDto.siteUrl();
+        siteUrl = normalizeUrl(siteUrl);
         fetchAllowedSiteService.isExist(siteUrl, allowedGroupId);
         AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
         createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
+    }
+
+    private String normalizeUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return url;
+        }
+        url = url.trim();
+        if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+            url = "http://" + url;
+        }
+        return url;
     }
 
     public void updateAllowedSiteUrl(Long allowedGroupId, Long allowedSiteId, AllowedSiteRequestDto allowedSiteRequestDto) {
