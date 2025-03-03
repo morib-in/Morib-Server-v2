@@ -28,5 +28,5 @@ public class SseMessageBuilder {
         return userName + " 님이 친구 요청을 수락했습니다.";
     }
 
-
+    public String buildHeartbeatMessage() { return "heart-beat"; }
 }
