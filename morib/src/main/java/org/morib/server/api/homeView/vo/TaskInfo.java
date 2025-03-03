@@ -3,6 +3,7 @@ package org.morib.server.api.homeView.vo;
 import org.morib.server.domain.task.infra.Task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record TaskInfo(
         Long id,
@@ -10,8 +11,8 @@ public record TaskInfo(
         LocalDate startDate,
         LocalDate endDate,
         int elapsedTime,
-        boolean isComplete
-) {
+        boolean isComplete,
+        LocalDateTime createdAt) {
     public static TaskInfo of(Task task, int elapsedTime) {
         return new TaskInfo(
                 task.getId(),
@@ -19,7 +20,8 @@ public record TaskInfo(
                 task.getStartDate(),
                 task.getEndDate(),
                 elapsedTime,
-                task.getIsComplete());
+                task.getIsComplete(),
+                task.getCreatedAt());
     }
 }
 
