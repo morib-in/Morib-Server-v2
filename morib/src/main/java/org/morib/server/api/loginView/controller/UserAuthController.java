@@ -31,9 +31,9 @@ public class UserAuthController {
     private final UserAuthFacade userAuthFacade;
 
     @PostMapping("/users/reissue")
-    public ResponseEntity<BaseResponse<?>> reissue(@RequestHeader(AUTHORIZATION) final String accessToken,
-                                                   @CookieValue(name = REFRESH_TOKEN_SUBJECT) final String refreshToken) {
-        ReissueTokenServiceDto dto = userAuthFacade.reissue(accessToken, refreshToken);
+    public ResponseEntity<BaseResponse<?>> reissue(@CookieValue(name = REFRESH_TOKEN_SUBJECT) final String refreshToken
+    ) {
+        ReissueTokenServiceDto dto = userAuthFacade.reissue(refreshToken);
         return ResponseEntity.status(SuccessMessage.SUCCESS.getHttpStatus())
                 .header(HttpHeaders.SET_COOKIE, buildCookieForRefreshToken(dto.refreshToken()).toString())
                 .body(BaseResponse.of(SuccessMessage.SUCCESS, UserReissueResponseDto.of(dto.accessToken())));
