@@ -23,8 +23,8 @@ jobs:
       - name: secretProperties.java 생성
         run: |
           cd ./morib/src/main/java/org/morib/server/global/common
-          touch ./secretProperties.java
-          echo "${{ secrets.SECRET_PROPERTIES }}" >> ./secretProperties.java
+          touch ./SecretProperties.java
+          echo "${{ secrets.SECRET_PROPERTIES }}" >> ./SecretProperties.java
         working-directory: ${{ env.working-directory }}
 
           
