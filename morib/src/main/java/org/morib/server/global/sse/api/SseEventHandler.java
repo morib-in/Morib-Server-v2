@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.global.message.SseMessageBuilder;
 import org.morib.server.global.sse.application.event.SseDisconnectEvent;
+import org.morib.server.global.sse.application.event.SseHeartbeatEvent;
 import org.morib.server.global.sse.application.event.SseTimeoutEvent;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
@@ -39,6 +40,13 @@ public class SseEventHandler {
         log.info("SseTimeoutEvent received for userId: {}", event.getUserId());
         List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(event.getUserId());
         List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
-        sseSender.broadcast(targetEmitters, SSE_EVENT_TIME_OUT, sseMessageBuilder.buildTimeoutMessage(event.getUserId()));
+        sseSender.sendEvent(sseService.fetchSseEmitterByUserId(event.getUserId()), SSE_EVENT_TIME_OUT, sseMessageBuilder.buildTimeoutMessage(event.getUserId()));
+    }
+
+    @EventListener
+    public void handleSseHeartbeat(SseHeartbeatEvent event) {
+        log.info("SseHeartbeat received");
+        List<SseEmitter> targetEmitters = sseService.fetchAllConnectedSseEmitters();
+        sseSender.broadcast(targetEmitters, SSE_EVENT_HEARTBEAT, sseMessageBuilder.buildHeartbeatMessage());
     }
 }

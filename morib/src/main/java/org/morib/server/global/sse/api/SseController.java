@@ -26,11 +26,17 @@ public class SseController {
         return ResponseEntity.ok(emitter);
     }
 
-    @PostMapping("/sse/refresh")
+    @GetMapping("/sse/refresh")
     public ResponseEntity<SseEmitter> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                              @RequestBody UserInfoDtoForSseUserInfoWrapper userInfoDtoForSseUserInfoWrapper){
+                                              @RequestHeader(required = false) String elapsedTime,
+                                              @RequestHeader(required = false) String runningCategoryName,
+                                              @RequestHeader(required = false) String taskId){
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        SseEmitter emitter = sseFacade.refresh(userId, userInfoDtoForSseUserInfoWrapper);
+        SseEmitter emitter = sseFacade.refresh(userId, UserInfoDtoForSseUserInfoWrapper.of(
+                userId,
+                elapsedTime == null ? 0 : Integer.parseInt(elapsedTime),
+                runningCategoryName == null ? "" : runningCategoryName,
+                taskId == null ? null : Long.parseLong(taskId)));
         return ResponseEntity.ok(emitter);
     }
 

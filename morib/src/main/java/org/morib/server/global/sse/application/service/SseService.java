@@ -34,10 +34,6 @@ public class SseService {
         return sseRepository.add(userId, emitter, 0, "", null);
     }
 
-    public void remove(SseEmitter emitter) {
-        sseRepository.remove(emitter);
-    }
-
     public void saveSseUserInfo(Long userId, SseEmitter emitter, UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper) {
         sseRepository.add(
                 userId,
@@ -70,12 +66,11 @@ public class SseService {
         return null;
     }
 
-    public void broadcast(Long userId, Object data, String eventName, List<Relationship> relationships) {
-        sseRepository.broadcast(userId, data, eventName, relationships);
-    }
-
     public boolean validateConnection(Long userId) {
         return sseRepository.isConnected(userId);
     }
 
+    public List<SseEmitter> fetchAllConnectedSseEmitters() {
+        return sseRepository.getAllSseEmitters();
+    }
 }
