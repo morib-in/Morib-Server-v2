@@ -11,8 +11,13 @@ public class HealthCheckController {
 
     private final Environment environment;
 
+    @GetMapping("/health")
+    public String healthCheck() {
+        return "UP";
+    }
+
     @GetMapping("/profile")
-    public String getProfile() {
+    public String getActiveProfile() {
         String[] profiles = environment.getActiveProfiles();
         if (profiles.length == 0) {
             return "UP";
