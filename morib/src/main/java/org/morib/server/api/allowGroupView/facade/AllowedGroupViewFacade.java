@@ -67,9 +67,10 @@ public class AllowedGroupViewFacade {
     }
 
     private List<String> getTop5FaviconInAllowedGroup(AllowedGroup allowedGroup) {
-        return allowedGroup.getAllowedSites().stream()
-                .limit(MAX_VISIBLE_ALLOWED_SERVICES)
+        return filteredAllowedSitesByDomain(allowedGroup).values().stream()
+                .flatMap(List::stream)
                 .map(AllowedSite::getFavicon)
+                .limit(MAX_VISIBLE_ALLOWED_SERVICES)
                 .toList();
     }
 
@@ -91,6 +92,15 @@ public class AllowedGroupViewFacade {
     }
 
     public List<AllowedSiteWithIdVo> filterByTopDomainAndGetAllowedSiteWithIdVo(AllowedGroup findAllowedGroup) {
+        TreeMap<String, List<AllowedSite>> filteredAllowedSites = filteredAllowedSitesByDomain(findAllowedGroup);
+
+        return filteredAllowedSites.values().stream()
+                .flatMap(List::stream)
+                .map(AllowedSiteWithIdVo::of)
+                .toList();
+    }
+
+    private TreeMap<String, List<AllowedSite>> filteredAllowedSitesByDomain(AllowedGroup findAllowedGroup) {
         TreeMap<String, List<AllowedSite>> filteredAllowedSites = new TreeMap<>();
         for (AllowedSite allowedSite : findAllowedGroup.getAllowedSites()) {
             String domainForKey = fetchSiteInfoService.getTopDomain(allowedSite.getSiteUrl());
@@ -101,11 +111,7 @@ public class AllowedGroupViewFacade {
 
         filteredAllowedSites.values().forEach(
                 list -> list.sort(Comparator.comparing(AllowedSite::getSiteUrl)));
-
-        return filteredAllowedSites.values().stream()
-                .flatMap(List::stream)
-                .map(AllowedSiteWithIdVo::of)
-                .toList();
+        return filteredAllowedSites;
     }
 
     @Transactional

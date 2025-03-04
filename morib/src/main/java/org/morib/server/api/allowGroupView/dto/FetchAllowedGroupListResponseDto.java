@@ -6,9 +6,9 @@ public record FetchAllowedGroupListResponseDto(
         Long id,
         String name,
         String colorCode,
-        List<String> allowedSites,
+        List<String> favicons,
         int extraCnt) {
-    public static FetchAllowedGroupListResponseDto of(Long id, String name, String colorCode, List<String> allowedSites, int extraCnt) {
-        return new FetchAllowedGroupListResponseDto(id, name, colorCode, allowedSites, extraCnt);
+    public static FetchAllowedGroupListResponseDto of(Long id, String name, String colorCode, List<String> favicons, int extraCnt) {
+        return new FetchAllowedGroupListResponseDto(id, name, colorCode, favicons, extraCnt);
     }
 }
