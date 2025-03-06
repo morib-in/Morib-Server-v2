@@ -1,6 +1,9 @@
 package org.morib.server.global.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import org.morib.server.global.common.SecretProperties;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -55,6 +58,7 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
         additionalParameters.put("prompt", "consent");
 
         return OAuth2AuthorizationRequest.from(authorizationRequest)
+                .redirectUri("https://api.morib.in/login/oauth2/code/google")
                 .additionalParameters(additionalParameters)
                 .build();
     }
