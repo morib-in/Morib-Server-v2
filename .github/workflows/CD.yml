@@ -1,6 +1,6 @@
 name: DOCKER-CD
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
 
 jobs:
