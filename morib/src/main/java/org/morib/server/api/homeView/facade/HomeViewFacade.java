@@ -105,18 +105,19 @@ public class HomeViewFacade {
         // Task ID 리스트 조회 (Batch 조회)
         List<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
 
+        classifyTaskService.validateIncludingCompletedTasks(tasks);
+
         // 타이머가 존재하는 Task 조회 (Batch 조회)
         Set<Long> existingTimerTaskIds = fetchTimerService.fetchExistingTaskIdsByTargetDate(tasks, targetDate);
 
         // Task 업데이트 & 타이머 생성 (존재하지 않는 타이머만)
-        updateTaskInTodo(startTimerRequestDto, todo);
+        updateTaskInTodo(tasks, todo);
         tasks.stream()
                 .filter(task -> !existingTimerTaskIds.contains(task.getId())) // 이미 존재하는 타이머는 제외
                 .forEach(task -> createTimerService.createTimer(findUser, targetDate, task));
     }
 
-    private void updateTaskInTodo(StartTimerRequestDto startTimerRequestDto, Todo todo) {
-        List<Task> tasks = fetchTaskService.fetchByTaskIds(startTimerRequestDto.taskIdList());
+    private void updateTaskInTodo(List<Task> tasks, Todo todo) {
         todoManager.updateTask(todo, tasks);
     }
 
