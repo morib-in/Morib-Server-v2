@@ -84,5 +84,11 @@ public class GlobalExceptionHandler {
         log.error(">>> handle: DuplicateResourceException ", e);
         return ApiResponseUtil.failure(ErrorMessage.DUPLICATE_RESOURCE);
     }
+
+    @ExceptionHandler(InvalidTaskInTodoException.class)
+    protected ResponseEntity<BaseResponse<?>> handleInvalidTaskInTodoException(final InvalidTaskInTodoException e) {
+        log.error(">>> handle: InvalidTaskInTodoException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.INVALID_TASK_IN_TODO);
+    }
 }
 
