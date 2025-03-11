@@ -15,6 +15,7 @@ import org.morib.server.domain.recentAllowedGroup.application.DeleteRecentAllowe
 import org.morib.server.domain.recentAllowedGroup.application.FetchRecentAllowedGroupService;
 import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
+import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
@@ -50,6 +51,7 @@ public class TimerViewFacade {
     private final FetchUserService fetchUserService;
     private final TimerManager timerManager;
     private final FetchRelationshipService fetchRelationshipService;
+    private final ClassifyTaskService classifyTaskService;
     private final SseService sseService;
     private final SseSender sseSender;
     private final ModalViewFacade modalViewFacade;
@@ -61,6 +63,7 @@ public class TimerViewFacade {
     private final FetchAllowedGroupService fetchAllowedGroupService;
 
     public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
+        classifyTaskService.validateIncludingCompletedTask(fetchTaskService.fetchById(runTimerRequestDto.taskId()));
         int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
         UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, runTimerRequestDto.runningCategoryName(), runTimerRequestDto.taskId());
         SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);

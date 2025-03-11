@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.vo.TaskWithTimers;
 import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.global.exception.InvalidTaskInTodoException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,5 +30,19 @@ public class ClassifyTaskServiceImpl implements ClassifyTaskService {
     public boolean isTaskInDateRange(Task task, LocalDate date) {
         return (task.getStartDate().isBefore(date.plusDays(1))) &&
                 (task.getEndDate() == null || task.getEndDate().isAfter(date.minusDays(1)));
+    }
+
+    @Override
+    public void validateIncludingCompletedTasks(List<Task> tasks) {
+        if (tasks.stream().anyMatch(Task::getIsComplete)) {
+            throw new InvalidTaskInTodoException(ErrorMessage.INVALID_TASK_IN_TODO);
+        }
+    }
+
+    @Override
+    public void validateIncludingCompletedTask(Task task) {
+        if (task.getIsComplete()) {
+            throw new InvalidTaskInTodoException(ErrorMessage.INVALID_TASK_IN_TODO);
+        }
     }
 }
