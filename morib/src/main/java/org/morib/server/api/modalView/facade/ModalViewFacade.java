@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.morib.server.global.common.Constants.*;
 
@@ -106,6 +103,7 @@ public class ModalViewFacade {
                         sseService.validateConnection(user.getId()),
                         fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now())
                 ))
+                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
                 .toList();
     }
 
