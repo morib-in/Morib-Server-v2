@@ -19,6 +19,8 @@ import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.global.common.ConnectType;
+import org.morib.server.global.exception.DuplicateResourceException;
+import org.morib.server.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
@@ -142,22 +144,16 @@ public class AllowedGroupViewFacade {
     public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
         String siteUrl = allowedSiteRequestDto.siteUrl();
-        siteUrl = normalizeUrl(siteUrl);
-        fetchAllowedSiteService.isExist(siteUrl, allowedGroupId);
+        // url 정규화
+        siteUrl = fetchSiteInfoService.normalizeUrl(siteUrl);
+        AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId);
+        if (findAllowedSite != null) {
+            throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+        }
         AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
         createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
     }
 
-    private String normalizeUrl(String url) {
-        if (url == null || url.trim().isEmpty()) {
-            return url;
-        }
-        url = url.trim();
-        if (!(url.startsWith("http://") || url.startsWith("https://"))) {
-            url = "http://" + url;
-        }
-        return url;
-    }
 
     public void updateAllowedSiteUrl(Long allowedGroupId, Long allowedSiteId, AllowedSiteRequestDto allowedSiteRequestDto) {
         fetchAllowedSiteService.isExist(allowedSiteRequestDto.siteUrl(), allowedGroupId);
