@@ -6,4 +6,7 @@ public interface FetchSiteInfoService {
     AllowedSiteVo fetch(String url);
     String getTopDomain(String urlString);
     String getTopDomainUrl(String urlString);
+    String getTopDomainWhenParsingFailed(String urlString);
+    String normalizeUrl(String url);
+    String getDomainExceptHost(String urlString);
 }

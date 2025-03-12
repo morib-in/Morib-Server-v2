@@ -77,6 +77,7 @@ public class AllowedGroupViewController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    // deprecated
     @PatchMapping("/allowedSite/{allowedGroupId}/{allowedSiteId}")
     public ResponseEntity<BaseResponse<?>> updateAllowedSiteUrl(@PathVariable Long allowedGroupId,
                                                                 @PathVariable Long allowedSiteId,

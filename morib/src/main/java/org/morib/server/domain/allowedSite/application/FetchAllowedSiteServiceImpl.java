@@ -23,6 +23,16 @@ public class FetchAllowedSiteServiceImpl implements FetchAllowedSiteService{
     }
 
     @Override
+    public AllowedSite fetchBySiteUrlAndAllowedGroupId(String siteUrl, Long allowedGroupId) {
+        return allowedSiteRepository.findBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId);
+    }
+
+    @Override
+    public AllowedSite fetchBySiteUrlContainingAndAllowedGroupId(String siteUrl, Long allowedGroupId) {
+        return allowedSiteRepository.findBySiteUrlContainingAndAllowedGroupId(siteUrl, allowedGroupId);
+    }
+
+    @Override
     public AllowedSite fetchById(Long id) {
         return allowedSiteRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
@@ -33,4 +43,5 @@ public class FetchAllowedSiteServiceImpl implements FetchAllowedSiteService{
     public List<AllowedSite> fetchByDomainContaining(Long allowedGroupId, String topDomainUrl) {
         return allowedSiteRepository.findByAllowedGroupIdAndSiteUrlContaining(allowedGroupId, topDomainUrl);
     }
+
 }
