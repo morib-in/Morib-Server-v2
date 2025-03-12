@@ -17,6 +17,9 @@ public class ValidateRelationshipServiceImpl implements ValidateRelationshipServ
 
     @Override
     public void validateRelationshipByUserAndFriend(User user, User friend) {
+        if (user.equals(friend)) {
+            throw new AlreadyFriendException(ErrorMessage.CANNOT_ADD_YOURSELF);
+        }
         relationshipRepository.findByUserAndFriend(user.getId(), friend.getId())
                 .ifPresent(relationship -> {
                     if (relationship.getRelationLevel() == RelationLevel.CONNECTED) {
