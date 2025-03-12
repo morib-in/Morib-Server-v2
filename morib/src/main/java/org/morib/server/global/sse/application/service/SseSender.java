@@ -48,22 +48,4 @@ public class SseSender {
             }
         }
     }
-
-    public void broadcastWithReconnectTime(List<SseEmitter> emitters, String eventName, Object data) {
-        for (SseEmitter targetEmitter : emitters) {
-            try {
-                if (targetEmitter != null) {
-                    SseEmitter.SseEventBuilder event = SseEmitter.event()
-                            .data(data)
-                            .name(eventName)
-                            .reconnectTime(300000L);  // 300,000ms = 5분
-                    targetEmitter.send(event);
-                }
-            } catch (IOException e) {
-                targetEmitter.completeWithError(e);
-                throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
-
-            }
-        }
-    }
 }
