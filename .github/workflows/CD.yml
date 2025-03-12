@@ -36,13 +36,13 @@ jobs:
           cat ./application.yml
         working-directory: ${{ env.working-directory }}
         
-      - name: logback-spring.xml 생성
-        run: |
-          cd ./morib/src/main/resources
-          touch ./logback-spring.xml
-          echo "${{ secrets.LOG_CONFIGURATION }}" >> ./logback-spring.xml
-          cat ./logback-spring.xml
-        working-directory: ${{ env.working-directory }}
+      # - name: logback-spring.xml 생성
+      #   run: |
+      #     cd ./morib/src/main/resources
+      #     touch ./logback-spring.xml
+      #     echo "${{ secrets.LOG_CONFIGURATION }}" >> ./logback-spring.xml
+      #     cat ./logback-spring.xml
+      #   working-directory: ${{ env.working-directory }}
 
 
       - name: 빌드
