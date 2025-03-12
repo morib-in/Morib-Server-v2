@@ -1,0 +1,40 @@
+<configuration>
+
+    <!-- ColorConverter를 등록합니다. (Spring Boot 2.x 이상에서는 기본적으로 제공됨) -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 각 로그 부분에 대해 컬러를 설정합니다.
+                 %clr(...){} 구문을 사용하여 색상, 스타일 지정이 가능합니다. -->
+            <pattern>
+                %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level){bold,blue} %clr(%logger{36}){magenta} %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- File Appender: ERROR 레벨 이상의 로그만 기록 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%n</pattern>
+        </encoder>
+        <!-- ThresholdFilter: ERROR 레벨 이상의 로그만 통과 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- Root logger: DEBUG 레벨로 설정하여 콘솔에는 모든 로그를 출력하되,
+         FILE appender의 필터에 의해 ERROR 이상의 로그만 파일에 기록됨 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
