@@ -50,7 +50,7 @@ public class SseRepository {
             });
 
             emitter.onTimeout(() -> {
-                log.error("onTimeout callback");
+                log.info("onTimeout callback");
                 emitter.complete();
                 eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
             });
