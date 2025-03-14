@@ -112,7 +112,7 @@ public class JwtService {
 
         } catch (Exception e) {
 //            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
-            log.error("invalid access token");
+//            log.error("invalid access token");
             return Optional.empty();
         }
     }
