@@ -69,10 +69,41 @@ public class SseRepository {
         return emitter;
     }
 
-    // 30초 간격으로 heartbeat 메시지 전송
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 180000) // 5분마다 실행
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
+    }
+
+    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    public void cleanupStaleConnections() {
+        log.info("오래된 SSE 연결 정리 시작...");
+        long currentTime = System.currentTimeMillis();
+        int removedCount = 0;
+        
+        for (Map.Entry<Long, SseUserInfoWrapper> entry : emitters.entrySet()) {
+            SseEmitter emitter = entry.getValue().getSseEmitter();
+            if (emitter != null) {
+                // 연결 시간이 MAX_CONNECTION_TIME을 초과하면 제거
+                if (currentTime - emitter.hashCode() > MAX_CONNECTION_TIME) {
+                    try {
+                        emitter.complete();
+                    } catch (Exception e) {
+                        log.warn("오래된 연결 완료 처리 중 오류 발생: {}", e.getMessage());
+                    }
+                    emitters.remove(entry.getKey());
+                    removedCount++;
+                    
+                    // 연결 종료 이벤트 발행
+                    eventPublisher.publishEvent(new SseDisconnectEvent(this, entry.getKey()));
+                }
+            } else {
+                // emitter가 null인 경우 제거
+                emitters.remove(entry.getKey());
+                removedCount++;
+            }
+        }
+        
+        log.info("오래된 SSE 연결 정리 완료. 제거된 연결 수: {}, 남은 연결 수: {}", removedCount, emitters.size());
     }
 
     public SseEmitter getSseEmitterById(Long id) {
