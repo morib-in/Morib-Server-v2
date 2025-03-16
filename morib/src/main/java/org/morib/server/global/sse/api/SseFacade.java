@@ -39,8 +39,6 @@ public class SseFacade {
 
     public SseEmitter init(Long userId) {
         try {
-            SseEmitter existingEmitter = sseService.fetchSseEmitterByUserId(userId);
-            if (existingEmitter != null) existingEmitter.complete();
             SseEmitter createdEmitter = sseService.create();
             sseService.add(userId, createdEmitter);
             return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_CONNECT);
