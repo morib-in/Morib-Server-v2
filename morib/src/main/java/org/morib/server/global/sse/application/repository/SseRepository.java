@@ -115,7 +115,39 @@ public class SseRepository {
     }
 
     public List<SseEmitter> getAllSseEmitters() {
-        return emitters.values().stream().map(SseUserInfoWrapper::getSseEmitter).toList();
+        return emitters.values().stream()
+                .map(SseUserInfoWrapper::getSseEmitter)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
+    public boolean remove(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter emitter = emitters.get(userId).getSseEmitter();
+            if (emitter != null) {
+                try {
+                    emitter.complete();
+                } catch (Exception e) {
+                    log.warn("SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+            return true;
+        }
+        return false;
+    }
+
+    private void removeExistingEmitter(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter oldEmitter = emitters.get(userId).getSseEmitter();
+            if (oldEmitter != null) {
+                try {
+                    oldEmitter.complete();
+                } catch (Exception e) {
+                    log.warn("기존 SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+        }
+    }
 }
