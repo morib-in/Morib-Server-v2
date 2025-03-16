@@ -20,9 +20,19 @@ public class SseController {
     private final SseFacade sseFacade;
 
     @GetMapping(value = "/sse/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<SseEmitter> connect(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+    public ResponseEntity<SseEmitter> connect(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        // 연결 전 메모리 사용량 측정
+        long beforeMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        log.info("SSE 연결 전 메모리 사용량: {} bytes", beforeMemory);
+
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         SseEmitter emitter = sseFacade.init(userId);
+
+        // 연결 후 메모리 사용량 측정
+        long afterMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        log.info("SSE 연결 후 메모리 사용량: {} bytes", afterMemory);
+        log.info("SSE 연결 당 메모리 사용량: {} bytes", afterMemory - beforeMemory);
+
         return ResponseEntity.ok(emitter);
     }
 
