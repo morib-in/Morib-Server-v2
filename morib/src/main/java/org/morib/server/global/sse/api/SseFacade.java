@@ -1,17 +1,18 @@
 package org.morib.server.global.sse.api;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
-import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.global.exception.SSEConnectionException;
+import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SseMessageBuilder;
-import org.morib.server.global.sse.application.repository.SseRepository;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -24,6 +25,7 @@ import static org.morib.server.global.common.Constants.SSE_EVENT_REFRESH;
 
 @Facade
 @RequiredArgsConstructor
+@Slf4j
 public class SseFacade {
 
     private final SseService sseService;
