@@ -2,7 +2,10 @@ package org.morib.server.global.sse.application.repository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static org.morib.server.global.common.Constants.SSE_EVENT_COMPLETION;
-import static org.morib.server.global.common.Constants.SSE_TIMEOUT;
+import static org.morib.server.global.common.Constants.*;
 
 @Repository
 @Slf4j
