@@ -36,13 +36,17 @@ public class SseFacade {
     private final SseMessageBuilder sseMessageBuilder;
 
     public SseEmitter init(Long userId) {
-//        SseEmitter findEmitter = sseService.fetchSseEmitterByUserId(userId);
-//        if (findEmitter != null) sseService.remove(findEmitter);
-        SseEmitter createdEmitter = sseService.create();
-        sseService.add(userId, createdEmitter);
-        return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_CONNECT);
+        try {
+            SseEmitter existingEmitter = sseService.fetchSseEmitterByUserId(userId);
+            if (existingEmitter != null) existingEmitter.complete();
+            SseEmitter createdEmitter = sseService.create();
+            sseService.add(userId, createdEmitter);
+            return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_CONNECT);
+        } catch (Exception e) {
+            log.error("SSE 초기화 중 오류 발생: {}", e.getMessage(), e);
+            throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
+        }
     }
-
     public SseEmitter refresh(Long userId, UserInfoDtoForSseUserInfoWrapper userInfoDtoForSseUserInfoWrapper) {
         SseEmitter createdEmitter = sseService.create();
         if (userInfoDtoForSseUserInfoWrapper.taskId() != null) {
