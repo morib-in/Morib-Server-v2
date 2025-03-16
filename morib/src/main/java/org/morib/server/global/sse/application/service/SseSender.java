@@ -85,3 +85,16 @@ public class SseSender {
             }
         }
     }
+
+    @Scheduled(fixedRate = 300000) // 5분마다 실행
+    public void checkFailedAttempts() {
+        int currentFailures = failedSendAttempts.get();
+        if (currentFailures > 0) {
+            log.info("현재 SSE 이벤트 전송 실패 횟수: {}", currentFailures);
+        }
+        
+        // 실패 카운터 재설정
+        failedSendAttempts.set(0);
+    }
+}
+
