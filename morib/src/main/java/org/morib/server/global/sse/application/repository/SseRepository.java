@@ -37,24 +37,35 @@ public class SseRepository {
     }
 
     public SseEmitter add(Long userId, SseEmitter emitter, int elapsedTime, String runningCategoryName, Long taskId) {
-        emitters.put(userId, new SseUserInfoWrapper(emitter, elapsedTime, runningCategoryName, taskId));
-        log.info("new emitter added: {}", emitter);
-        log.info("emitter list size: {}", emitters.size());
-        log.info("emitter list: {}", emitters);
+        removeExistingEmitter(userId);
 
+        emitters.put(userId, new SseUserInfoWrapper(emitter, elapsedTime, runningCategoryName, taskId));
+        log.info("새 emitter 추가됨: {}", emitter);
+        log.info("emitter 목록 크기: {}", emitters.size());
+        
         if (emitter != null) {
+
             emitter.onCompletion(() -> {
-                log.info("onCompletion callback");
+                log.info("onCompletion 콜백 - userId: {}", userId);
                 emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
             });
 
             emitter.onTimeout(() -> {
-                log.info("onTimeout callback");
+                log.info("onTimeout 콜백 - userId: {}", userId);
                 emitter.complete();
+                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
             });
+
+            emitter.onError(e -> {
+                log.error("SseEmitter 오류 발생 - userId: {}, 오류: {}", userId, e.getMessage());
+                emitter.complete();
+                emitters.remove(userId);
+                eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+            });
         }
+        
         return emitter;
     }
 
