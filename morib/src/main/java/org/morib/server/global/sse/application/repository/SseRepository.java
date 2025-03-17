@@ -46,32 +46,31 @@ public class SseRepository {
         log.info("emitter 목록 크기: {}", emitters.size());
         
         if (emitter != null) {
-
             emitter.onCompletion(() -> {
                 log.info("onCompletion 콜백 - userId: {}", userId);
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+                emitters.remove(userId);
             });
 
             emitter.onTimeout(() -> {
                 log.info("onTimeout 콜백 - userId: {}", userId);
-                emitter.complete();
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
+                emitter.complete();
+                emitters.remove(userId); // 명시적으로 제거
             });
 
             emitter.onError(e -> {
                 log.error("SseEmitter 오류 발생 - userId: {}, 오류: {}", userId, e.getMessage());
-                emitter.complete();
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+                emitter.complete();
+                emitters.remove(userId); // 명시적으로 제거
             });
         }
         
         return emitter;
     }
 
-    @Scheduled(fixedRate = 180000) // 5분마다 실행
+    @Scheduled(fixedRate = 60000)
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
     }
