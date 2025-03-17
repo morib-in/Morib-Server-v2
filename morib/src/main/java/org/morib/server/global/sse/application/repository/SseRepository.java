@@ -2,7 +2,10 @@ package org.morib.server.global.sse.application.repository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static org.morib.server.global.common.Constants.SSE_EVENT_COMPLETION;
-import static org.morib.server.global.common.Constants.SSE_TIMEOUT;
+import static org.morib.server.global.common.Constants.*;
 
 @Repository
 @Slf4j
@@ -37,31 +39,73 @@ public class SseRepository {
     }
 
     public SseEmitter add(Long userId, SseEmitter emitter, int elapsedTime, String runningCategoryName, Long taskId) {
-        emitters.put(userId, new SseUserInfoWrapper(emitter, elapsedTime, runningCategoryName, taskId));
-        log.info("new emitter added: {}", emitter);
-        log.info("emitter list size: {}", emitters.size());
-        log.info("emitter list: {}", emitters);
+        removeExistingEmitter(userId);
 
+        emitters.put(userId, new SseUserInfoWrapper(emitter, elapsedTime, runningCategoryName, taskId));
+        log.info("새 emitter 추가됨: {}", emitter);
+        log.info("emitter 목록 크기: {}", emitters.size());
+        
         if (emitter != null) {
+
             emitter.onCompletion(() -> {
-                log.info("onCompletion callback");
+                log.info("onCompletion 콜백 - userId: {}", userId);
                 emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
             });
 
             emitter.onTimeout(() -> {
-                log.info("onTimeout callback");
+                log.info("onTimeout 콜백 - userId: {}", userId);
                 emitter.complete();
+                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
             });
+
+            emitter.onError(e -> {
+                log.error("SseEmitter 오류 발생 - userId: {}, 오류: {}", userId, e.getMessage());
+                emitter.complete();
+                emitters.remove(userId);
+                eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+            });
         }
+        
         return emitter;
     }
 
-    // 30초 간격으로 heartbeat 메시지 전송
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 180000) // 5분마다 실행
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
+    }
+
+    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    public void cleanupStaleConnections() {
+        log.info("오래된 SSE 연결 정리 시작...");
+        long currentTime = System.currentTimeMillis();
+        int removedCount = 0;
+        
+        for (Map.Entry<Long, SseUserInfoWrapper> entry : emitters.entrySet()) {
+            SseEmitter emitter = entry.getValue().getSseEmitter();
+            if (emitter != null) {
+                // 연결 시간이 MAX_CONNECTION_TIME을 초과하면 제거
+                if (currentTime - emitter.hashCode() > MAX_CONNECTION_TIME) {
+                    try {
+                        emitter.complete();
+                    } catch (Exception e) {
+                        log.warn("오래된 연결 완료 처리 중 오류 발생: {}", e.getMessage());
+                    }
+                    emitters.remove(entry.getKey());
+                    removedCount++;
+                    
+                    // 연결 종료 이벤트 발행
+                    eventPublisher.publishEvent(new SseDisconnectEvent(this, entry.getKey()));
+                }
+            } else {
+                // emitter가 null인 경우 제거
+                emitters.remove(entry.getKey());
+                removedCount++;
+            }
+        }
+        
+        log.info("오래된 SSE 연결 정리 완료. 제거된 연결 수: {}, 남은 연결 수: {}", removedCount, emitters.size());
     }
 
     public SseEmitter getSseEmitterById(Long id) {
@@ -73,7 +117,39 @@ public class SseRepository {
     }
 
     public List<SseEmitter> getAllSseEmitters() {
-        return emitters.values().stream().map(SseUserInfoWrapper::getSseEmitter).toList();
+        return emitters.values().stream()
+                .map(SseUserInfoWrapper::getSseEmitter)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
+    public boolean remove(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter emitter = emitters.get(userId).getSseEmitter();
+            if (emitter != null) {
+                try {
+                    emitter.complete();
+                } catch (Exception e) {
+                    log.warn("SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+            return true;
+        }
+        return false;
+    }
+
+    private void removeExistingEmitter(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter oldEmitter = emitters.get(userId).getSseEmitter();
+            if (oldEmitter != null) {
+                try {
+                    oldEmitter.complete();
+                } catch (Exception e) {
+                    log.warn("기존 SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+        }
+    }
 }

@@ -13,6 +13,8 @@ public final class Constants {
     public static final String SEND = "send";
     public static final String RECEIVE = "receive";
     public static final Long SSE_TIMEOUT = 300_000L;
+    public static final Long MAX_CONNECTION_TIME = 30 * 60 * 1000L;
+    public static final int MAX_FAILED_ATTEMPTS = 100;
     public static final String IS_SIGN_UP_QUERYSTRING = "?isSignUp=";
     public static final String GOOGLE_REGISTRATION_ID = "google";
     public static final String INVALID_REFRESH_TOKEN = "invalid";

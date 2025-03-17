@@ -55,6 +55,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/**").permitAll()
+                .requestMatchers("/api/v2/admin/sse/monitor", "/api/v2/admin/sse/gc").permitAll()
                 .anyRequest().authenticated()
         );
         http.addFilterAfter(jwtAuthenticationFilter(), LogoutFilter.class);
