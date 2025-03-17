@@ -29,8 +29,8 @@ public class SseController {
     @GetMapping(value = "/sse/refresh", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                               @RequestHeader(required = false) String elapsedTime,
-                                              @RequestHeader(required = false) String runningCategoryName,
-                                              @RequestHeader(required = false) String taskId){
+                                              @RequestHeader(required = false) String taskId,
+                                              @RequestParam("runningCategoryName") String runningCategoryName) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         SseEmitter emitter = sseFacade.refresh(userId, UserInfoDtoForSseUserInfoWrapper.of(
                 userId,
