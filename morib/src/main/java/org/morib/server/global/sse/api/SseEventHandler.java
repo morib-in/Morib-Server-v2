@@ -38,8 +38,6 @@ public class SseEventHandler {
     @EventListener
     public void handleSseTimeout(SseTimeoutEvent event) {
         log.info("SseTimeoutEvent received for userId: {}", event.getUserId());
-        List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(event.getUserId());
-        List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
         sseSender.sendEvent(sseService.fetchSseEmitterByUserId(event.getUserId()), SSE_EVENT_TIME_OUT, sseMessageBuilder.buildTimeoutMessage(event.getUserId()));
     }
 
@@ -47,6 +45,6 @@ public class SseEventHandler {
     public void handleSseHeartbeat(SseHeartbeatEvent event) {
         log.info("SseHeartbeat received");
         List<SseEmitter> targetEmitters = sseService.fetchAllConnectedSseEmitters();
-        sseSender.broadcast(targetEmitters, SSE_EVENT_HEARTBEAT, sseMessageBuilder.buildHeartbeatMessage());
+        sseSender.sendHeartbeat(targetEmitters);
     }
 }
