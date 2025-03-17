@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.morib.server.global.common.Constants.SSE_EVENT_CONNECT;
@@ -72,5 +73,13 @@ public class SseService {
 
     public List<SseEmitter> fetchAllConnectedSseEmitters() {
         return sseRepository.getAllSseEmitters();
+    }
+
+    public int getConnectionCount() {
+        return sseRepository.getConnectionCount();
+    }
+
+    public Set<Long> getConnectedUserIds() {
+        return sseRepository.getConnectedUserIds();
     }
 }
