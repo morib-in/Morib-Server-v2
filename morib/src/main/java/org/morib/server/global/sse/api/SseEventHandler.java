@@ -45,6 +45,6 @@ public class SseEventHandler {
     public void handleSseHeartbeat(SseHeartbeatEvent event) {
         log.info("SseHeartbeat received");
         List<SseEmitter> targetEmitters = sseService.fetchAllConnectedSseEmitters();
-        sseSender.sendHeartbeat(targetEmitters);
+        sseSender.broadcast(targetEmitters, SSE_EVENT_HEARTBEAT, sseMessageBuilder.buildHeartbeatMessage());
     }
 }
