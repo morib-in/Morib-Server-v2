@@ -18,8 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.morib.server.global.common.Constants.MAX_FAILED_ATTEMPTS;
-import static org.morib.server.global.common.Constants.SSE_EVENT_COMPLETION;
+import static org.morib.server.global.common.Constants.*;
 
 @Component
 @RequiredArgsConstructor
@@ -95,6 +94,31 @@ public class SseSender {
         
         // 실패 카운터 재설정
         failedSendAttempts.set(0);
+    }
+
+    public void sendHeartbeat(List<SseEmitter> emitters) {
+        String eventName = "heartbeat";
+        if (emitters == null || emitters.isEmpty()) {
+            log.debug("브로드캐스트할 SseEmitter가 없습니다: {}", eventName);
+            return;
+        }
+
+        log.debug("이벤트 브로드캐스트: {}, 대상 수: {}", eventName, emitters.size());
+
+        for (SseEmitter targetEmitter : emitters) {
+            try {
+                if (targetEmitter != null) {
+                    targetEmitter.send(SseEmitter.event()
+                            .comment(SSE_EVENT_HEARTBEAT));
+                }
+            } catch (IOException e) {
+                log.error("SSE 브로드캐스트 실패: {}", e.getMessage());
+                targetEmitter.completeWithError(e);
+            } catch (Exception e) {
+                log.error("SSE 브로드캐스트 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+                targetEmitter.completeWithError(e);
+            }
+        }
     }
 }
 
