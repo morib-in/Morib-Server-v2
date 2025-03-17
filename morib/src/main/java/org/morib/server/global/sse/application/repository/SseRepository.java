@@ -33,9 +33,26 @@ public class SseRepository {
 
     public static final ConcurrentHashMap<Long, SseUserInfoWrapper> emitters = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher eventPublisher;
+    
+    // 최대 연결 유지 시간 (기본값: 30분)
+    private static final long MAX_CONNECTION_TIME = 30 * 60 * 1000; // 30분
 
     public SseEmitter create() {
         return new SseEmitter(SSE_TIMEOUT);
+    }
+
+    public void removeExistingEmitter(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter oldEmitter = emitters.get(userId).getSseEmitter();
+            if (oldEmitter != null) {
+                try {
+                    oldEmitter.complete();
+                } catch (Exception e) {
+                    log.warn("기존 SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+        }
     }
 
     public SseEmitter add(Long userId, SseEmitter emitter, int elapsedTime, String runningCategoryName, Long taskId) {
