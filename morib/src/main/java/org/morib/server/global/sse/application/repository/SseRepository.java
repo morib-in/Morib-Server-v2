@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.morib.server.global.common.Constants.MAX_CONNECTION_TIME;
 import static org.morib.server.global.common.Constants.SSE_TIMEOUT;
 
 @Repository
@@ -25,9 +26,6 @@ public class SseRepository {
 
     public static final ConcurrentHashMap<Long, SseUserInfoWrapper> emitters = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher eventPublisher;
-    
-    // 최대 연결 유지 시간 (기본값: 30분)
-    private static final long MAX_CONNECTION_TIME = 30 * 60 * 1000; // 30분
 
     public SseEmitter create() {
         return new SseEmitter(SSE_TIMEOUT);
@@ -79,7 +77,7 @@ public class SseRepository {
         return emitter;
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
     }
