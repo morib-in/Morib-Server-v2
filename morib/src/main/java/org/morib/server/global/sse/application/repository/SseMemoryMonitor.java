@@ -19,9 +19,6 @@ public class SseMemoryMonitor {
     public void logMemoryUsage() {
         Runtime runtime = Runtime.getRuntime();
         
-        // 가비지 컬렉션 실행
-        System.gc();
-        
         long usedMemory = runtime.totalMemory() - runtime.freeMemory();
         int connectionCount = sseRepository.getConnectionCount();
         
