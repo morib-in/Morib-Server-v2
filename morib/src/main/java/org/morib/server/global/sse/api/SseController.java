@@ -26,7 +26,7 @@ public class SseController {
         return ResponseEntity.ok(emitter);
     }
 
-    @GetMapping("/sse/refresh")
+    @GetMapping(value = "/sse/refresh", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> refresh(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                               @RequestHeader(required = false) String elapsedTime,
                                               @RequestHeader(required = false) String runningCategoryName,
