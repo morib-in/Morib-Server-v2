@@ -1,30 +1,22 @@
 package org.morib.server.global.sse.application.repository;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.morib.server.domain.relationship.application.FetchRelationshipService;
-import org.morib.server.domain.relationship.infra.Relationship;
-import org.morib.server.global.exception.SSEConnectionException;
-import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.sse.application.event.SseDisconnectEvent;
 import org.morib.server.global.sse.application.event.SseHeartbeatEvent;
 import org.morib.server.global.sse.application.event.SseTimeoutEvent;
-import org.morib.server.global.userauth.CustomUserDetails;
-import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static org.morib.server.global.common.Constants.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.morib.server.global.common.Constants.SSE_TIMEOUT;
 
 @Repository
 @Slf4j
@@ -33,9 +25,26 @@ public class SseRepository {
 
     public static final ConcurrentHashMap<Long, SseUserInfoWrapper> emitters = new ConcurrentHashMap<>();
     private final ApplicationEventPublisher eventPublisher;
+    
+    // 최대 연결 유지 시간 (기본값: 30분)
+    private static final long MAX_CONNECTION_TIME = 30 * 60 * 1000; // 30분
 
     public SseEmitter create() {
         return new SseEmitter(SSE_TIMEOUT);
+    }
+
+    public void removeExistingEmitter(Long userId) {
+        if (emitters.containsKey(userId)) {
+            SseEmitter oldEmitter = emitters.get(userId).getSseEmitter();
+            if (oldEmitter != null) {
+                try {
+                    oldEmitter.complete();
+                } catch (Exception e) {
+                    log.warn("기존 SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
+                }
+            }
+            emitters.remove(userId);
+        }
     }
 
     public SseEmitter add(Long userId, SseEmitter emitter, int elapsedTime, String runningCategoryName, Long taskId) {
@@ -46,32 +55,31 @@ public class SseRepository {
         log.info("emitter 목록 크기: {}", emitters.size());
         
         if (emitter != null) {
-
             emitter.onCompletion(() -> {
                 log.info("onCompletion 콜백 - userId: {}", userId);
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+                emitters.remove(userId);
             });
 
             emitter.onTimeout(() -> {
                 log.info("onTimeout 콜백 - userId: {}", userId);
-                emitter.complete();
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseTimeoutEvent(this, userId));
+                emitter.complete();
+                emitters.remove(userId); // 명시적으로 제거
             });
 
             emitter.onError(e -> {
                 log.error("SseEmitter 오류 발생 - userId: {}, 오류: {}", userId, e.getMessage());
-                emitter.complete();
-                emitters.remove(userId);
                 eventPublisher.publishEvent(new SseDisconnectEvent(this, userId));
+                emitter.complete();
+                emitters.remove(userId); // 명시적으로 제거
             });
         }
         
         return emitter;
     }
 
-    @Scheduled(fixedRate = 180000) // 5분마다 실행
+    @Scheduled(fixedRate = 60000)
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
     }
@@ -123,33 +131,11 @@ public class SseRepository {
                 .toList();
     }
 
-    public boolean remove(Long userId) {
-        if (emitters.containsKey(userId)) {
-            SseEmitter emitter = emitters.get(userId).getSseEmitter();
-            if (emitter != null) {
-                try {
-                    emitter.complete();
-                } catch (Exception e) {
-                    log.warn("SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
-                }
-            }
-            emitters.remove(userId);
-            return true;
-        }
-        return false;
+    public int getConnectionCount() {
+        return emitters.size();
     }
 
-    private void removeExistingEmitter(Long userId) {
-        if (emitters.containsKey(userId)) {
-            SseEmitter oldEmitter = emitters.get(userId).getSseEmitter();
-            if (oldEmitter != null) {
-                try {
-                    oldEmitter.complete();
-                } catch (Exception e) {
-                    log.warn("기존 SseEmitter 완료 처리 중 오류 발생: {}", e.getMessage());
-                }
-            }
-            emitters.remove(userId);
-        }
+    public Set<Long> getConnectedUserIds() {
+        return emitters.keySet();
     }
 }
