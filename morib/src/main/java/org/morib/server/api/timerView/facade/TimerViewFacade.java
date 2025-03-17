@@ -32,10 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.morib.server.global.common.Constants.SSE_EVENT_TIMER_START;
@@ -99,9 +96,13 @@ public class TimerViewFacade {
      */
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
-        Todo todo = fetchTodoService.fetchByUserIdAndTargetDate(userId, targetDate);
-        LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo, targetDate);
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate);
+        Optional<Todo> todo = fetchTodoService.fetchByUserIdAndTargetDate(userId, targetDate);
+
+        if (todo.isEmpty()) return new TodoCardResponseDto(totalTimeOfToday, Collections.emptyList());
+
+        LinkedHashSet<Task> tasks = fetchTaskService.fetchByTodoAndSameTargetDate(todo.get(), targetDate);
+
         List<TaskInTodoCardDto> taskInTodoCardDtos = tasks.stream()
             .map(t -> getTaskInTodoCardDto(targetDate, t))
             .toList();

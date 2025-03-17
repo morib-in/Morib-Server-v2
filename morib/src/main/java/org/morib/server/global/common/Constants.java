@@ -27,7 +27,7 @@ public final class Constants {
     public static final String SSE_EVENT_TIMER_STOP_ACTION = "timerStopAction";
     public static final String SSE_EVENT_FRIEND_REQUEST = "friendRequest";
     public static final String SSE_EVENT_FRIEND_REQUEST_ACCEPT = "friendRequestAccept";
-    public static final String SSE_EVENT_HEARTBEAT = ": heartbeat\n\n";
+    public static final String SSE_EVENT_HEARTBEAT = "heartbeat";
     public static final int MAX_VISIBLE_ALLOWED_SERVICES = 5;
 
 

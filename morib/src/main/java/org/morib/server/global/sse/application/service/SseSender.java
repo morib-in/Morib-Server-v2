@@ -109,7 +109,8 @@ public class SseSender {
             try {
                 if (targetEmitter != null) {
                     targetEmitter.send(SseEmitter.event()
-                            .comment(SSE_EVENT_HEARTBEAT));
+                            .name(SSE_EVENT_HEARTBEAT)
+                            .data(": heartbeat \n\n"));
                 }
             } catch (IOException e) {
                 log.error("SSE 브로드캐스트 실패: {}", e.getMessage());
