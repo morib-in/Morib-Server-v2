@@ -17,6 +17,7 @@ public enum ErrorMessage {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     INVALID_TASK_IN_TODO(HttpStatus.BAD_REQUEST, "완료된 태스크는 할 일에 추가하거나 타이머를 실행할 수 없습니다."),
     CANNOT_ADD_YOURSELF(HttpStatus.BAD_REQUEST, "자기 자신을 친구로 추가할 수 없습니다."),
+    WITHOUT_TIMER_STATUS(HttpStatus.BAD_REQUEST, "timerStatus 값이 없습니다. Request Header에 추가했는지 확인해주세요."),
     /**
      * 401 Unauthorized
      */
