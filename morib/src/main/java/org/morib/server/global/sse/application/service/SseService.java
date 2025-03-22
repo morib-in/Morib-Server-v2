@@ -47,9 +47,9 @@ public class SseService {
     public String fetchFriendsRunningCategoryNameBySseEmitters(Long userId) {
         try {
             if (sseRepository.getConnectedUserIds().contains(userId)) {
-                return sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName() == null ?
-                        "" :
-                        sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName();
+                if (sseRepository.getSseUserInfoWrapperById(userId) != null)
+                    return sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName() == null ? "" : sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName();
+                else return "";
             }
         } catch (SSEConnectionException e) {
             throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
