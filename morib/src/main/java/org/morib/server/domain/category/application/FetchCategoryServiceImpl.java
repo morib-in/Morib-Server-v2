@@ -43,4 +43,9 @@ public class FetchCategoryServiceImpl implements FetchCategoryService{
         return categoryRepository.findByUserIdAndFetchTasksAndTimers(userId);
     }
 
+    @Override
+    public Category fetchByUserIdAndTaskId(Long userId, Long taskId) {
+        return categoryRepository.findByUserIdAndTaskId(userId, taskId);
+    }
+
 }

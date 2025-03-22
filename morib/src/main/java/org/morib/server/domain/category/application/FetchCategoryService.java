@@ -16,4 +16,5 @@ public interface FetchCategoryService {
     CategoryWithTasks convertToCategoryWithTasks(Category category, LinkedHashSet<TaskWithTimers> taskWithTimers);
     Category fetchByUserAndCategoryId(User findUser, Long categoryId);
     List<Category> fetchByUserIdAndTasksAndTimers(Long userId);
+    Category fetchByUserIdAndTaskId(Long userId, Long taskId);
 }
