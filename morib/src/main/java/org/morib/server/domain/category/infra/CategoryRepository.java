@@ -16,4 +16,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "WHERE c.user.id = :userId " +
             "ORDER BY c.createdAt ASC ")
     List<Category> findByUserIdAndFetchTasksAndTimers(Long userId);
+
+    @Query("SELECT c FROM Category c " +
+            "LEFT JOIN FETCH c.tasks t " +
+            "LEFT JOIN FETCH t.timers ti " +
+            "WHERE c.user.id = :userId " +
+            "AND t.id = :taskId")
+    Category findByUserIdAndTaskId(Long userId, Long taskId);
+
 }

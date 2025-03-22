@@ -78,6 +78,7 @@ public class SseSender {
             } catch (IOException e) {
                 log.error("SSE 브로드캐스트 실패: {}", e.getMessage());
                 targetEmitter.completeWithError(e);
+
             } catch (Exception e) {
                 log.error("SSE 브로드캐스트 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
                 targetEmitter.completeWithError(e);
@@ -94,32 +95,6 @@ public class SseSender {
         
         // 실패 카운터 재설정
         failedSendAttempts.set(0);
-    }
-
-    public void sendHeartbeat(List<SseEmitter> emitters) {
-        String eventName = "heartbeat";
-        if (emitters == null || emitters.isEmpty()) {
-            log.debug("브로드캐스트할 SseEmitter가 없습니다: {}", eventName);
-            return;
-        }
-
-        log.debug("이벤트 브로드캐스트: {}, 대상 수: {}", eventName, emitters.size());
-
-        for (SseEmitter targetEmitter : emitters) {
-            try {
-                if (targetEmitter != null) {
-                    targetEmitter.send(SseEmitter.event()
-                            .name(SSE_EVENT_HEARTBEAT)
-                            .data(": heartbeat \n\n"));
-                }
-            } catch (IOException e) {
-                log.error("SSE 브로드캐스트 실패: {}", e.getMessage());
-                targetEmitter.completeWithError(e);
-            } catch (Exception e) {
-                log.error("SSE 브로드캐스트 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
-                targetEmitter.completeWithError(e);
-            }
-        }
     }
 }
 

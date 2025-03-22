@@ -67,4 +67,9 @@ public class FetchTimerServiceImpl implements FetchTimerService{
         return timerRepository.findExistingTaskIdsByTargetDate(taskIds, targetDate);
     }
 
+    @Override
+    public Timer fetchByTaskIdAndTargetDate(Long taskId, LocalDate targetDate) {
+        return timerRepository.findByTaskIdAndTargetDate(taskId, targetDate);
+    }
+
 }

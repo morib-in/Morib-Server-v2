@@ -14,5 +14,5 @@ public interface TimerRepository extends JpaRepository<Timer, Long> {
     List<Timer> findByUser(User user);
     @Query("SELECT t.task.id FROM Timer t WHERE t.task.id IN :taskIds AND t.targetDate = :targetDate")
     Set<Long> findExistingTaskIdsByTargetDate(List<Long> taskIds, LocalDate targetDate);
-
+    Timer findByTaskIdAndTargetDate(Long taskId, LocalDate targetDate);
 }
