@@ -51,18 +51,18 @@ public class SseFacade {
             // 기존 연결이 있으면 종료
             sseService.removeExistingEmitter(userId);
             SseEmitter createdEmitter = sseService.create();
-
-            for (int i=0; i<10; i++) {
-                if (!sseService.validateConnection(userId)) {
-                    // emitter 생성 후 저장
-                    sseService.add(userId, createdEmitter);
-                    break;
-                }
-                else {
-                    log.info("SseEmitter is already connected. Retry to connect ... count : {}", i);
-                    Thread.sleep(10);
-                }
-            }
+            sseService.add(userId, createdEmitter);
+//            for (int i=0; i<10; i++) {
+//                if (!sseService.validateConnection(userId)) {
+//                    // emitter 생성 후 저장
+//                    sseService.add(userId, createdEmitter);
+//                    break;
+//                }
+//                else {
+//                    log.info("SseEmitter is already connected. Retry to connect ... count : {}", i);
+//                    Thread.sleep(10);
+//                }
+//            }
             // 브로드캐스트
             return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_CONNECT);
         } catch (Exception e) {
