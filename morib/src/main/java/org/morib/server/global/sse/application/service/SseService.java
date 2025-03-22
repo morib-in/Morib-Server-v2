@@ -47,7 +47,9 @@ public class SseService {
     public String fetchFriendsRunningCategoryNameBySseEmitters(Long userId) {
         try {
             if (sseRepository.getConnectedUserIds().contains(userId)) {
-                return sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName();
+                return sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName() == null ?
+                        "" :
+                        sseRepository.getSseUserInfoWrapperById(userId).getRunningCategoryName();
             }
         } catch (SSEConnectionException e) {
             throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
