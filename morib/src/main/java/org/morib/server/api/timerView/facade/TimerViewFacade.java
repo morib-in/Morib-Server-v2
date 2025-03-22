@@ -21,11 +21,14 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.sse.api.SseFacade;
 import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
+import org.morib.server.global.sse.application.repository.SseUserInfoWrapper;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +56,7 @@ public class TimerViewFacade {
     private final SseSender sseSender;
     private final ModalViewFacade modalViewFacade;
     private final HomeViewFacade homeViewFacade;
+    private final SseFacade sseFacade;
     private final AllowedGroupViewFacade allowedGroupViewFacade;
     private final FetchRecentAllowedGroupService fetchRecentAllowedGroupService;
     private final DeleteRecentAllowedGroupService deleteRecentAllowedGroupService;
@@ -61,27 +65,32 @@ public class TimerViewFacade {
 
     public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
         classifyTaskService.validateIncludingCompletedTask(fetchTaskService.fetchById(runTimerRequestDto.taskId()));
-        int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
-        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, runTimerRequestDto.runningCategoryName(), runTimerRequestDto.taskId());
-        SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
-        sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
+        SseUserInfoWrapper updatedSseUserInfoWrapper =
+                sseFacade.updateAndBuildSseUserInfoWrapperWhenRefreshOrRunTimer(
+                        userId,
+                        runTimerRequestDto.taskId(),
+                        runTimerRequestDto.elapsedTime(),
+                        runTimerRequestDto.runningCategoryName(),
+                        TimerStatus.RUNNING);
+        sseService.saveSseUserInfoWrapper(userId, updatedSseUserInfoWrapper);
         List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(userId);
         List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
-        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_START, calculatedSseUserInfoWrapper);
+        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_START, updatedSseUserInfoWrapper);
     }
 
     @Transactional
     public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
-        Task findTask = fetchTaskService.fetchByIdAndTimer(taskId);
-        Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, dto.targetDate());
-        timerManager.addElapsedTime(timer, dto.elapsedTime());
-        int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
-        UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, dto.runningCategoryName(), taskId);
-        SseEmitter emitter = sseService.fetchSseEmitterByUserId(userId);
-        sseService.saveSseUserInfo(userId, emitter, calculatedSseUserInfoWrapper);
+        SseUserInfoWrapper updatedSseUserInfoWrapper =
+                sseFacade.updateAndBuildSseUserInfoWrapperWhenStopTimer(
+                        userId,
+                        taskId,
+                        dto.elapsedTime(),
+                        dto.runningCategoryName(),
+                        TimerStatus.PAUSED);
+        sseService.saveSseUserInfoWrapper(userId, updatedSseUserInfoWrapper);
         List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(userId);
         List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
-        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_STOP_ACTION, calculatedSseUserInfoWrapper);
+        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_STOP_ACTION, updatedSseUserInfoWrapper);
     }
 
     /**
