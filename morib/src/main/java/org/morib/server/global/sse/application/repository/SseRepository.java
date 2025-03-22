@@ -77,6 +77,19 @@ public class SseRepository {
         return emitter;
     }
 
+    public SseUserInfoWrapper mergeUserInfoWrapper(Long userId, SseUserInfoWrapper userInfoWrapper) {
+        userInfos.merge(userId, userInfoWrapper, (oldValue, newValue) -> {
+            oldValue.setElapsedTime(oldValue.getElapsedTime() + newValue.getElapsedTime());
+            oldValue.setRunningCategoryName(newValue.getRunningCategoryName());
+            oldValue.setTaskId(newValue.getTaskId());
+            oldValue.setTimerStatus(newValue.getTimerStatus());
+            oldValue.setLastTimerStatusChangeTime(LocalDateTime.now());
+            return oldValue;
+        });
+        return userInfos.get(userId);
+    }
+
+
     @Scheduled(fixedRate = 30000)
     public void sendHeartbeat() {
         eventPublisher.publishEvent(new SseHeartbeatEvent(this));
