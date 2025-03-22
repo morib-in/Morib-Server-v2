@@ -4,24 +4,34 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
+import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.domain.task.application.FetchTaskService;
-import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
-import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.global.exception.SSEConnectionException;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SseMessageBuilder;
+import org.morib.server.global.sse.application.event.SseDisconnectEvent;
+import org.morib.server.global.sse.application.repository.SseRepository;
+import org.morib.server.global.sse.application.repository.SseUserInfoWrapper;
 import org.morib.server.global.sse.application.service.SseSender;
 import org.morib.server.global.sse.application.service.SseService;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.morib.server.global.common.Constants.SSE_EVENT_CONNECT;
-import static org.morib.server.global.common.Constants.SSE_EVENT_REFRESH;
 
 @Facade
 @RequiredArgsConstructor
@@ -29,11 +39,10 @@ import static org.morib.server.global.common.Constants.SSE_EVENT_REFRESH;
 public class SseFacade {
 
     private final SseService sseService;
-    private final FetchTaskService fetchTaskService;
     private final FetchTimerService fetchTimerService;
+    private final FetchCategoryService fetchCategoryService;
     private final FetchRelationshipService fetchRelationshipService;
     private final TimerManager timerManager;
-    private final HomeViewFacade homeViewFacade;
     private final SseSender sseSender;
     private final SseMessageBuilder sseMessageBuilder;
 
@@ -61,13 +70,17 @@ public class SseFacade {
             throw new SSEConnectionException(ErrorMessage.SSE_CONNECT_FAILED);
         }
     }
-    public SseEmitter refresh(Long userId, UserInfoDtoForSseUserInfoWrapper userInfoDtoForSseUserInfoWrapper) {
-        SseEmitter createdEmitter = sseService.create();
-        if (userInfoDtoForSseUserInfoWrapper.taskId() != null) {
-            UserInfoDtoForSseUserInfoWrapper calculatedSseUserInfoWrapper = update(userId, userInfoDtoForSseUserInfoWrapper);
-            sseService.saveSseUserInfo(userId, createdEmitter, calculatedSseUserInfoWrapper);
+
+    public SseUserInfoWrapper refresh(Long userId, int elapsedTime, Long taskId, TimerStatus timerStatus) {
+        if (elapsedTime == 0 || taskId == null) {
+            log.info("refresh 요청 시, elapsedTime 또는 taskId가 null입니다. userInfos를 업데이트하지 않습니다.");
+            return null;
         }
-        return broadcastAllAfterCreated(userId, createdEmitter, SSE_EVENT_REFRESH);
+        // 전달받은 내용을 userInfos에 업데이트
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, taskId);
+        SseUserInfoWrapper updatedSseUserInfoWrapper = updateAndBuildSseUserInfoWrapperWhenRefreshOrRunTimer(userId, taskId, elapsedTime, findCategory.getName(), timerStatus);
+        sseService.saveSseUserInfoWrapper(userId, updatedSseUserInfoWrapper);
+        return updatedSseUserInfoWrapper;
     }
 
     public SseEmitter broadcastAllAfterCreated(Long userId, SseEmitter createdEmitter, String sseEventMessage) {
@@ -78,11 +91,28 @@ public class SseFacade {
         return createdEmitter;
     }
 
-    public UserInfoDtoForSseUserInfoWrapper update(Long userId, UserInfoDtoForSseUserInfoWrapper wrapper) {
-        Task findTask = fetchTaskService.fetchByIdAndTimer(wrapper.taskId());
-        Timer timer = fetchTimerService.fetchByTaskAndTargetDate(findTask, LocalDate.now());
-        timerManager.addElapsedTime(timer, wrapper.elapsedTime());
-        int calculatedElapsedTime = homeViewFacade.fetchTotalElapsedTimeTodayByUser(userId, LocalDate.now()).sumTodayElapsedTime();
-        return UserInfoDtoForSseUserInfoWrapper.of(userId, calculatedElapsedTime, wrapper.runningCategoryName(), wrapper.taskId());
+    // refresh 시에는 현재 실행중인 타이머 정보를 보내므로 elapsedTime을 sse userInfos에 그대로 저장 (timer.setElapsedTime)
+    public SseUserInfoWrapper updateAndBuildSseUserInfoWrapperWhenRefreshOrRunTimer(Long userId, Long taskId, int elapsedTime, String runningCategoryName, TimerStatus timerStatus) {
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, taskId);
+        findCategory.getTasks().stream()
+                .filter(task -> task.getId().equals(taskId))
+                .findFirst()
+                .flatMap(task -> task.getTimers().stream()
+                        .filter(timer -> timer.getTargetDate().equals(LocalDate.now()))
+                        .findFirst()).ifPresent(timer -> timerManager.setElapsedTime(timer, elapsedTime));
+        return SseUserInfoWrapper.of(elapsedTime, runningCategoryName, taskId, timerStatus, LocalDateTime.now());
+    }
+
+    public SseUserInfoWrapper updateAndBuildSseUserInfoWrapperWhenStopTimer(Long userId, Long taskId, int elapsedTime, String runningCategoryName, TimerStatus timerStatus) {
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, taskId);
+        findCategory.getTasks().stream()
+                .filter(task -> task.getId().equals(taskId))
+                .findFirst()
+                .flatMap(task -> task.getTimers().stream()
+                        .filter(timer -> timer.getTargetDate().equals(LocalDate.now()))
+                        .findFirst()).ifPresent(timer -> timerManager.addElapsedTime(timer, elapsedTime)
+                );
+        int elapsedTimeAfterAddOperation = fetchTimerService.fetchByTaskIdAndTargetDate(taskId, LocalDate.now()).getElapsedTime();
+        return SseUserInfoWrapper.of(elapsedTimeAfterAddOperation, runningCategoryName, taskId, timerStatus, LocalDateTime.now());
     }
 }
