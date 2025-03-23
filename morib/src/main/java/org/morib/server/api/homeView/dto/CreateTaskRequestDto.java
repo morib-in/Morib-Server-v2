@@ -8,6 +8,6 @@ import java.time.LocalDate;
 public record CreateTaskRequestDto(
         @NotNull String name,
         @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
 }
