@@ -19,10 +19,12 @@ import org.morib.server.domain.relationship.application.FetchRelationshipService
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
 import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
+import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerSession;
 import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.domain.todo.application.FetchTodoService;
@@ -56,12 +58,14 @@ public class TimerViewFacade {
     private final FetchCategoryService fetchCategoryService;
     private final TimerSessionManager timerSessionManager;
     private final HealthCheckController healthCheckController;
-
+    private final TimerManager timerManager;
 
     @Transactional
     public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
         Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
+        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
+        timerManager.addElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
 
         if (findTimerSession == null) {
             createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
