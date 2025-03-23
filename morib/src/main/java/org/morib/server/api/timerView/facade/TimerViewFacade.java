@@ -10,36 +10,36 @@ import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.api.timerView.dto.*;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
+import org.morib.server.domain.category.application.FetchCategoryService;
+import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.recentAllowedGroup.application.CreateRecentAllowedGroupService;
 import org.morib.server.domain.recentAllowedGroup.application.DeleteRecentAllowedGroupService;
 import org.morib.server.domain.recentAllowedGroup.application.FetchRecentAllowedGroupService;
 import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
+import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
+import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
-import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
+import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
+import org.morib.server.domain.timer.infra.TimerSession;
 import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.domain.todo.application.FetchTodoService;
 import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.sse.api.SseFacade;
-import org.morib.server.global.sse.api.UserInfoDtoForSseUserInfoWrapper;
-import org.morib.server.global.sse.application.repository.SseUserInfoWrapper;
-import org.morib.server.global.sse.application.service.SseSender;
-import org.morib.server.global.sse.application.service.SseService;
+import org.morib.server.global.common.HealthCheckController;
+
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.morib.server.global.common.Constants.SSE_EVENT_TIMER_START;
-import static org.morib.server.global.common.Constants.SSE_EVENT_TIMER_STOP_ACTION;
 
 @Facade
 @RequiredArgsConstructor
@@ -49,60 +49,32 @@ public class TimerViewFacade {
     private final FetchTaskService fetchTaskService;
     private final FetchTodoService fetchTodoService;
     private final FetchUserService fetchUserService;
-    private final TimerManager timerManager;
     private final FetchRelationshipService fetchRelationshipService;
-    private final ClassifyTaskService classifyTaskService;
-    private final SseService sseService;
-    private final SseSender sseSender;
     private final ModalViewFacade modalViewFacade;
-    private final HomeViewFacade homeViewFacade;
-    private final SseFacade sseFacade;
     private final AllowedGroupViewFacade allowedGroupViewFacade;
     private final FetchRecentAllowedGroupService fetchRecentAllowedGroupService;
     private final DeleteRecentAllowedGroupService deleteRecentAllowedGroupService;
     private final CreateRecentAllowedGroupService createRecentAllowedGroupService;
     private final FetchAllowedGroupService fetchAllowedGroupService;
+    private final FetchTimerSessionService fetchTimerSessionService;
+    private final CreateTimerSessionService createTimerSessionService;
+    private final FetchCategoryService fetchCategoryService;
+    private final TimerSessionManager timerSessionManager;
+    private final HealthCheckController healthCheckController;
 
-    public void runTimer(Long userId, RunTimerRequestDto runTimerRequestDto) {
-        classifyTaskService.validateIncludingCompletedTask(fetchTaskService.fetchById(runTimerRequestDto.taskId()));
-        SseUserInfoWrapper updatedSseUserInfoWrapper =
-                sseFacade.updateAndBuildSseUserInfoWrapperWhenRefreshOrRunTimer(
-                        userId,
-                        runTimerRequestDto.taskId(),
-                        runTimerRequestDto.elapsedTime(),
-                        runTimerRequestDto.runningCategoryName(),
-                        TimerStatus.RUNNING);
-        sseService.saveSseUserInfoWrapper(userId, updatedSseUserInfoWrapper);
-        List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(userId);
-        List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
-        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_START, updatedSseUserInfoWrapper);
-    }
 
     @Transactional
-    public void stopAfterSumElapsedTime(Long userId, Long taskId, StopTimerRequestDto dto) {
-        SseUserInfoWrapper updatedSseUserInfoWrapper =
-                sseFacade.updateAndBuildSseUserInfoWrapperWhenStopTimer(
-                        userId,
-                        taskId,
-                        dto.elapsedTime(),
-                        dto.runningCategoryName(),
-                        TimerStatus.PAUSED);
-        sseService.saveSseUserInfoWrapper(userId, updatedSseUserInfoWrapper);
-        List<Long> targetUserIds = fetchRelationshipService.fetchConnectedRelationshipAndClassify(userId);
-        List<SseEmitter> targetEmitters = sseService.fetchConnectedSseEmittersById(targetUserIds);
-        sseSender.broadcast(targetEmitters, SSE_EVENT_TIMER_STOP_ACTION, updatedSseUserInfoWrapper);
+    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
+
+        if (findTimerSession == null) {
+            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
+        } else {
+            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
+        }
     }
 
-    /**
-     *
-     * 타이머 뷰 안에서 todo 내의 task 들을 가져온다.
-     * 해당 타이머들의 총 시간을 계산해야함!
-     * 1. todo를 유저를 통해 찾는다.
-     * 2. 찾은 todo 에서 task들을 불러온다.
-     * 3. totalTimeToday~ 는 유저id랑, targetDate를 바탕으로 user의 모든 timer를 조회해서 elapsedTime을 더한 값이다.
-     * @param targetDate
-     * @return
-     */
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate);
@@ -122,23 +94,35 @@ public class TimerViewFacade {
         return TaskInTodoCardDto.of(task, targetDate, fetchTimerService.sumOneTaskElapsedTimeInTargetDate(task, targetDate));
     }
 
-    /**
-     * 타이머 하단 친구 정보 불러오기
-     * 0. 해당 시점의 다른 친구들 정보를 최신화 하기 위한 API 필요할 듯 -> 이는 Timeout 줄여서 간극 줄입시다.
-     * 1. 친구 목록 조회 (온, 오프라인 모두)
-     * 2. Emitter Repository 에서 실행중인 categoryName 받아와서 FriendsInTimerResponseDto Build
-     */
     public List<FriendsInTimerResponseDto> fetchFriendsInfo(Long userId) {
-        List<FetchRelationshipResponseDto> fetchRelationshipResponseDtos = modalViewFacade.fetchConnectedRelationships(userId);
-        List<FriendsInTimerResponseDto> friendsInTimerResponseDtos = fetchRelationshipResponseDtos.stream().map(dto ->
-                FriendsInTimerResponseDto.of(
-                        dto,
-                        sseService.fetchFriendsRunningCategoryNameBySseEmitters(dto.id())
-                )
-        ).collect(Collectors.toList()); // mutable list
-        friendsInTimerResponseDtos.sort(Comparator.comparing(FriendsInTimerResponseDto::name));
-        return friendsInTimerResponseDtos;
+        List<FetchRelationshipResponseDto> fetchRelationshipResponseDtoList = fetchConnectedRelationships(userId);
+        return fetchRelationshipResponseDtoList.stream()
+                .map(dto -> {
+                    if (fetchTimerSessionService.fetchTimerSession(dto.id(), LocalDate.now()) == null) {
+                      return FriendsInTimerResponseDto.of(dto, 0, "", TimerStatus.PAUSED);
+                    }
+                    else {
+                        TimerSession timerSession = fetchTimerSessionService.fetchTimerSession(dto.id(), LocalDate.now());
+                        return FriendsInTimerResponseDto.of(dto, timerSession.getElapsedTime(), timerSession.getRunningCategoryName(), timerSession.getTimerStatus());
+                    }
+                }).toList();
     }
+
+    public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
+        return buildFetchRelationshipResponseDto(userId, fetchRelationshipService.fetchConnectedRelationship(userId));
+    }
+
+    public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
+        return modalViewFacade.classifyRelationships(relationships, userId).values().stream()
+                .flatMap(List::stream)
+                .map(user -> FetchRelationshipResponseDto.of(
+                        user,
+                        healthCheckController.isUserActive(user.getId())
+                ))
+                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
+                .toList();
+    }
+
 
     public void assignAllowedGroupsInTimer(Long userId, AssignAllowedGroupsRequestDto assignAllowedGroupsRequestDto) {
         List<Long> currentIdList = fetchRecentAllowedGroupService.findAllByUserId(userId).stream().map(recentAllowedGroup -> recentAllowedGroup.getSelectedAllowedGroup().getId()).toList();
