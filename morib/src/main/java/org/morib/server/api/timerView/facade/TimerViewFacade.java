@@ -114,14 +114,11 @@ public class TimerViewFacade {
     public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
         return modalViewFacade.classifyRelationships(relationships, userId).values().stream()
                 .flatMap(List::stream)
-                .map(user -> FetchRelationshipResponseDto.of(
-                        user,
-                        healthCheckController.isUserActive(user.getId())
-                ))
-                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
+                .filter(user -> fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now()) > 0)
+                .map(user -> FetchRelationshipResponseDto.of(user, healthCheckController.isUserActive(user.getId())))
+                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed().thenComparing(FetchRelationshipResponseDto::name))
                 .toList();
     }
-
 
     public void assignAllowedGroupsInTimer(Long userId, AssignAllowedGroupsRequestDto assignAllowedGroupsRequestDto) {
         List<Long> currentIdList = fetchRecentAllowedGroupService.findAllByUserId(userId).stream().map(recentAllowedGroup -> recentAllowedGroup.getSelectedAllowedGroup().getId()).toList();
