@@ -12,16 +12,8 @@ import org.morib.server.domain.user.application.service.DeleteUserService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.application.service.ReissueTokenService;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.exception.UnauthorizedException;
-import org.morib.server.global.jwt.JwtService;
-import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.service.CustomOAuth2UserService;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

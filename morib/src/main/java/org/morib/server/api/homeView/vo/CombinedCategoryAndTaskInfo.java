@@ -1,6 +1,5 @@
 package org.morib.server.api.homeView.vo;
 
-import java.util.Collections;
 import java.util.List;
 
 public record CombinedCategoryAndTaskInfo(

@@ -7,7 +7,6 @@ import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

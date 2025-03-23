@@ -18,18 +18,17 @@ import org.morib.server.domain.relationship.application.ValidateRelationshipServ
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.type.RelationLevel;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.global.common.HealthCheckController;
 import org.morib.server.global.message.SseMessageBuilder;
-import org.morib.server.global.sse.application.service.SseSender;
-import org.morib.server.global.sse.application.service.SseService;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.time.LocalDate;
 import java.util.*;
 
-import static org.morib.server.global.common.Constants.*;
+import static org.morib.server.global.common.Constants.RECEIVE;
+import static org.morib.server.global.common.Constants.SEND;
 
 
 @RequiredArgsConstructor
@@ -47,9 +46,9 @@ public class ModalViewFacade {
     private final ValidateRelationshipService validateRelationshipService;
     private final RelationshipManager relationshipManager;
     private final FetchTimerService fetchTimerService;
-    private final SseSender sseSender;
-    private final SseService sseService;
     private final SseMessageBuilder sseMessageBuilder;
+    private final HealthCheckController healthCheckController;
+    private final FetchTimerSessionService fetchTimerSessionService;
 
     @Transactional
     public void createCategory(Long userId, CreateCategoryRequestDto createCategoryRequestDto) {
@@ -69,11 +68,6 @@ public class ModalViewFacade {
                 .toList();
     }
 
-// deprecated
-//    public TabNameByUrlResponse fetchTabNameByUrl(String url) {
-//        return TabNameByUrlResponse.of(fetchSiteInfoService.fetch(url));
-//    }
-
     @Transactional
     public void updateCategoryNameById(Long userId, Long categoryId, UpdateCategoryNameRequestDto updateCategoryNameRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
@@ -87,8 +81,6 @@ public class ModalViewFacade {
         User findFriend = fetchUserService.fetchByUserEmail(createRelationshipRequestDto.friendEmail());
         validateRelationshipService.validateRelationshipByUserAndFriend(findUser, findFriend);
         createRelationshipService.create(findUser, findFriend);
-        SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(findFriend.getId());
-        if (findFriendEmitter != null) sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST, sseMessageBuilder.buildFriendRequestMessage(findUser.getName()));
     }
 
     public List<FetchRelationshipResponseDto> fetchConnectedRelationships(Long userId) {
@@ -100,8 +92,7 @@ public class ModalViewFacade {
                 .flatMap(List::stream)
                 .map(user -> FetchRelationshipResponseDto.of(
                         user,
-                        sseService.validateConnection(user.getId()),
-                        fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now())
+                        healthCheckController.isUserActive(user.getId())
                 ))
                 .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
                 .toList();
@@ -137,9 +128,6 @@ public class ModalViewFacade {
     public void acceptPendingFriendRequest(Long userId, Long friendId) {
         Relationship relationship = fetchRelationshipService.fetchRelationshipByUserIdAndFriendId(friendId, userId, RelationLevel.UNCONNECTED);
         relationshipManager.updateRelationLevelToConnect(relationship);
-        User friend = fetchUserService.fetchByUserId(friendId);
-        SseEmitter findFriendEmitter = sseService.fetchSseEmitterByUserId(friendId);
-        if (findFriendEmitter != null) sseSender.sendEvent(findFriendEmitter, SSE_EVENT_FRIEND_REQUEST_ACCEPT, sseMessageBuilder.buildFriendRequestAcceptMessage(friend.getName()));
     }
 
     @Transactional

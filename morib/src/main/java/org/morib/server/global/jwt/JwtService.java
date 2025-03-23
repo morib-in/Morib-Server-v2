@@ -176,7 +176,10 @@ public class JwtService {
             else throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ErrorMessage.EXPIRED_TOKEN);
+        } catch (Exception e) {
+            throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
+
     }
 
     private boolean isValidatedExpiredAccessToken(String token) {

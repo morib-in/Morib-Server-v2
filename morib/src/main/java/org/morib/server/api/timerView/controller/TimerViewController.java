@@ -1,12 +1,8 @@
 package org.morib.server.api.timerView.controller;
 
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
-import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
-import org.morib.server.api.timerView.dto.RunTimerRequestDto;
-import org.morib.server.api.timerView.dto.StopTimerRequestDto;
-import org.morib.server.api.timerView.dto.TodoCardResponseDto;
+import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -16,13 +12,9 @@ import org.morib.server.global.userauth.PrincipalHandler;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v2")
@@ -32,20 +24,11 @@ public class TimerViewController {
     private final TimerViewFacade timerViewFacade;
     private final PrincipalHandler principalHandler;
 
-    @PostMapping("/timer/run")
-    public ResponseEntity<BaseResponse<?>> startTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                      @RequestBody RunTimerRequestDto runTimerRequestDto) {
+    @PostMapping("/timer/sync")
+    public ResponseEntity<BaseResponse<?>> saveTimerSession(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                            @RequestBody SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        timerViewFacade.runTimer(userId, runTimerRequestDto);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }
-
-    @PostMapping("/timer/stop/{taskId}")
-    public ResponseEntity<BaseResponse<?>> stopTimerAndFetchAccumulatedTime(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                            @PathVariable Long taskId,
-                                                                            @RequestBody StopTimerRequestDto dto) {
-        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        timerViewFacade.stopAfterSumElapsedTime(userId, taskId, dto);
+        timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 

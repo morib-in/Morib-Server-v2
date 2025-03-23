@@ -11,9 +11,7 @@ import org.morib.server.global.common.BaseTimeEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

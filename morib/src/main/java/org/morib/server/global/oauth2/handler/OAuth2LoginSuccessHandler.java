@@ -1,8 +1,6 @@
 package org.morib.server.global.oauth2.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -13,27 +11,24 @@ import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.domain.user.infra.type.Role;
-import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.DataUtils;
 import org.morib.server.global.common.SecretProperties;
-import org.morib.server.global.common.TokenResponseDto;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.jwt.JwtService;
 import org.morib.server.global.message.ErrorMessage;
-import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static org.morib.server.global.common.Constants.*;
+import static org.morib.server.global.common.Constants.IS_SIGN_UP_QUERYSTRING;
+import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
 
 @Slf4j
 @Component

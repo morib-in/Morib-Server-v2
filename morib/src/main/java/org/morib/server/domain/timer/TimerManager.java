@@ -1,11 +1,11 @@
 package org.morib.server.domain.timer;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Manager;
 import org.morib.server.domain.timer.infra.Timer;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Manager

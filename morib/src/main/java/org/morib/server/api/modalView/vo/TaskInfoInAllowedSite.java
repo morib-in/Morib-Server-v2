@@ -1,7 +1,8 @@
 package org.morib.server.api.modalView.vo;
 
-import java.time.LocalDate;
 import org.morib.server.domain.task.infra.Task;
+
+import java.time.LocalDate;
 
 public record TaskInfoInAllowedSite(
         Long id,

@@ -1,6 +1,5 @@
 package org.morib.server.global.message;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

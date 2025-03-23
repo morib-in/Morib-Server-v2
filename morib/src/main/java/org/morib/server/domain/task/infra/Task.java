@@ -1,11 +1,7 @@
 package org.morib.server.domain.task.infra;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;

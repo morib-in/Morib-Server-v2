@@ -6,7 +6,6 @@ import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.global.oauth2.userinfo.GoogleOAuth2UserInfo;
 import org.morib.server.global.oauth2.userinfo.OAuth2UserInfo;
 
-
 import java.util.Map;
 
 @Getter

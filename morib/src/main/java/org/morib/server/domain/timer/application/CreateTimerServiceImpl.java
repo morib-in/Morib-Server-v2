@@ -1,7 +1,6 @@
 package org.morib.server.domain.timer.application;
 
 import lombok.RequiredArgsConstructor;
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;

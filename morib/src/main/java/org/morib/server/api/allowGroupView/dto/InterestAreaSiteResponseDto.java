@@ -1,7 +1,8 @@
 package org.morib.server.api.allowGroupView.dto;
 
-import java.util.List;
 import org.morib.server.domain.user.infra.type.InterestAreaSiteVo;
+
+import java.util.List;
 
 public record InterestAreaSiteResponseDto(
         List<InterestAreaSiteVo> recommendSites

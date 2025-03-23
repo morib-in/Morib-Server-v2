@@ -2,19 +2,20 @@ package org.morib.server.domain.task.application;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.vo.TaskWithTimers;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.task.infra.TaskRepository;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.todo.infra.Todo;
-import org.morib.server.global.exception.BusinessException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

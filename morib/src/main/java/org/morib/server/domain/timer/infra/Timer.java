@@ -2,13 +2,11 @@ package org.morib.server.domain.timer.infra;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.infra.Task;
-
-import java.sql.Time;
-import java.time.LocalDate;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.BaseTimeEntity;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter

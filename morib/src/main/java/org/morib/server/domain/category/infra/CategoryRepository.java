@@ -1,11 +1,11 @@
 package org.morib.server.domain.category.infra;
 
-import java.util.Optional;
 import org.morib.server.domain.user.infra.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByUserAndId(User findUser, Long categoryId);

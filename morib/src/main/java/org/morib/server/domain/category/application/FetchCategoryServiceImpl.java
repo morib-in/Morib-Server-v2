@@ -6,12 +6,10 @@ import org.morib.server.api.homeView.vo.TaskWithTimers;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.user.infra.User;
-
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;

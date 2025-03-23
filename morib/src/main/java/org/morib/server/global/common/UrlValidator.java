@@ -4,9 +4,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.morib.server.annotation.ValidUrl;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 public class UrlValidator implements ConstraintValidator<ValidUrl, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

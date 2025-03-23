@@ -1,13 +1,12 @@
 package org.morib.server.domain.timer.application;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.user.infra.User;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 public interface FetchTimerService {
     Timer fetchByTaskAndTargetDate(Task findTask, LocalDate localDate);
