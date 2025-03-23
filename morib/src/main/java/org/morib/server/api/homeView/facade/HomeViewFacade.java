@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
+import org.morib.server.api.homeView.dto.UpdateTaskRequestDto;
 import org.morib.server.api.homeView.dto.fetch.FetchMyElapsedTimeResponseDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
@@ -93,9 +94,9 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public void update(Long taskId, CreateTaskRequestDto createTaskRequestDto) {
+    public void update(Long taskId, UpdateTaskRequestDto updateTaskRequestDto) {
         Task findTask = fetchTaskService.fetchById(taskId);
-        taskManager.updateTask(findTask, createTaskRequestDto.name(), createTaskRequestDto.startDate(), createTaskRequestDto.endDate());
+        taskManager.updateTask(findTask, updateTaskRequestDto.name(), updateTaskRequestDto.startDate(), updateTaskRequestDto.endDate());
     }
 
     @Transactional

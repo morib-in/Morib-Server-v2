@@ -3,6 +3,7 @@ package org.morib.server.api.homeView.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
+import org.morib.server.api.homeView.dto.UpdateTaskRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -37,8 +38,8 @@ public class TaskController {
 
     @PatchMapping("/tasks/{taskId}")
     public ResponseEntity<BaseResponse<?>> update(@PathVariable Long taskId,
-                                                  @Valid @RequestBody CreateTaskRequestDto createTaskRequestDto) {
-        homeViewFacade.update(taskId, createTaskRequestDto);
+                                                  @Valid @RequestBody UpdateTaskRequestDto updateTaskRequestDto) {
+        homeViewFacade.update(taskId, updateTaskRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
