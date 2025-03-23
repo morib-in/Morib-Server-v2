@@ -1,6 +1,5 @@
 package org.morib.server.domain.allowedGroup.application.impl;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.allowedGroup.application.FetchAllowedGroupService;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
@@ -8,6 +7,8 @@ import org.morib.server.domain.allowedGroup.infra.AllowedGroupRepository;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

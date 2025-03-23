@@ -1,7 +1,8 @@
 package org.morib.server.api.modalView.vo;
 
-import java.time.LocalDate;
 import org.morib.server.domain.category.infra.Category;
+
+import java.time.LocalDate;
 
 public record CategoryInfoInAllowedSite(
     Long id,

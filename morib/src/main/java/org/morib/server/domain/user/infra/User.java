@@ -1,19 +1,20 @@
 package org.morib.server.domain.user.infra;
 
 import jakarta.persistence.*;
-import java.util.LinkedHashSet;
 import lombok.*;
 import org.morib.server.domain.allowedGroup.infra.AllowedGroup;
-import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.category.infra.Category;
+import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.BaseTimeEntity;
 import org.morib.server.global.oauth2.userinfo.OAuth2UserInfo;
-import static org.morib.server.global.common.Constants.INVALID_REFRESH_TOKEN;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
+
+import static org.morib.server.global.common.Constants.INVALID_REFRESH_TOKEN;
 
 @Entity
 @Getter

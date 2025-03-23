@@ -1,27 +1,15 @@
 package org.morib.server.domain.allowedGroup.infra;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.morib.server.domain.allowedGroup.infra.type.ColorCode;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.BaseTimeEntity;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Builder
 @Entity

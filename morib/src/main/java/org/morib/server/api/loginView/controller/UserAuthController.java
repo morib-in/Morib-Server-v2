@@ -1,15 +1,11 @@
 package org.morib.server.api.loginView.controller;
 
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.loginView.dto.UserReissueResponseDto;
 import org.morib.server.api.loginView.facade.UserAuthFacade;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
-import org.morib.server.global.common.DataUtils;
-import org.morib.server.global.exception.UnauthorizedException;
-import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.morib.server.global.userauth.PrincipalHandler;
@@ -19,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static org.morib.server.global.common.Constants.AUTHORIZATION;
 import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
 
 @RestController

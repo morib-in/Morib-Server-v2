@@ -2,7 +2,6 @@ package org.morib.server.domain.relationship.application;
 
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.type.RelationLevel;
-import org.morib.server.domain.user.infra.User;
 
 import java.util.List;
 

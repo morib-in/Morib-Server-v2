@@ -10,9 +10,6 @@ import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 @Service

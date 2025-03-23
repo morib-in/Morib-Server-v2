@@ -1,7 +1,6 @@
 package org.morib.server.annotation;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Indexed;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

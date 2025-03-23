@@ -10,7 +10,6 @@ import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
 import org.morib.server.api.homeView.vo.*;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
-import org.morib.server.domain.category.infra.CategoryRepository;
 import org.morib.server.domain.task.TaskManager;
 import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.CreateTaskService;

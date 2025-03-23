@@ -3,10 +3,8 @@ package org.morib.server.domain.timer.infra;
 import jakarta.persistence.*;
 import lombok.*;
 import org.morib.server.global.common.BaseTimeEntity;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

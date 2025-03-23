@@ -1,9 +1,8 @@
 package org.morib.server.domain.task.application;
 
-import java.time.LocalDate;
-import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.domain.category.infra.Category;
-import org.morib.server.domain.task.infra.Task;
+
+import java.time.LocalDate;
 
 public interface CreateTaskService {
 

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.Facade;
 import org.morib.server.api.allowGroupView.dto.AllowedSiteWithIdVo;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
-import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.api.modalView.dto.FetchRelationshipResponseDto;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
 import org.morib.server.api.timerView.dto.*;
@@ -18,10 +17,8 @@ import org.morib.server.domain.recentAllowedGroup.application.FetchRecentAllowed
 import org.morib.server.domain.recentAllowedGroup.infra.RecentAllowedGroup;
 import org.morib.server.domain.relationship.application.FetchRelationshipService;
 import org.morib.server.domain.relationship.infra.Relationship;
-import org.morib.server.domain.task.application.ClassifyTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
-import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
 import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
@@ -33,9 +30,7 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.HealthCheckController;
-
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.time.LocalDate;
 import java.util.*;

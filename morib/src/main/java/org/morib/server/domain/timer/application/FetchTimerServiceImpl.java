@@ -1,19 +1,15 @@
 package org.morib.server.domain.timer.application;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerRepository;
 import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.exception.NotFoundException;
-import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

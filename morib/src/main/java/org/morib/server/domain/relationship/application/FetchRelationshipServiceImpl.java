@@ -4,16 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.RelationshipRepository;
 import org.morib.server.domain.relationship.infra.type.RelationLevel;
-import org.morib.server.domain.user.infra.User;
-import org.morib.server.global.exception.AlreadyFriendException;
-import org.morib.server.global.exception.AlreadyFriendRequestException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
