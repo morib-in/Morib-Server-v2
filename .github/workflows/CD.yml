@@ -73,6 +73,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
 
   cd:
+    if: github.event_name == 'push'
     needs: ci
     runs-on: ubuntu-22.04
 
