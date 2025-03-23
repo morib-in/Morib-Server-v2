@@ -25,6 +25,7 @@ import org.morib.server.global.common.HealthCheckController;
 import org.morib.server.global.message.SseMessageBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.morib.server.global.common.Constants.RECEIVE;
@@ -92,8 +93,8 @@ public class ModalViewFacade {
                 .flatMap(List::stream)
                 .map(user -> FetchRelationshipResponseDto.of(
                         user,
-                        healthCheckController.isUserActive(user.getId())
-                ))
+                        fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now()),
+                        healthCheckController.isUserActive(user.getId())))
                 .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
                 .toList();
     }
