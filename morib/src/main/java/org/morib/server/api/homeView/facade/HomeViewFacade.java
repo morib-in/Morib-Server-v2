@@ -93,6 +93,12 @@ public class HomeViewFacade {
     }
 
     @Transactional
+    public void update(Long taskId, CreateTaskRequestDto createTaskRequestDto) {
+        Task findTask = fetchTaskService.fetchById(taskId);
+        taskManager.updateTask(findTask, createTaskRequestDto.name(), createTaskRequestDto.startDate(), createTaskRequestDto.endDate());
+    }
+
+    @Transactional
     public void startTimer(Long userId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
         // 사용자 조회 (한 번만)
         User findUser = fetchUserService.fetchByUserId(userId);
