@@ -20,7 +20,7 @@ public class TaskController {
     private final PrincipalHandler principalHandler;
 
     @PostMapping("/tasks/{categoryId}")
-    public ResponseEntity<BaseResponse<?>> createTask(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ResponseEntity<BaseResponse<?>> create(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                       @PathVariable Long categoryId,
                                                       @RequestBody CreateTaskRequestDto createTaskRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
@@ -34,8 +34,15 @@ public class TaskController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @PatchMapping("/tasks/{taskId}")
+    public ResponseEntity<BaseResponse<?>> update(@PathVariable Long taskId,
+                                                  @RequestBody CreateTaskRequestDto createTaskRequestDto) {
+        homeViewFacade.update(taskId, createTaskRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
     @DeleteMapping("/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> deleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<BaseResponse<?>> delete(@PathVariable Long taskId) {
         homeViewFacade.deleteTask(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
