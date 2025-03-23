@@ -1,5 +1,6 @@
 package org.morib.server.api.homeView.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
@@ -36,7 +37,7 @@ public class TaskController {
 
     @PatchMapping("/tasks/{taskId}")
     public ResponseEntity<BaseResponse<?>> update(@PathVariable Long taskId,
-                                                  @RequestBody CreateTaskRequestDto createTaskRequestDto) {
+                                                  @Valid @RequestBody CreateTaskRequestDto createTaskRequestDto) {
         homeViewFacade.update(taskId, createTaskRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
