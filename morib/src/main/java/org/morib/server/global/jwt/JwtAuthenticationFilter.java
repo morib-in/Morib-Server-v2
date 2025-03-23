@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.userauth.CustomUserAuthentication;
 import org.morib.server.global.userauth.CustomUserDetails;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
     @Override
@@ -32,13 +35,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (requestUri.contains("reissue")) {
             jwtService.isTokenValidWhenReissueToken(request);
         }
-        else {
+
+        try {
             String accessToken = jwtService.extractAccessToken(request)
                     .filter(jwtService::isTokenValid)
                     .orElse(null);
-            handleAccessToken(accessToken);
+
+            if (accessToken != null) {
+                handleAccessToken(accessToken);
+            }
+
+            // 인증이 성공했거나, 인증이 필요없는 경로만 다음 필터로 진행
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            // 예외 발생 시 SecurityContext에 인증 정보를 지우고 AuthenticationEntryPoint가 처리하도록 함
+            SecurityContextHolder.clearContext();
+
+            // AuthenticationEntryPoint가 처리하도록 예외를 전달
+            customJwtAuthenticationEntryPoint.commence(request, response,
+                    new BadCredentialsException(e.getMessage(), e));
         }
-        filterChain.doFilter(request, response);
     }
 
     private void handleAccessToken(String accessToken) {
