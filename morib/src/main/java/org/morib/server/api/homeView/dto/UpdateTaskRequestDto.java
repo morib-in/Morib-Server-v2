@@ -5,9 +5,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-public record CreateTaskRequestDto(
+public record UpdateTaskRequestDto(
         @NotNull String name,
         @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-
+        @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+) {
 }

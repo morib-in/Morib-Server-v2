@@ -1,7 +1,9 @@
 package org.morib.server.api.homeView.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.CreateTaskRequestDto;
+import org.morib.server.api.homeView.dto.UpdateTaskRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
@@ -20,7 +22,7 @@ public class TaskController {
     private final PrincipalHandler principalHandler;
 
     @PostMapping("/tasks/{categoryId}")
-    public ResponseEntity<BaseResponse<?>> createTask(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public ResponseEntity<BaseResponse<?>> create(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                       @PathVariable Long categoryId,
                                                       @RequestBody CreateTaskRequestDto createTaskRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
@@ -34,8 +36,15 @@ public class TaskController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
+    @PatchMapping("/tasks/{taskId}")
+    public ResponseEntity<BaseResponse<?>> update(@PathVariable Long taskId,
+                                                  @Valid @RequestBody UpdateTaskRequestDto updateTaskRequestDto) {
+        homeViewFacade.update(taskId, updateTaskRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
     @DeleteMapping("/tasks/{taskId}")
-    public ResponseEntity<BaseResponse<?>> deleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<BaseResponse<?>> delete(@PathVariable Long taskId) {
         homeViewFacade.deleteTask(taskId);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }

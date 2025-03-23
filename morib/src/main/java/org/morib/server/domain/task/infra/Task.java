@@ -50,4 +50,10 @@ public class Task extends BaseTimeEntity {
     public void toggleStatus() {
         this.isComplete = !this.isComplete;
     }
+
+    public void updateName(String name, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }
