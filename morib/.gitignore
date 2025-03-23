@@ -44,3 +44,4 @@ out/
 *.log
 ## secret properties
 **/src/main/java/org/morib/server/global/common/SecretProperties.java
+**/src/main/java/org/morib/server/global/sse/**
