@@ -42,7 +42,8 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final DataUtils dataUtils;
     private final FetchUserService fetchUserService;
     private final UserManager userManager;
-
+    private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
+    
     @Override
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
