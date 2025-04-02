@@ -24,10 +24,11 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
-import static org.morib.server.global.common.Constants.IS_ONBOARDING_COMPLETED;
+import static org.morib.server.global.common.Constants.ACCESS_TOKEN_SUBJECT;
 import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
 
 @Slf4j
@@ -68,27 +69,18 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
         jwtService.updateRefreshToken(oAuth2User.getUserId(), refreshToken);
-        log.info("oAuthUser.getUserId() : " + oAuth2User.getUserId());
-        log.info("refreshToken : " + refreshToken);
-        log.info("1 : User 파싱");
-//         prod
         User user = fetchUserService.fetchByUserId(oAuth2User.getUserId());
-        log.info("2 : Social Refresh Token Build");
         String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
-        log.info("3 : SocialRefreshToken Update");
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
-        StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriProd());
+
         String redirectUri = UriComponentsBuilder.fromUriString(secretProperties.getClientRedirectUriProd())
                 .queryParam(IS_ONBOARDING_COMPLETED, isOnboardingCompleted)
                 .queryParam(ACCESS_TOKEN_SUBJECT, accessToken)
                 .build()
                 .toUri()
                 .toString();
-        redirectUri.append("&accessToken=").append(accessToken);
-        log.info("redirectUri : " + redirectUri.toString());
         response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
         response.sendRedirect(redirectUri);
-        response.sendRedirect(redirectUri.toString());
     }
 
     private String getSocialRefreshTokenByAuthorizedClient(String registrationId, String principalName) {
