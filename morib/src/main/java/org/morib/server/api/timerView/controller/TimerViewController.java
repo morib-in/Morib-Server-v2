@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
 import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
+import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.global.common.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
@@ -28,6 +29,18 @@ public class TimerViewController {
     public ResponseEntity<BaseResponse<?>> saveTimerSession(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                             @RequestBody SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @GetMapping("/timer/ping")
+    public ResponseEntity<BaseResponse<?>> timerPing(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                            @RequestParam Long taskId,
+                                                            @RequestParam int elapsedTime,
+                                                            @RequestParam TimerStatus timerStatus,
+                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
+        SaveTimerSessionRequestDto saveTimerSessionRequestDto = SaveTimerSessionRequestDto.of(taskId, elapsedTime, timerStatus, targetDate);
         timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
