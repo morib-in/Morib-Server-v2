@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static org.morib.server.global.common.Constants.IS_SIGN_UP_QUERYSTRING;
+import static org.morib.server.global.common.Constants.IS_ONBOARDING_COMPLETED;
 import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
 
 @Slf4j
@@ -47,22 +47,22 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
-        boolean isSignUp = false;
+
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+            User findUser = userRepository.findById(oAuth2User.getUserId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
             if(oAuth2User.getRole() == Role.GUEST) { // 회원 가입
-                User findUser = userRepository.findById(oAuth2User.getUserId())
-                        .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                 findUser.authorizeUser();
-                isSignUp = true;
             }
-            loginSuccess(response, oAuth2User, isSignUp);
+            // 아니면 로그인으로 바로 직행
+            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted());
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isSignUp) throws IOException {
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isOnboardingCompleted) throws IOException {
         log.info("login success 진입");
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
@@ -82,7 +82,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
 //        StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriDev());
 
         // common
-        redirectUri.append(IS_SIGN_UP_QUERYSTRING).append(isSignUp);
+        redirectUri.append(IS_ONBOARDING_COMPLETED).append(isOnboardingCompleted);
         redirectUri.append("&accessToken=").append(accessToken);
         log.info("redirectUri : " + redirectUri.toString());
         response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
