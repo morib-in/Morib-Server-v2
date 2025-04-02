@@ -78,16 +78,16 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         log.info("3 : SocialRefreshToken Update");
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
         StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriProd());
-
-        // dev
-//        StringBuilder redirectUri = new StringBuilder(secretProperties.getClientRedirectUriDev());
-
-        // common
-        redirectUri.append(IS_ONBOARDING_COMPLETED).append(isOnboardingCompleted);
+        String redirectUri = UriComponentsBuilder.fromUriString(secretProperties.getClientRedirectUriProd())
+                .queryParam(IS_ONBOARDING_COMPLETED, isOnboardingCompleted)
+                .queryParam(ACCESS_TOKEN_SUBJECT, accessToken)
+                .build()
+                .toUri()
+                .toString();
         redirectUri.append("&accessToken=").append(accessToken);
         log.info("redirectUri : " + redirectUri.toString());
         response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
-        log.info("Response Cookies: " + response.getHeaders("Set-Cookie"));
+        response.sendRedirect(redirectUri);
         response.sendRedirect(redirectUri.toString());
     }
 
