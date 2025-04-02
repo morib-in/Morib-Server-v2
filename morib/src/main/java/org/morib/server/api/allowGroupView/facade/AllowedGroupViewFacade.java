@@ -191,7 +191,7 @@ public class AllowedGroupViewFacade {
     public void onboard(Long userId, String interestArea, OnboardRequestDto onboardRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
         // 온보딩 완료 처리
-        findUser.completeOnboarding();
+        userManager.completeOnboarding(findUser);
         // 온보딩 건너뛰기를 누른 경우 (쿼리 파라미터가 비어있는 경우 OR 요청 Body가 비어있는 경우)
         // interestArea를 OTHERS로 설정
         if (interestArea.equals("unknown") || onboardRequestDto == null) {
