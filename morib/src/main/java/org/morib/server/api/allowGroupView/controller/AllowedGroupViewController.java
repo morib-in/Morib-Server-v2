@@ -109,8 +109,8 @@ public class AllowedGroupViewController {
     // 온보딩
     @PostMapping("/onboard")
     public ResponseEntity<BaseResponse<?>> onboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                   @RequestParam("interestArea") String interestArea,
-                                                   @RequestBody OnboardRequestDto onboardRequestDto) {
+                                                   @RequestParam(value = "interestArea", defaultValue = "unknown") String interestArea,
+                                                   @RequestBody(required = false) OnboardRequestDto onboardRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         allowedGroupViewFacade.onboard(userId, interestArea, onboardRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
