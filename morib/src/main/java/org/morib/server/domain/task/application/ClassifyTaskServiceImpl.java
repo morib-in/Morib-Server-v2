@@ -26,8 +26,19 @@ public class ClassifyTaskServiceImpl implements ClassifyTaskService {
 
     @Override
     public boolean isTaskInDateRange(Task task, LocalDate date) {
-        return (task.getStartDate().isBefore(date.plusDays(1))) &&
-                (task.getEndDate() == null || task.getEndDate().isAfter(date.minusDays(1)));
+        LocalDate startDate = task.getStartDate();
+        LocalDate endDate = task.getEndDate();
+
+        if (endDate == null) {
+            // endDate가 null이면, date가 startDate와 정확히 같은 날짜여야 합니다.
+            return date.equals(startDate);
+        } else {
+            // endDate가 null이 아니면, date가 startDate와 endDate 사이에 있거나 경계와 같아야 합니다.
+            // 즉, startDate <= date <= endDate
+            // !date.isBefore(startDate)는 date >= startDate 와 동일합니다.
+            // !date.isAfter(endDate)는 date <= endDate 와 동일합니다.
+            return !date.isBefore(startDate) && !date.isAfter(endDate);
+        }
     }
 
     @Override
