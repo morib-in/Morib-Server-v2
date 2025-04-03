@@ -49,6 +49,7 @@ public class User extends BaseTimeEntity {
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
     private String social_refreshToken;
     private boolean isPushEnabled;
+    private boolean isOnboardingCompleted;
     // 유저 권한 설정 메소드
     public void authorizeUser() {
         this.role = Role.USER;
@@ -87,5 +88,9 @@ public class User extends BaseTimeEntity {
 
     public void updateUserInterestArea(InterestArea interestArea) {
         this.interestArea = interestArea;
+    }
+
+    public void completeOnboarding() {
+        this.isOnboardingCompleted = true;
     }
 }

@@ -23,4 +23,8 @@ public class UserManager {
     public void updateUserInterestArea(User findUser, String interestArea) {
         findUser.updateUserInterestArea(InterestArea.fromValue(interestArea));
     }
+
+    public void completeOnboarding(User findUser) {
+        findUser.completeOnboarding();
+    }
 }

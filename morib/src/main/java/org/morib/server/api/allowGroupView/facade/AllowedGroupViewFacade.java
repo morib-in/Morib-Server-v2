@@ -190,6 +190,14 @@ public class AllowedGroupViewFacade {
     @Transactional
     public void onboard(Long userId, String interestArea, OnboardRequestDto onboardRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);
+        userManager.completeOnboarding(findUser);
+        // 온보딩 건너뛰기를 누른 경우 (쿼리 파라미터가 비어있는 경우 OR 요청 Body가 비어있는 경우)
+        // interestArea를 OTHERS로 설정
+        if (interestArea.equals("unknown") || onboardRequestDto == null) {
+            userManager.updateUserInterestArea(findUser, InterestArea.OTHERS.getInterestArea());
+            return;
+        }
+        // 온보딩을 정상적으로 진행하는 경우
         userManager.updateUserInterestArea(findUser, interestArea);
         AllowedGroup createdAllowedGroup = createAllowedGroupService.createWithBody(findUser, onboardRequestDto.name(), onboardRequestDto.colorCode());
         createAllowedSiteService.createAll(createdAllowedGroup, onboardRequestDto.allowedSiteVos());
