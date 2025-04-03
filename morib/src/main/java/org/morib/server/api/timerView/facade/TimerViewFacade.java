@@ -65,7 +65,7 @@ public class TimerViewFacade {
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
         Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
         Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
-        timerManager.addElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
+        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
 
         if (findTimerSession == null) {
             createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
