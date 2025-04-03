@@ -117,8 +117,7 @@ public class AllowedGroupViewController {
     }
 
     @GetMapping("/onboard/allowedSite/info")
-    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteInfoForOnboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                                          @RequestParam("siteUrl") String siteUrl) {
+    public ResponseEntity<BaseResponse<?>> fetchAllowedSiteInfoForOnboard(@RequestParam("siteUrl") String siteUrl) {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchAllowedSiteInfoForOnBoard(siteUrl));
     }
 
