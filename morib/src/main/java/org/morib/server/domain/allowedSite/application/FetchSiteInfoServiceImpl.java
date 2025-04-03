@@ -90,7 +90,7 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
             InternetDomainName domainName = InternetDomainName.from(host);
             return domainName.topPrivateDomain().toString();
         } catch (Exception e) {
-            return urlString.split("//www.")[1].split("/")[0];
+            return urlString.split("://")[1].split("/")[0];
         }
     }
 
