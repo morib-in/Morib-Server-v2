@@ -2,7 +2,7 @@ package org.morib.server.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import org.morib.server.global.common.UrlValidator;
+import org.morib.server.global.common.util.UrlValidator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

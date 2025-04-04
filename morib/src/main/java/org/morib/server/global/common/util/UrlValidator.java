@@ -1,4 +1,4 @@
-package org.morib.server.global.common;
+package org.morib.server.global.common.util;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

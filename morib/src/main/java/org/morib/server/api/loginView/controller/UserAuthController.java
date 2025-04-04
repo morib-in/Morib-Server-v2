@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.loginView.dto.UserReissueResponseDto;
 import org.morib.server.api.loginView.facade.UserAuthFacade;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;

@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.allowGroupView.dto.*;
 import org.morib.server.api.allowGroupView.facade.AllowedGroupViewFacade;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.message.SuccessMessage;

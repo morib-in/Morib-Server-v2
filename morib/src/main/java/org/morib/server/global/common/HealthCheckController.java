@@ -1,6 +1,7 @@
 package org.morib.server.global.common;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.morib.server.global.userauth.PrincipalHandler;

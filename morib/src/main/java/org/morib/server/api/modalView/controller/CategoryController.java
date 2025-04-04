@@ -3,7 +3,7 @@ package org.morib.server.api.modalView.controller;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.modalView.dto.UpdateCategoryNameRequestDto;
 import org.morib.server.api.modalView.facade.ModalViewFacade;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;

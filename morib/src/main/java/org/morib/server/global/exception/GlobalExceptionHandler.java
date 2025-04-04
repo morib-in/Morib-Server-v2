@@ -1,7 +1,7 @@
 package org.morib.server.global.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.http.ResponseEntity;
