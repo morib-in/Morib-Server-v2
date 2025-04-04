@@ -1,4 +1,4 @@
-package org.morib.server.global.common;
+package org.morib.server.global.common.util;
 
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,12 @@ public class DataUtils {
                 cookie.getDomain(),
                 cookie.getPath());
         return cookie;
+    }
+
+    public static String extractDomainFromRawUrl(String urlString) {
+        if (urlString.contains("www.")) return urlString.split("www.")[1].split("/")[0];
+        else if (urlString.contains("://")) return urlString.split("://")[1].split("/")[0];
+        else return urlString;
     }
 }
 

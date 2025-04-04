@@ -1,12 +1,10 @@
 package org.morib.server.domain.allowedSite.application;
 
-import com.google.common.net.InternetDomainName;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.morib.server.api.allowGroupView.dto.AllowedSiteVo;
-import org.morib.server.global.exception.InvalidURLException;
-import org.morib.server.global.message.ErrorMessage;
+import org.morib.server.global.common.util.UrlUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -52,50 +50,24 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
             return AllowedSiteVo.of(favicon, siteName, pageName, url);
         }
         catch (IOException e) {
-            String domain = getTopDomainWhenParsingFailed(url);
+            String domain = UrlUtils.extractTopPrivateDomain(url);
             return AllowedSiteVo.of("", domain, domain, url);
         }
     }
 
     @Override
     public String getTopDomain(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String host = url.getHost();
-            InternetDomainName domainName = InternetDomainName.from(host);
-            return domainName.topPrivateDomain().toString();
-        } catch (Exception e) {
-            throw new InvalidURLException(ErrorMessage.INVALID_URL);
-        }
+        return UrlUtils.extractTopPrivateDomain(urlString);
     }
 
     @Override
     public String getTopDomainUrl(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String host = url.getHost();
-            InternetDomainName domainName = InternetDomainName.from(host);
-            String topPrivateDomain = domainName.topPrivateDomain().toString();
-            return url.getProtocol() + "://" + topPrivateDomain + "/";
-        } catch (Exception e) {
-            throw new InvalidURLException(ErrorMessage.INVALID_URL);
-        }
+        return UrlUtils.getTopDomainUrl(urlString);
     }
 
     @Override
     public String getTopDomainWhenParsingFailed(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String host = url.getHost();
-            InternetDomainName domainName = InternetDomainName.from(host);
-            return domainName.topPrivateDomain().toString();
-        } catch (Exception e) {
-            if (urlString.contains("://")) {
-                return urlString.split("://")[1].split("/")[0];
-            } else {
-                return urlString;
-            }
-        }
+        return UrlUtils.extractTopPrivateDomain(urlString);
     }
 
     @Override
@@ -140,13 +112,6 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
 
     @Override
     public String getDomainExceptHost(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            String host = url.getHost();
-            InternetDomainName domainName = InternetDomainName.from(host);
-            return domainName.topPrivateDomain().toString();
-        } catch (Exception e) {
-            return urlString.split("//www.")[1].split("/")[0];
-        }
+        return UrlUtils.extractTopPrivateDomain(urlString);
     }
 }

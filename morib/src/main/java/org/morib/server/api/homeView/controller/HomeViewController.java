@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;

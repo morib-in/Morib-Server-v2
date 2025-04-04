@@ -1,5 +1,6 @@
-package org.morib.server.global.common;
+package org.morib.server.global.common.util;
 
+import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.message.SuccessMessage;
 import org.springframework.http.ResponseEntity;

@@ -11,7 +11,7 @@ import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.domain.user.infra.type.Role;
-import org.morib.server.global.common.DataUtils;
+import org.morib.server.global.common.util.DataUtils;
 import org.morib.server.global.common.SecretProperties;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.exception.UnauthorizedException;

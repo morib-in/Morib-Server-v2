@@ -5,7 +5,7 @@ import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
 import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
 import org.morib.server.domain.timer.infra.TimerStatus;
-import org.morib.server.global.common.ApiResponseUtil;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
