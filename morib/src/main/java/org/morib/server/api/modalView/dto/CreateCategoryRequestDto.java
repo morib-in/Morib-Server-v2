@@ -1,5 +1,7 @@
 package org.morib.server.api.modalView.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record CreateCategoryRequestDto(
-        String name) {
+        @NotBlank  String name) {
 }
