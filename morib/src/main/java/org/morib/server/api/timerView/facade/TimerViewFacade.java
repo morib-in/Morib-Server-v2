@@ -102,7 +102,7 @@ public class TimerViewFacade {
                     }
                     else {
                         TimerSession timerSession = fetchTimerSessionService.fetchTimerSession(dto.id(), LocalDate.now());
-                        return FriendsInTimerResponseDto.of(dto, timerSession.getElapsedTime(), timerSession.getRunningCategoryName(), timerSession.getTimerStatus());
+                        return FriendsInTimerResponseDto.of(dto, dto.elapsedTime(), timerSession.getRunningCategoryName(), timerSession.getTimerStatus());
                     }
                 }).toList();
     }
