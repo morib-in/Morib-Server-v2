@@ -102,7 +102,7 @@ public class TimerViewFacade {
                     }
                     else {
                         TimerSession timerSession = fetchTimerSessionService.fetchTimerSession(dto.id(), LocalDate.now());
-                        return FriendsInTimerResponseDto.of(dto, timerSession.getElapsedTime(), timerSession.getRunningCategoryName(), timerSession.getTimerStatus());
+                        return FriendsInTimerResponseDto.of(dto, dto.elapsedTime(), timerSession.getRunningCategoryName(), timerSession.getTimerStatus());
                     }
                 }).toList();
     }
@@ -116,7 +116,9 @@ public class TimerViewFacade {
                 .flatMap(List::stream)
                 .filter(user -> fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now()) > 0)
                 .map(user -> FetchRelationshipResponseDto.of(user, healthCheckController.isUserActive(user.getId())))
-                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed().thenComparing(FetchRelationshipResponseDto::name))
+                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed()
+                        .thenComparing(FetchRelationshipResponseDto::elapsedTime).reversed()
+                        .thenComparing(FetchRelationshipResponseDto::name))
                 .toList();
     }
 

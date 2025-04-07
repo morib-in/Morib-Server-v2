@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Component
 public class DataUtils {
+
     public static boolean isInRange(LocalDate idxDate, LocalDate startDate, LocalDate endDate) {
         return !idxDate.isBefore(startDate) && !idxDate.isAfter(endDate);
     }
@@ -29,12 +30,6 @@ public class DataUtils {
                 cookie.getDomain(),
                 cookie.getPath());
         return cookie;
-    }
-
-    public static String extractDomainFromRawUrl(String urlString) {
-        if (urlString.contains("www.")) return urlString.split("www.")[1].split("/")[0];
-        else if (urlString.contains("://")) return urlString.split("://")[1].split("/")[0];
-        else return urlString;
     }
 }
 
