@@ -21,6 +21,7 @@ import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.exception.DuplicateResourceException;
 import org.morib.server.global.message.ErrorMessage;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -145,16 +146,17 @@ public class AllowedGroupViewFacade {
     public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
         String siteUrl = allowedSiteRequestDto.siteUrl();
-        // url 정규화
         siteUrl = fetchSiteInfoService.normalizeUrl(siteUrl);
         AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId);
-        if (findAllowedSite != null) {
+        if (findAllowedSite != null) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+
+        try {
+            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
+            createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
+        } catch (DataIntegrityViolationException e) {
             throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
         }
-        AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
-        createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
     }
-
 
     public void updateAllowedSiteUrl(Long allowedGroupId, Long allowedSiteId, AllowedSiteRequestDto allowedSiteRequestDto) {
         fetchAllowedSiteService.isExist(allowedSiteRequestDto.siteUrl(), allowedGroupId);
