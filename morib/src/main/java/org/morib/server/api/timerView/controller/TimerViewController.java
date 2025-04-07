@@ -1,5 +1,6 @@
 package org.morib.server.api.timerView.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
 import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
@@ -27,7 +28,7 @@ public class TimerViewController {
 
     @PostMapping("/timer/sync")
     public ResponseEntity<BaseResponse<?>> saveTimerSession(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                            @RequestBody SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
+                                                            @Valid @RequestBody SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
