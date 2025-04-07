@@ -13,6 +13,7 @@ import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.userauth.CustomUserAuthentication;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,27 +37,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            String accessToken = jwtService.extractAccessToken(request)
-                    .filter(jwtService::isTokenValid)
-                    .orElse(null);
+            String accessToken = jwtService.extractAccessToken(request).orElse(null);
 
             if (accessToken != null) {
-                handleAccessToken(accessToken);
+                if (jwtService.isTokenValid(accessToken)) {
+                    handleAccessToken(accessToken);
+                } else {
+                    SecurityContextHolder.clearContext();
+                    customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
+                    return;
+                }
             }
-
-            // 인증이 성공했거나, 인증이 필요없는 경로만 다음 필터로 진행
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            // 예외 발생 시 SecurityContext에 인증 정보를 지우고 AuthenticationEntryPoint가 처리하도록 함
+        } catch (AuthenticationException authenticationException) {
             SecurityContextHolder.clearContext();
-
-            // AuthenticationEntryPoint가 처리하도록 예외를 전달
-            customJwtAuthenticationEntryPoint.commence(request, response,
-                    new BadCredentialsException(e.getMessage(), e));
+            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(authenticationException.getMessage(), authenticationException));
         }
     }
 
-    private void handleAccessToken(String accessToken) {
+    private void handleAccessToken(String accessToken) throws NotFoundException {
         jwtService.extractId(accessToken)
                 .map(id -> userRepository.findById(Long.valueOf(id)).orElseThrow(
                         () -> new NotFoundException(ErrorMessage.NOT_FOUND)
