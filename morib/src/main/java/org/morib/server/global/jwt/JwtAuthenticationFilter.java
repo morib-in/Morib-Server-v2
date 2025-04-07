@@ -49,9 +49,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (AuthenticationException authenticationException) {
+        }
+        catch (NotFoundException notFoundException) {
             SecurityContextHolder.clearContext();
-            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(authenticationException.getMessage(), authenticationException));
+            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.NOT_FOUND.getMessage(), notFoundException));
+        }
+        catch (AuthenticationException authenticationException) {
+            SecurityContextHolder.clearContext();
+            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.UNAUTHORIZED.getMessage(), authenticationException));
         }
     }
 
