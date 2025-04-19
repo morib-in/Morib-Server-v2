@@ -18,4 +18,8 @@ public class TimerSessionManager {
     public void pause(int calculatedElapsedTime, TimerSession timerSession, LocalDateTime now) {
         timerSession.pause(calculatedElapsedTime, now);
     }
+    public TimerSession handleCalledByClientFetch(int calculatedElapsedTime, TimerSession timerSession, LocalDateTime now) {
+        return timerSession.handleCalledByClientFetch(calculatedElapsedTime, now);
+    }
+
 }

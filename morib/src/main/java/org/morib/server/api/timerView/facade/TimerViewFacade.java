@@ -83,6 +83,18 @@ public class TimerViewFacade {
         timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(requestDto.taskId(), requestDto.targetDate()), findTimerSession.getElapsedTime());
     }
 
+    @Transactional
+    public TimerDtos.TimerStatusResponse getSelectedTimerInfo(Long userId, LocalDate targetDate) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
+        if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        if (findTimerSession.getTimerStatus().equals(TimerStatus.RUNNING)) {
+            int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, LocalDateTime.now());
+            findTimerSession = timerSessionManager.handleCalledByClientFetch(calculatedElapsedTime, findTimerSession, now);
+            timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(findTimerSession.getSelectedTask().getId(), findTimerSession.getTargetDate()), findTimerSession.getElapsedTime());
+        }
+        return TimerDtos.TimerStatusResponse.from(findTimerSession);
+    }
 
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
