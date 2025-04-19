@@ -85,7 +85,7 @@ public class TimerViewFacade {
         }
         if (findTimerSession.getTimerStatus().equals(TimerStatus.PAUSED)) return;
 
-        int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, LocalDateTime.now());
+        int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, now);
         timerSessionManager.pause(calculatedElapsedTime, findTimerSession, now);
         timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(requestDto.taskId(), requestDto.targetDate()), findTimerSession.getElapsedTime());
     }
