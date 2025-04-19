@@ -47,3 +47,7 @@ public class TimerSession extends BaseTimeEntity {
         this.lastCalculatedAt = now;
         this.lastHeartbeatAt = now;
     }
+    public void updateHeartbeat(LocalDateTime now) {
+        if (this.timerStatus != TimerStatus.RUNNING) return;
+        this.lastHeartbeatAt = now;
+    }

@@ -108,6 +108,13 @@ public class TimerViewFacade {
     }
 
     @Transactional
+    public void handleHeartbeat(Long userId, LocalDate targetDate) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
+        timerSessionManager.handleHeartbeat(findTimerSession, now);
+    }
+
+    @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate);
         Optional<Todo> todo = fetchTodoService.fetchByUserIdAndTargetDate(userId, targetDate);
