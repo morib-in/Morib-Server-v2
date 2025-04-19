@@ -97,6 +97,17 @@ public class TimerViewFacade {
     }
 
     @Transactional
+    public void selectTimerInfo(Long userId, TimerDtos.TimerRequest requestDto) {
+        User user = fetchUserService.fetchByUserId(userId);
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, requestDto.taskId());
+        Task selectedTask = fetchTaskService.fetchById(requestDto.taskId());
+        Timer timer = fetchTimerService.fetchOrCreateByTaskAndTargetDate(user, selectedTask, requestDto.targetDate());
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        timerSessionManager.updateTimerSession(findTimerSession, findCategory.getName(), selectedTask, timer.getElapsedTime(), TimerStatus.PAUSED, requestDto.targetDate());
+    }
+
+    @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
         int totalTimeOfToday = fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate);
         Optional<Todo> todo = fetchTodoService.fetchByUserIdAndTargetDate(userId, targetDate);

@@ -7,10 +7,10 @@ import org.morib.server.domain.timer.infra.TimerSession;
 @Manager
 public class TimerSessionManager {
 
-    public void updateTimerSession(TimerSession timerSession, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
-        timerSession.setElapsedTime(saveTimerSessionRequestDto.elapsedTime());
-        timerSession.setTimerStatus(saveTimerSessionRequestDto.timerStatus());
-        timerSession.setTaskId(saveTimerSessionRequestDto.taskId());
+    public void updateTimerSession(TimerSession timerSession, String runningCategoryName, Task selectedTask, int elapsedTime, TimerStatus timerStatus, LocalDate targetDate) {
+        timerSession.update(runningCategoryName, selectedTask, elapsedTime, timerStatus, targetDate);
+    }
+
     public void run(TimerSession timerSession, LocalDateTime now) {
         timerSession.run(now);
     }
