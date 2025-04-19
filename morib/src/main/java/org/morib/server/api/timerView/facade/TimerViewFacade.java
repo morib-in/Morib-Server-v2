@@ -59,6 +59,15 @@ public class TimerViewFacade {
     private final TimerSessionManager timerSessionManager;
     private final HealthCheckController healthCheckController;
     private final TimerManager timerManager;
+    @Transactional
+    public void runTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
+            throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        }
+        timerSessionManager.run(findTimerSession, now);
+    }
 
     @Transactional
     public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {

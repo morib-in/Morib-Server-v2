@@ -11,6 +11,7 @@ public class TimerSessionManager {
         timerSession.setElapsedTime(saveTimerSessionRequestDto.elapsedTime());
         timerSession.setTimerStatus(saveTimerSessionRequestDto.timerStatus());
         timerSession.setTaskId(saveTimerSessionRequestDto.taskId());
-        timerSession.setTargetDate(saveTimerSessionRequestDto.targetDate());
+    public void run(TimerSession timerSession, LocalDateTime now) {
+        timerSession.run(now);
     }
 }
