@@ -1,6 +1,7 @@
 package org.morib.server.global.message;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public enum ErrorMessage {
     INVALID_TASK_IN_TODO(HttpStatus.BAD_REQUEST, "완료된 태스크는 할 일에 추가하거나 타이머를 실행할 수 없습니다."),
     CANNOT_ADD_YOURSELF(HttpStatus.BAD_REQUEST, "자기 자신을 친구로 추가할 수 없습니다."),
     WITHOUT_TIMER_STATUS(HttpStatus.BAD_REQUEST, "timerStatus 값이 없습니다. Request Header에 추가했는지 확인해주세요."),
+    TIMER_SESSION_NOT_FOUND(HttpStatus.BAD_REQUEST, "타이머 세션을 찾을 수 없습니다."),
+    MISSING_REQUIRED_PARAMETER(HttpStatus.BAD_REQUEST, "필수 요청 파라미터가 누락되었습니다."),
+    TARGET_DATE_IS_NOT_PRESENT(HttpStatus.BAD_REQUEST, "targetDate 날짜는 오늘이어야 합니다."),
     /**
      * 401 Unauthorized
      */
@@ -56,5 +60,4 @@ public enum ErrorMessage {
 
     private final HttpStatus httpStatus;
     private final String message;
-
 }
