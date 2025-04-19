@@ -14,4 +14,8 @@ public class TimerSessionManager {
     public void run(TimerSession timerSession, LocalDateTime now) {
         timerSession.run(now);
     }
+
+    public void pause(int calculatedElapsedTime, TimerSession timerSession, LocalDateTime now) {
+        timerSession.pause(calculatedElapsedTime, now);
+    }
 }

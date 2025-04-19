@@ -70,18 +70,19 @@ public class TimerViewFacade {
     }
 
     @Transactional
-    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
-        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
-        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
-        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
-        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
-
-        if (findTimerSession == null) {
-            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
-        } else {
-            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
+    public void pauseTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
+            throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
         }
+        if (findTimerSession.getTimerStatus().equals(TimerStatus.PAUSED)) return;
+
+        int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, LocalDateTime.now());
+        timerSessionManager.pause(calculatedElapsedTime, findTimerSession, now);
+        timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(requestDto.taskId(), requestDto.targetDate()), findTimerSession.getElapsedTime());
     }
+
 
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
