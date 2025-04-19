@@ -22,6 +22,7 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.application.TimerSession.CalculateTimerSessionService;
 import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
 import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
 import org.morib.server.domain.timer.infra.Timer;
@@ -32,9 +33,13 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.HealthCheckController;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
+import org.springframework.cglib.core.Local;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +64,8 @@ public class TimerViewFacade {
     private final TimerSessionManager timerSessionManager;
     private final HealthCheckController healthCheckController;
     private final TimerManager timerManager;
+    private final CalculateTimerSessionService calculateTimerSessionService;
+
     @Transactional
     public void runTimer(Long userId, TimerDtos.TimerRequest requestDto) {
         LocalDateTime now = LocalDateTime.now();
@@ -113,6 +120,24 @@ public class TimerViewFacade {
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
         timerSessionManager.handleHeartbeat(findTimerSession, now);
     }
+
+
+//
+
+    // ----------------------------------------------------------------------
+//    @Transactional
+//    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
+//        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
+//        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
+//        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
+//        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
+//
+//        if (findTimerSession == null) {
+//            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
+//        } else {
+//            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
+//        }
+//    }
 
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
