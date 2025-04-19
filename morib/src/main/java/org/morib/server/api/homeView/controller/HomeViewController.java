@@ -44,7 +44,7 @@ public class HomeViewController {
                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate,
                                                       @RequestBody StartTimerRequestDto startTimerRequestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        homeViewFacade.startTimer(userId, startTimerRequestDto, targetDate);
+        homeViewFacade.enterTimer(userId, startTimerRequestDto, targetDate);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
