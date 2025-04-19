@@ -18,9 +18,14 @@ import org.morib.server.domain.task.application.DeleteTaskService;
 import org.morib.server.domain.task.application.FetchTaskService;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
+import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.CreateTimerService;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
+import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
 import org.morib.server.domain.timer.infra.Timer;
+import org.morib.server.domain.timer.infra.TimerSession;
+import org.morib.server.domain.timer.infra.TimerStatus;
 import org.morib.server.domain.todo.TodoManager;
 import org.morib.server.domain.todo.application.CreateTodoService;
 import org.morib.server.domain.todo.application.FetchTodoService;
@@ -51,6 +56,9 @@ public class HomeViewFacade {
     private final TodoManager todoManager;
     private final TimerManager timerManager;
     private final TaskManager taskManager;
+    private final FetchTimerSessionService fetchTimerSessionService;
+    private final CreateTimerSessionService createTimerSessionService;
+    private final TimerSessionManager timerSessionManager;
 
     public List<HomeViewResponseDto> fetchHome(Long userId, LocalDate startDate, LocalDate endDate) {
         List<Category> findCategories = fetchCategoryService.fetchByUserIdAndTasksAndTimers(userId);
@@ -100,7 +108,7 @@ public class HomeViewFacade {
     }
 
     @Transactional
-    public void startTimer(Long userId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
+    public void enterTimer(Long userId, StartTimerRequestDto startTimerRequestDto, LocalDate targetDate) {
         // 사용자 조회 (한 번만)
         User findUser = fetchUserService.fetchByUserId(userId);
 
@@ -121,6 +129,17 @@ public class HomeViewFacade {
         tasks.stream()
                 .filter(task -> !existingTimerTaskIds.contains(task.getId())) // 이미 존재하는 타이머는 제외
                 .forEach(task -> createTimerService.createTimer(findUser, targetDate, task));
+
+        // TimerSession에 selectedTask를 할일의 첫번째 태스크로 추가
+        Task firstTask = tasks.get(0);
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, firstTask.getId());
+        int elapsedTimeOfFirstTask = fetchTimerService.fetchElapsedTimeOrZeroByTaskAndTargetDate(firstTask, targetDate);
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
+        if (findTimerSession == null) {
+            createTimerSessionService.create(userId, findCategory.getName(), firstTask, elapsedTimeOfFirstTask, TimerStatus.PAUSED, targetDate);
+        } else {
+            timerSessionManager.updateTimerSession(findTimerSession, findCategory.getName(), firstTask, elapsedTimeOfFirstTask, TimerStatus.PAUSED, targetDate);
+        }
     }
 
     private void updateTaskInTodo(List<Task> tasks, Todo todo) {

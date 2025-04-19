@@ -18,7 +18,7 @@ import static org.morib.server.global.common.Constants.INVALID_REFRESH_TOKEN;
 
 @Entity
 @Getter
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseTimeEntity {

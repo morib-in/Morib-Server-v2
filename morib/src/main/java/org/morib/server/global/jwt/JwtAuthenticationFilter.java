@@ -36,28 +36,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtService.isTokenValidWhenReissueToken(request);
         }
 
-        try {
-            String accessToken = jwtService.extractAccessToken(request).orElse(null);
+        String accessToken = jwtService.extractAccessToken(request).orElse(null);
 
-            if (accessToken != null) {
-                if (jwtService.isTokenValid(accessToken)) {
-                    handleAccessToken(accessToken);
-                } else {
-                    SecurityContextHolder.clearContext();
-                    customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
-                    return;
-                }
+        if (accessToken != null) {
+            if (jwtService.isTokenValid(accessToken)) {
+                handleAccessToken(accessToken);
+            } else {
+                SecurityContextHolder.clearContext();
+                customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
+                return;
             }
-            filterChain.doFilter(request, response);
         }
-        catch (NotFoundException notFoundException) {
-            SecurityContextHolder.clearContext();
-            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.NOT_FOUND.getMessage(), notFoundException));
-        }
-        catch (AuthenticationException authenticationException) {
-            SecurityContextHolder.clearContext();
-            customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.UNAUTHORIZED.getMessage(), authenticationException));
-        }
+        filterChain.doFilter(request, response);
     }
 
     private void handleAccessToken(String accessToken) throws NotFoundException {

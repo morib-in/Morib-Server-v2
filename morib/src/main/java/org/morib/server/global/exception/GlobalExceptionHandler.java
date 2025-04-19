@@ -1,13 +1,21 @@
 package org.morib.server.global.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
 import org.morib.server.global.message.ErrorMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -68,9 +76,24 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<BaseResponse<?>> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    protected ResponseEntity<?> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error(">>> handle: MethodArgumentNotValidException ", e);
-        return ApiResponseUtil.failure(ErrorMessage.TYPE_MISMATCH);
+        Map<String, Object> errors = new HashMap<>();
+        errors.put("status", 400);
+        e.getBindingResult().getFieldErrors().stream()
+                .forEach(error -> errors.put("message", error.getField() + " " + error.getDefaultMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<?> handleConstraintViolationException(final ConstraintViolationException e) {
+        log.error(">>> handle: ConstraintViolationException ", e);
+        Map<String, Object> errors = new TreeMap<>();
+        errors.put("status", 400);
+        errors.put("message", e.getConstraintViolations().stream()
+                .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+                .collect(Collectors.joining(",")));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ExceptionHandler(SSEConnectionException.class)
@@ -89,6 +112,12 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<BaseResponse<?>> handleInvalidTaskInTodoException(final InvalidTaskInTodoException e) {
         log.error(">>> handle: InvalidTaskInTodoException ", e);
         return ApiResponseUtil.failure(e.getErrorMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ResponseEntity<BaseResponse<?>> handleMissingServletRequestParameterException(final MissingServletRequestParameterException e) {
+        log.error(">>> handle: MissingServletRequestParameterException, parameter name: {}", e.getParameterName());
+        return ApiResponseUtil.failure(ErrorMessage.valueOf(e.getMessage()));
     }
 }
 

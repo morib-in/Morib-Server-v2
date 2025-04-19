@@ -22,6 +22,7 @@ import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.TimerSessionManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.application.TimerSession.CalculateTimerSessionService;
 import org.morib.server.domain.timer.application.TimerSession.CreateTimerSessionService;
 import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
 import org.morib.server.domain.timer.infra.Timer;
@@ -32,9 +33,13 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.HealthCheckController;
+import org.morib.server.global.exception.NotFoundException;
+import org.morib.server.global.message.ErrorMessage;
+import org.springframework.cglib.core.Local;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,20 +64,80 @@ public class TimerViewFacade {
     private final TimerSessionManager timerSessionManager;
     private final HealthCheckController healthCheckController;
     private final TimerManager timerManager;
+    private final CalculateTimerSessionService calculateTimerSessionService;
 
     @Transactional
-    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
-        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
-        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
-        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
-        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
-
-        if (findTimerSession == null) {
-            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
-        } else {
-            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
+    public void runTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
+            throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
         }
+        timerSessionManager.run(findTimerSession, now);
     }
+
+    @Transactional
+    public void pauseTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
+            throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        }
+        if (findTimerSession.getTimerStatus().equals(TimerStatus.PAUSED)) return;
+
+        int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, now);
+        timerSessionManager.pause(calculatedElapsedTime, findTimerSession, now);
+        timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(requestDto.taskId(), requestDto.targetDate()), findTimerSession.getElapsedTime());
+    }
+
+    @Transactional
+    public TimerDtos.TimerStatusResponse getSelectedTimerInfo(Long userId, LocalDate targetDate) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
+        if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        if (findTimerSession.getTimerStatus().equals(TimerStatus.RUNNING)) {
+            int calculatedElapsedTime = calculateTimerSessionService.calculateElapsedTimeByLastCalculatedAt(findTimerSession, LocalDateTime.now());
+            findTimerSession = timerSessionManager.handleCalledByClientFetch(calculatedElapsedTime, findTimerSession, now);
+            timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(findTimerSession.getSelectedTask().getId(), findTimerSession.getTargetDate()), findTimerSession.getElapsedTime());
+        }
+        return TimerDtos.TimerStatusResponse.from(findTimerSession);
+    }
+
+    @Transactional
+    public void selectTimerInfo(Long userId, TimerDtos.TimerRequest requestDto) {
+        User user = fetchUserService.fetchByUserId(userId);
+        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, requestDto.taskId());
+        Task selectedTask = fetchTaskService.fetchById(requestDto.taskId());
+        Timer timer = fetchTimerService.fetchOrCreateByTaskAndTargetDate(user, selectedTask, requestDto.targetDate());
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
+        if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
+        timerSessionManager.updateTimerSession(findTimerSession, findCategory.getName(), selectedTask, timer.getElapsedTime(), TimerStatus.PAUSED, requestDto.targetDate());
+    }
+
+    @Transactional
+    public void handleHeartbeat(Long userId, LocalDate targetDate) {
+        LocalDateTime now = LocalDateTime.now();
+        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
+        timerSessionManager.handleHeartbeat(findTimerSession, now);
+    }
+
+
+//
+
+    // ----------------------------------------------------------------------
+//    @Transactional
+//    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
+//        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
+//        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
+//        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
+//        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
+//
+//        if (findTimerSession == null) {
+//            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
+//        } else {
+//            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
+//        }
+//    }
 
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {

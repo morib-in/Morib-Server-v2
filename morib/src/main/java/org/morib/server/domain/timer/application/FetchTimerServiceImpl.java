@@ -68,4 +68,13 @@ public class FetchTimerServiceImpl implements FetchTimerService{
         return timerRepository.findByTaskIdAndTargetDate(taskId, targetDate);
     }
 
+    @Override
+    public Timer fetchOrCreateByTaskAndTargetDate(User user, Task task, LocalDate targetDate) {
+        Timer timer = fetchByTaskAndTargetDate(task, targetDate);
+        if (timer == null) {
+            timer = Timer.create(user, targetDate, task);
+        }
+        return timer;
+    }
+
 }

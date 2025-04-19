@@ -22,7 +22,6 @@ public class TimerManager {
         timer.setElapsedTime(elapsedTime);
     }
 
-
     public void addElapsedTime(Timer timer, int elapsedTime){
         timer.addElapsedTime(elapsedTime);
     }

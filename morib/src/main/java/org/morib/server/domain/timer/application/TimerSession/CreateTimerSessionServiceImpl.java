@@ -1,6 +1,7 @@
 package org.morib.server.domain.timer.application.TimerSession;
 
 import lombok.RequiredArgsConstructor;
+import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.TimerSession;
 import org.morib.server.domain.timer.infra.TimerSessionRepository;
 import org.morib.server.domain.timer.infra.TimerStatus;
@@ -15,8 +16,8 @@ public class CreateTimerSessionServiceImpl implements CreateTimerSessionService 
     private final TimerSessionRepository timerSessionRepository;
 
     @Override
-    public void create(Long userId, String runningCategoryName, Long taskId, int elapsedTime, TimerStatus timerStatus, LocalDate targetDate) {
-        timerSessionRepository.save(
-                TimerSession.create(userId, runningCategoryName, taskId, elapsedTime, timerStatus, targetDate));
+    public TimerSession create(Long userId, String runningCategoryName, Task task, int elapsedTime, TimerStatus timerStatus, LocalDate targetDate) {
+        return timerSessionRepository.save(
+                TimerSession.create(userId, runningCategoryName, task, elapsedTime, timerStatus, targetDate));
     }
 }
