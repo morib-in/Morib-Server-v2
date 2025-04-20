@@ -4,14 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.annotation.IsToday;
 import org.morib.server.api.timerView.dto.AssignAllowedGroupsRequestDto;
-import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
-import org.morib.server.api.timerView.dto.TimerDtos;
+import org.morib.server.api.timerView.dto.TimerRequestDto;
+import org.morib.server.api.timerView.dto.TimerResponseDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
-import org.morib.server.domain.timer.infra.TimerStatus;
-import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.common.BaseResponse;
-import org.morib.server.global.exception.InvalidQueryParameterException;
-import org.morib.server.global.message.ErrorMessage;
+import org.morib.server.global.common.util.ApiResponseUtil;
 import org.morib.server.global.message.SuccessMessage;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.morib.server.global.userauth.PrincipalHandler;
@@ -34,7 +31,7 @@ public class TimerViewController {
 
     @PostMapping("/timer/run")
     public ResponseEntity<BaseResponse<?>> runTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                    @Valid @RequestBody TimerDtos.TimerRequest requestDto) {
+                                                    @Valid @RequestBody TimerRequestDto requestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         timerViewFacade.runTimer(userId, requestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -42,7 +39,7 @@ public class TimerViewController {
 
     @PostMapping("/timer/pause")
     public ResponseEntity<BaseResponse<?>> pauseTimer(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                      @Valid @RequestBody TimerDtos.TimerRequest requestDto) {
+                                                      @Valid @RequestBody TimerRequestDto requestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         timerViewFacade.pauseTimer(userId, requestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -52,13 +49,12 @@ public class TimerViewController {
     public ResponseEntity<BaseResponse<?>> getSelectedTimerInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                                 @IsToday @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        TimerDtos.TimerStatusResponse response = timerViewFacade.getSelectedTimerInfo(userId, targetDate);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, response);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, timerViewFacade.getSelectedTimerInfo(userId, targetDate));
     }
 
     @PostMapping("/timer/select")
     public ResponseEntity<BaseResponse<?>> selectTimerInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                           @Valid @RequestBody TimerDtos.TimerRequest requestDto) { // @Valid 추가 가능
+                                                           @Valid @RequestBody TimerRequestDto requestDto) { // @Valid 추가 가능
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         timerViewFacade.selectTimerInfo(userId, requestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
