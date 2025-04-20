@@ -13,7 +13,7 @@ public enum ErrorMessage {
      */
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "잘못된 형식입니다"),
-    INVALID_URL(HttpStatus.BAD_REQUEST, "요청된 url이 유효하지 않습니다."),
+    INVALID_URL(HttpStatus.BAD_REQUEST, "유효하지 않은 URL 형식입니다."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "유효하지 않은 이메일 형식입니다."),
     INVALID_TASK_IN_TODO(HttpStatus.BAD_REQUEST, "완료된 태스크는 할 일에 추가하거나 타이머를 실행할 수 없습니다."),
     CANNOT_ADD_YOURSELF(HttpStatus.BAD_REQUEST, "자기 자신을 친구로 추가할 수 없습니다."),

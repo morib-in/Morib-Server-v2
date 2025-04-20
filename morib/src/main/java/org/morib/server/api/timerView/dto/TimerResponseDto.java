@@ -10,15 +10,17 @@ public record TimerResponseDto(
         String taskName,
         Long selectedTaskId,
         int elapsedTime,
+        int totalElapsedTimeOfToday,
         TimerStatus timerStatus,
         LocalDate targetDate
 ) {
-    public static TimerResponseDto from(TimerSession timerSession) {
+    public static TimerResponseDto from(TimerSession timerSession, int totalElapsedTimeOfToday) {
         return new TimerResponseDto(
                 timerSession.getRunningCategoryName(),
                 timerSession.getSelectedTask() != null ? timerSession.getSelectedTask().getName() : null,
                 timerSession.getSelectedTask() != null ? timerSession.getSelectedTask().getId() : null,
                 timerSession.getElapsedTime(),
+                totalElapsedTimeOfToday,
                 timerSession.getTimerStatus(),
                 timerSession.getTargetDate()
         );

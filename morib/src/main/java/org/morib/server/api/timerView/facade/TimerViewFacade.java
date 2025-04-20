@@ -99,7 +99,7 @@ public class TimerViewFacade {
             findTimerSession = timerSessionManager.handleCalledByClientFetch(calculatedElapsedTime, findTimerSession, now);
             timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(findTimerSession.getSelectedTask().getId(), findTimerSession.getTargetDate()), findTimerSession.getElapsedTime());
         }
-        return TimerResponseDto.from(findTimerSession);
+        return TimerResponseDto.from(findTimerSession, fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate));
     }
 
     @Transactional
@@ -110,7 +110,8 @@ public class TimerViewFacade {
         Timer timer = fetchTimerService.fetchOrCreateByTaskAndTargetDate(user, selectedTask, requestDto.targetDate());
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
         if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
-        timerSessionManager.updateTimerSession(findTimerSession, findCategory.getName(), selectedTask, timer.getElapsedTime(), TimerStatus.PAUSED, requestDto.targetDate());
+        timerSessionManager.updateTimerSession(findTimerSession,
+                UpdateTimerSessionDto.of(findCategory.getName(), selectedTask, timer.getElapsedTime(), TimerStatus.PAUSED, requestDto.targetDate()));
     }
 
     @Transactional

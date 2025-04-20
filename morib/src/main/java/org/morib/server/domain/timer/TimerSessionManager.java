@@ -1,6 +1,7 @@
 package org.morib.server.domain.timer;
 
 import org.morib.server.annotation.Manager;
+import org.morib.server.api.timerView.dto.UpdateTimerSessionDto;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.TimerSession;
 import org.morib.server.domain.timer.infra.TimerStatus;
@@ -11,8 +12,14 @@ import java.time.LocalDateTime;
 @Manager
 public class TimerSessionManager {
 
-    public void updateTimerSession(TimerSession timerSession, String runningCategoryName, Task selectedTask, int elapsedTime, TimerStatus timerStatus, LocalDate targetDate) {
-        timerSession.update(runningCategoryName, selectedTask, elapsedTime, timerStatus, targetDate);
+    public void updateTimerSession(TimerSession timerSession, UpdateTimerSessionDto updateTimerSessionDto) {
+        timerSession.update(
+                updateTimerSessionDto.runningCategoryName(),
+                updateTimerSessionDto.selectedTask(),
+                updateTimerSessionDto.elapsedTime(),
+                updateTimerSessionDto.timerStatus(),
+                updateTimerSessionDto.targetDate()
+        );
     }
 
     public void run(TimerSession timerSession, LocalDateTime now) {

@@ -9,6 +9,7 @@ import org.morib.server.api.homeView.dto.fetch.FetchMyElapsedTimeResponseDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewRequestDto;
 import org.morib.server.api.homeView.dto.fetch.HomeViewResponseDto;
 import org.morib.server.api.homeView.vo.*;
+import org.morib.server.api.timerView.dto.UpdateTimerSessionDto;
 import org.morib.server.domain.category.application.FetchCategoryService;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.task.TaskManager;
@@ -138,7 +139,8 @@ public class HomeViewFacade {
         if (findTimerSession == null) {
             createTimerSessionService.create(userId, findCategory.getName(), firstTask, elapsedTimeOfFirstTask, TimerStatus.PAUSED, targetDate);
         } else {
-            timerSessionManager.updateTimerSession(findTimerSession, findCategory.getName(), firstTask, elapsedTimeOfFirstTask, TimerStatus.PAUSED, targetDate);
+            timerSessionManager.updateTimerSession(findTimerSession,
+                    UpdateTimerSessionDto.of(findCategory.getName(), firstTask, elapsedTimeOfFirstTask, TimerStatus.PAUSED, targetDate));
         }
     }
 

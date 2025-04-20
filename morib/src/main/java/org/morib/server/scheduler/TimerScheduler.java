@@ -58,26 +58,21 @@ public class TimerScheduler {
                     continue;
                 }
 
-                boolean isInactive = (lastHeartbeatTime == null || lastHeartbeatTime.isBefore(cutoffTime));
+                Duration elapsedDuration = Duration.ZERO;
 
-                if (isInactive) {
+                if (lastHeartbeatTime != null) {
+                    elapsedDuration = Duration.between(lastCalculatedAt, now);
+                } else {
+                    log.warn("[타이머 스케줄러] 비활성 세션 {}의 lastHeartbeatTime({})이 유효하지 않아 경과 시간 0으로 처리.", session.getId(), lastHeartbeatTime);
+                }
+                int deltaSeconds = (int) Math.max(0, elapsedDuration.toSeconds());
+
+                if (lastHeartbeatTime == null || lastHeartbeatTime.isBefore(cutoffTime)) {
                     // 비활성 세션의 경우, 마지막 계산 시점과 현재 시점 사이의 경과 시간을 계산
-                    Duration elapsedDuration = Duration.ZERO;
-                    if (lastHeartbeatTime != null) {
-                        elapsedDuration = Duration.between(lastCalculatedAt, now);
-                    } else {
-                        log.warn("[타이머 스케줄러] 비활성 세션 {}의 lastHeartbeatTime({})이 유효하지 않아 경과 시간 0으로 처리.", session.getId(), lastHeartbeatTime);
-                    }
-                    int deltaSeconds = (int) Math.max(0, elapsedDuration.toSeconds());
-
                     updateElapsedTimeAndPause(session, deltaSeconds);
                     pausedCount++;
-
                 } else {
                     // 활성 세션의 경우, 마지막 계산 시점과 현재 시점 사이의 경과 시간을 계산
-                    Duration elapsedDuration = Duration.between(lastCalculatedAt, now);
-                    int deltaSeconds = (int) Math.max(0, elapsedDuration.toSeconds());
-
                     updateElapsedTimeAndContinue(session, deltaSeconds, now, today);
                     updatedCount++;
                 }
