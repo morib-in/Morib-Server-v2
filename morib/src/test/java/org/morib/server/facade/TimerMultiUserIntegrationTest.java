@@ -1,4 +1,4 @@
-package org.morib.server.facade; // 실제 프로젝트 경로로 수정
+package org.morib.server.facade;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,11 +35,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class TimerMultiUserIntegrationTest { // 클래스 이름 변경 또는 새 클래스 생성
+class TimerMultiUserIntegrationTest {
 
-    // --- 의존성 주입 (동일) ---
-    @Autowired
-    private HomeViewFacade homeViewFacade;
+    @Autowired private HomeViewFacade homeViewFacade;
     @Autowired private TimerViewFacade timerViewFacade;
     @Autowired private TimerScheduler timerScheduler;
     @Autowired private UserRepository userRepository;
