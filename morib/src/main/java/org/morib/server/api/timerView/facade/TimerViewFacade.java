@@ -99,7 +99,7 @@ public class TimerViewFacade {
             findTimerSession = timerSessionManager.handleCalledByClientFetch(calculatedElapsedTime, findTimerSession, now);
             timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(findTimerSession.getSelectedTask().getId(), findTimerSession.getTargetDate()), findTimerSession.getElapsedTime());
         }
-        return TimerResponseDto.from(findTimerSession);
+        return TimerResponseDto.from(findTimerSession, fetchTimerService.sumElapsedTimeByUser(fetchUserService.fetchByUserId(userId), targetDate));
     }
 
     @Transactional
