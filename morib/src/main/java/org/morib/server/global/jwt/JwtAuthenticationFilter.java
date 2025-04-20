@@ -13,7 +13,6 @@ import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.userauth.CustomUserAuthentication;
 import org.morib.server.global.userauth.CustomUserDetails;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,18 +1,17 @@
 package org.morib.server.scheduler;
 
-import org.morib.server.domain.timer.TimerManager;
-import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
-import org.morib.server.domain.timer.infra.TimerSessionRepository;
-import org.springframework.stereotype.Component;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.morib.server.domain.task.infra.Task;
+import org.morib.server.domain.timer.TimerManager;
 import org.morib.server.domain.timer.application.FetchTimerService;
+import org.morib.server.domain.timer.application.TimerSession.FetchTimerSessionService;
 import org.morib.server.domain.timer.infra.Timer;
 import org.morib.server.domain.timer.infra.TimerSession;
+import org.morib.server.domain.timer.infra.TimerSessionRepository;
 import org.morib.server.domain.timer.infra.TimerStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
