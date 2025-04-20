@@ -2,7 +2,6 @@ package org.morib.server.domain.timer.application.TimerSession;
 
 import org.morib.server.domain.timer.infra.TimerSession;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

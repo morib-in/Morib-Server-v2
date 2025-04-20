@@ -1,12 +1,10 @@
 package org.morib.server.domain.timer;
 
 import org.morib.server.annotation.Manager;
-import org.morib.server.api.timerView.dto.SaveTimerSessionRequestDto;
 import org.morib.server.domain.task.infra.Task;
 import org.morib.server.domain.timer.infra.TimerSession;
 import org.morib.server.domain.timer.infra.TimerStatus;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

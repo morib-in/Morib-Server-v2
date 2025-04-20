@@ -35,7 +35,6 @@ import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.HealthCheckController;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
-import org.springframework.cglib.core.Local;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -67,7 +66,7 @@ public class TimerViewFacade {
     private final CalculateTimerSessionService calculateTimerSessionService;
 
     @Transactional
-    public void runTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+    public void runTimer(Long userId, TimerRequestDto requestDto) {
         LocalDateTime now = LocalDateTime.now();
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
         if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
@@ -77,7 +76,7 @@ public class TimerViewFacade {
     }
 
     @Transactional
-    public void pauseTimer(Long userId, TimerDtos.TimerRequest requestDto) {
+    public void pauseTimer(Long userId, TimerRequestDto requestDto) {
         LocalDateTime now = LocalDateTime.now();
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, requestDto.targetDate());
         if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
@@ -91,7 +90,7 @@ public class TimerViewFacade {
     }
 
     @Transactional
-    public TimerDtos.TimerStatusResponse getSelectedTimerInfo(Long userId, LocalDate targetDate) {
+    public TimerResponseDto getSelectedTimerInfo(Long userId, LocalDate targetDate) {
         LocalDateTime now = LocalDateTime.now();
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
         if (findTimerSession == null) throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
@@ -100,11 +99,11 @@ public class TimerViewFacade {
             findTimerSession = timerSessionManager.handleCalledByClientFetch(calculatedElapsedTime, findTimerSession, now);
             timerManager.setElapsedTime(fetchTimerService.fetchByTaskIdAndTargetDate(findTimerSession.getSelectedTask().getId(), findTimerSession.getTargetDate()), findTimerSession.getElapsedTime());
         }
-        return TimerDtos.TimerStatusResponse.from(findTimerSession);
+        return TimerResponseDto.from(findTimerSession);
     }
 
     @Transactional
-    public void selectTimerInfo(Long userId, TimerDtos.TimerRequest requestDto) {
+    public void selectTimerInfo(Long userId, TimerRequestDto requestDto) {
         User user = fetchUserService.fetchByUserId(userId);
         Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, requestDto.taskId());
         Task selectedTask = fetchTaskService.fetchById(requestDto.taskId());

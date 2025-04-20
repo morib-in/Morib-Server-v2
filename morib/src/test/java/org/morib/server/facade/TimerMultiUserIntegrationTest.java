@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
-import org.morib.server.api.timerView.dto.TimerDtos;
+import org.morib.server.api.timerView.dto.TimerRequestDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
@@ -104,9 +104,9 @@ class TimerMultiUserIntegrationTest { // 클래스 이름 변경 또는 새 클�
 
         // [단계 1] 각 사용자 Task 시작
         System.out.println("\n[단계 1] 사용자 1 Task 1-1 시작, 사용자 2 Task 2-1 시작");
-        timerViewFacade.runTimer(userId1, new TimerDtos.TimerRequest(task1_1.getId(), targetDate));
+        timerViewFacade.runTimer(userId1, new TimerRequestDto(task1_1.getId(), targetDate));
         LocalDateTime run1_1Time = LocalDateTime.now();
-        timerViewFacade.runTimer(userId2, new TimerDtos.TimerRequest(task2_1.getId(), targetDate));
+        timerViewFacade.runTimer(userId2, new TimerRequestDto(task2_1.getId(), targetDate));
         LocalDateTime run2_1Time = LocalDateTime.now();
 
         assertTimerSessionState(findTimerSession(userId1, targetDate), TimerStatus.RUNNING, task1_1.getId(), 0, "User 1 시작 후");
@@ -117,7 +117,7 @@ class TimerMultiUserIntegrationTest { // 클래스 이름 변경 또는 새 클�
         sleepSeconds(1);
         timerViewFacade.handleHeartbeat(userId1, targetDate);
         LocalDateTime pause2_1Time = LocalDateTime.now();
-        timerViewFacade.pauseTimer(userId2, new TimerDtos.TimerRequest(task2_1.getId(), targetDate));
+        timerViewFacade.pauseTimer(userId2, new TimerRequestDto(task2_1.getId(), targetDate));
 
         int delta2_1 = (int) Duration.between(run2_1Time, pause2_1Time).toSeconds();
         assertTimerSessionState(findTimerSession(userId1, targetDate), TimerStatus.RUNNING, task1_1.getId(), 0, "User 1 하트비트 후"); // 시간은 스케줄러나 다음 액션에서 계산됨
@@ -129,8 +129,8 @@ class TimerMultiUserIntegrationTest { // 클래스 이름 변경 또는 새 클�
         System.out.println("\n[단계 3] 사용자 1 정지, 사용자 2 Task 2-2 선택");
         sleepSeconds(1);
         LocalDateTime pause1_1Time = LocalDateTime.now();
-        timerViewFacade.pauseTimer(userId1, new TimerDtos.TimerRequest(task1_1.getId(), targetDate));
-        timerViewFacade.selectTimerInfo(userId2, new TimerDtos.TimerRequest(task2_2.getId(), targetDate));
+        timerViewFacade.pauseTimer(userId1, new TimerRequestDto(task1_1.getId(), targetDate));
+        timerViewFacade.selectTimerInfo(userId2, new TimerRequestDto(task2_2.getId(), targetDate));
 
         int delta1_1 = (int) Duration.between(run1_1Time, pause1_1Time).toSeconds(); // User 1의 Task 1-1 총 실행 시간 (약 2초)
         assertTimerSessionState(findTimerSession(userId1, targetDate), TimerStatus.PAUSED, task1_1.getId(), delta1_1, "User 1 정지 후");
@@ -139,11 +139,11 @@ class TimerMultiUserIntegrationTest { // 클래스 이름 변경 또는 새 클�
 
         // [단계 4] 스케줄러 테스트 준비: 두 사용자 모두 다른 Task 실행
         System.out.println("\n[단계 4] 스케줄러 테스트 준비: User 1 Task 1-3 시작, User 2 Task 2-2 시작");
-        timerViewFacade.selectTimerInfo(userId1, new TimerDtos.TimerRequest(task1_3.getId(), targetDate)); // User1 Task 1-3 선택
-        timerViewFacade.runTimer(userId1, new TimerDtos.TimerRequest(task1_3.getId(), targetDate));       // User1 Task 1-3 시작
+        timerViewFacade.selectTimerInfo(userId1, new TimerRequestDto(task1_3.getId(), targetDate)); // User1 Task 1-3 선택
+        timerViewFacade.runTimer(userId1, new TimerRequestDto(task1_3.getId(), targetDate));       // User1 Task 1-3 시작
         LocalDateTime run1_3Time = LocalDateTime.now();
         // User 2는 이미 Task 2-2가 선택된 상태
-        timerViewFacade.runTimer(userId2, new TimerDtos.TimerRequest(task2_2.getId(), targetDate));       // User2 Task 2-2 시작
+        timerViewFacade.runTimer(userId2, new TimerRequestDto(task2_2.getId(), targetDate));       // User2 Task 2-2 시작
         LocalDateTime run2_2Time = LocalDateTime.now();
 
         assertTimerSessionState(findTimerSession(userId1, targetDate), TimerStatus.RUNNING, task1_3.getId(), 0, "User 1 Task 1-3 시작 후");

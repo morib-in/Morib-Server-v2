@@ -6,7 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.morib.server.api.homeView.dto.StartTimerRequestDto;
 import org.morib.server.api.homeView.facade.HomeViewFacade;
-import org.morib.server.api.timerView.dto.TimerDtos;
+import org.morib.server.api.timerView.dto.TimerRequestDto;
+import org.morib.server.api.timerView.dto.TimerResponseDto;
 import org.morib.server.api.timerView.facade.TimerViewFacade;
 import org.morib.server.domain.category.infra.Category;
 import org.morib.server.domain.category.infra.CategoryRepository;
@@ -89,7 +90,7 @@ class TimerFullScenarioIntegrationTest {
         TimerSession sessionAfterEnter = findTimerSession(userId, targetDate);
         assertTimerSessionState(sessionAfterEnter, TimerStatus.PAUSED, task1.getId(), 0, "진입 후");
 
-        TimerDtos.TimerRequest selectRequest1 = new TimerDtos.TimerRequest(task1.getId(), targetDate);
+        TimerRequestDto selectRequest1 = new TimerRequestDto(task1.getId(), targetDate);
         timerViewFacade.selectTimerInfo(userId, selectRequest1); // Task 1 선택
 
         TimerSession sessionAfterSelect1 = findTimerSession(userId, targetDate);
@@ -101,7 +102,7 @@ class TimerFullScenarioIntegrationTest {
         // [단계 1] Task 1 시작
         System.out.println("\n[단계 1] Task 1 시작");
         // ... (runTimer 호출 및 검증 1 - 이전과 동일) ...
-        TimerDtos.TimerRequest runRequest1 = new TimerDtos.TimerRequest(task1.getId(), targetDate);
+        TimerRequestDto runRequest1 = new TimerRequestDto(task1.getId(), targetDate);
         timerViewFacade.runTimer(userId, runRequest1);
         LocalDateTime run1Time = LocalDateTime.now(); // 시작 시각 기록
         TimerSession sessionAfterRun1 = findTimerSession(userId, targetDate);
@@ -122,7 +123,7 @@ class TimerFullScenarioIntegrationTest {
         System.out.println("\n[단계 3] Task 1 실행 중 - 추가 1초 후 정지");
         sleepSeconds(1); // 추가 1초 대기
         LocalDateTime pause1Time = LocalDateTime.now();
-        TimerDtos.TimerRequest pauseRequest1 = new TimerDtos.TimerRequest(task1.getId(), targetDate);
+        TimerRequestDto pauseRequest1 = new TimerRequestDto(task1.getId(), targetDate);
         timerViewFacade.pauseTimer(userId, pauseRequest1);
 
         // 검증 3: Task 1 정지 후 상태
@@ -137,7 +138,7 @@ class TimerFullScenarioIntegrationTest {
 
         // [단계 4] Task 2 선택 (/timer/select)
         System.out.println("\n[단계 4] Task 2 선택");
-        TimerDtos.TimerRequest selectRequest2 = new TimerDtos.TimerRequest(task2.getId(), targetDate);
+        TimerRequestDto selectRequest2 = new TimerRequestDto(task2.getId(), targetDate);
         timerViewFacade.selectTimerInfo(userId, selectRequest2); // Task 2 선택
 
         // 검증 4: Task 2 선택 후 상태
@@ -157,7 +158,7 @@ class TimerFullScenarioIntegrationTest {
 
         // [단계 6] Task 2 시작 (/timer/run)
         System.out.println("\n[단계 6] Task 2 시작");
-        TimerDtos.TimerRequest runRequest2 = new TimerDtos.TimerRequest(task2.getId(), targetDate);
+        TimerRequestDto runRequest2 = new TimerRequestDto(task2.getId(), targetDate);
         // runTimer는 선택된 Task (Task 2)의 Timer에서 elapsedTime(현재 0)을 가져와 세션에 설정해야 함
         timerViewFacade.runTimer(userId, runRequest2);
         LocalDateTime run2Time = LocalDateTime.now();
@@ -169,7 +170,7 @@ class TimerFullScenarioIntegrationTest {
         assertThat((int) Duration.between(sessionAfterRun2.getLastHeartbeatAt(), run2Time).toSeconds() < 1);
 
         sleepSeconds(2);
-        TimerDtos.TimerStatusResponse syncResponse2 = timerViewFacade.getSelectedTimerInfo(userId, targetDate);
+        TimerResponseDto syncResponse2 = timerViewFacade.getSelectedTimerInfo(userId, targetDate);
 
         // 검증 5: 동기화(조회) 후 상태 (변경 없어야 함)
         assertThat(syncResponse2.timerStatus()).isEqualTo(TimerStatus.RUNNING);
@@ -185,7 +186,7 @@ class TimerFullScenarioIntegrationTest {
 //        System.out.println("\n[단계 7] Task 2 실행 중 - 2초 후 정지");
 //        sleepSeconds(2); // 2초 대기
 //        LocalDateTime pause2Time = LocalDateTime.now();
-//        TimerDtos.TimerRequest pauseRequest2 = new TimerDtos.TimerRequest(task2.getId(), targetDate);
+//        TimerRequestDto pauseRequest2 = new TimerRequestDto(task2.getId(), targetDate);
 //        timerViewFacade.pauseTimer(userId, pauseRequest2);
 //
 //        // 검증 7: Task 2 정지 후 상태
@@ -201,9 +202,9 @@ class TimerFullScenarioIntegrationTest {
         System.out.println("\n[단계 8] 비활성 세션(Task 3) 생성 및 스케줄러 테스트");
         // ... (스케줄러 테스트 로직 - 이전과 동일) ...
         LocalDateTime inactiveStartTime = LocalDateTime.now();
-        TimerDtos.TimerRequest selectRequest3 = new TimerDtos.TimerRequest(task3.getId(), targetDate);
+        TimerRequestDto selectRequest3 = new TimerRequestDto(task3.getId(), targetDate);
         timerViewFacade.selectTimerInfo(userId, selectRequest3);
-        TimerDtos.TimerRequest runRequest3 = new TimerDtos.TimerRequest(task3.getId(), targetDate);
+        TimerRequestDto runRequest3 = new TimerRequestDto(task3.getId(), targetDate);
         timerViewFacade.runTimer(userId, runRequest3);
         LocalDateTime run3Time = LocalDateTime.now();
         System.out.println(" - 1분 30초 대기...");
