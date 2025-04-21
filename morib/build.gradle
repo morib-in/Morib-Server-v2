@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:8.2.0'
     implementation 'io.sentry:sentry-logback:7.6.0'
     implementation 'com.google.guava:guava:33.0.0-jre'
-
+    implementation 'io.micrometer:micrometer-registry-prometheus'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
