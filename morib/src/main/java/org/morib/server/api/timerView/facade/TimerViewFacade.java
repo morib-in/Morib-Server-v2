@@ -177,10 +177,15 @@ public class TimerViewFacade {
     }
 
     public List<FetchRelationshipResponseDto> buildFetchRelationshipResponseDto(Long userId, List<Relationship> relationships) {
+        LocalDate today = LocalDate.now();
         return modalViewFacade.classifyRelationships(relationships, userId).values().stream()
                 .flatMap(List::stream)
-                .filter(user -> fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now()) > 0)
-                .map(user -> FetchRelationshipResponseDto.of(user, healthCheckController.isUserActive(user.getId())))
+                .map(user -> {
+                    int elapsedTime = fetchTimerService.sumElapsedTimeByUser(user, today);
+                    boolean isOnline = healthCheckController.isUserActive(user.getId());
+                    return FetchRelationshipResponseDto.of(user, elapsedTime, isOnline);
+                })
+                .filter(dto -> dto.elapsedTime() > 0)
                 .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed()
                         .thenComparing(FetchRelationshipResponseDto::elapsedTime).reversed()
                         .thenComparing(FetchRelationshipResponseDto::name))
