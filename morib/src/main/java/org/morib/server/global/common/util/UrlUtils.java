@@ -14,43 +14,49 @@ public final class UrlUtils {
 
     public static String extractTopPrivateDomain(String urlString) {
         if (urlString == null || urlString.isBlank()) {
-            log.warn("입력된 URL 문자열이 null이거나 비어있습니다.");
-            return "";
-        }
+    public static String getTopDomain(String originalUrl) {
+        if (originalUrl == null || originalUrl.trim().isEmpty()) {
+            throw new InvalidURLException(ErrorMessage.URL_IS_EMPTY);
         try {
-            String urlWithProtocol = urlString;
-            if (!urlString.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
-                urlWithProtocol = "http://" + urlString;
-            }
 
+        String urlToParse = originalUrl.trim();
+
+        if (!urlToParse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
+             if (!urlToParse.startsWith("//")) {
             URL url = new URL(urlWithProtocol);
-            String host = url.getHost();
+             } else {
+                 urlToParse = "https:" + urlToParse;
+             }
+        }
 
-            if (host == null || host.isBlank()) {
-                log.warn("URL에서 호스트를 추출할 수 없습니다: {}", urlString);
-                return extractDomainFromRawUrl(urlString);
+        try {
+            URI uri = new URI(urlToParse);
+            String host = uri.getHost();
+
+            if (host == null || host.isEmpty()) {
+                return normalizeUrl(originalUrl);
             }
 
-            if (host.matches("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$")) {
-                log.debug("입력된 호스트가 IP 주소 형식이므로 호스트 자체를 반환합니다: {}", host);
+            if ("localhost".equalsIgnoreCase(host)) {
+                return "localhost";
+            }
+
+            if (IP_ADDRESS_PATTERN.matcher(host).matches()) {
                 return host;
             }
 
             InternetDomainName domainName = InternetDomainName.from(host);
-            if (domainName.isTopPrivateDomain()) {
-                return domainName.toString();
-            } else if (domainName.hasParent()) {
+            if (domainName.hasPublicSuffix()) {
                 return domainName.topPrivateDomain().toString();
             } else {
-                log.warn("최상위 개인 도메인을 찾을 수 없습니다: {}", host);
-                return extractDomainFromRawUrl(urlString);
+                return normalizeHost(host);
             }
-        } catch (MalformedURLException e) {
-            log.warn("잘못된 형식의 URL입니다: {}, 기본 도메인 추출 시도 - {}", urlString, e.getMessage());
-            return extractDomainFromRawUrl(urlString);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            log.warn("URL로부터 도메인 파싱 중 오류 발생: {}, 기본 도메인 추출 시도 - {}", urlString, e.getMessage());
-            return extractDomainFromRawUrl(urlString);
+
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            return normalizeUrl(originalUrl);
+        }
+    }
+
         } catch (Exception e) {
             log.error("도메인 추출 중 예상치 못한 오류 발생: {}", urlString, e);
             return extractDomainFromRawUrl(urlString);
