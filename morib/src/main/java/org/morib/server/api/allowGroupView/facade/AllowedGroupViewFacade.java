@@ -19,15 +19,13 @@ import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.global.common.ConnectType;
+import org.morib.server.global.common.util.UrlUtils;
 import org.morib.server.global.exception.DuplicateResourceException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.morib.server.global.common.Constants.MAX_VISIBLE_ALLOWED_SERVICES;
 
@@ -110,7 +108,7 @@ public class AllowedGroupViewFacade {
     private TreeMap<String, List<AllowedSite>> filteredAllowedSitesByDomain(AllowedGroup findAllowedGroup) {
         TreeMap<String, List<AllowedSite>> filteredAllowedSites = new TreeMap<>();
         for (AllowedSite allowedSite : findAllowedGroup.getAllowedSites()) {
-            String domainForKey = fetchSiteInfoService.getTopDomain(allowedSite.getSiteUrl());
+            String domainForKey = UrlUtils.getTopDomain(allowedSite.getSiteUrl());
             filteredAllowedSites
                     .computeIfAbsent(domainForKey, k -> new ArrayList<>())
                     .add(allowedSite);
@@ -148,13 +146,12 @@ public class AllowedGroupViewFacade {
     @Transactional
     public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
-        String siteUrl = allowedSiteRequestDto.siteUrl();
-        siteUrl = fetchSiteInfoService.normalizeUrl(siteUrl);
+        String siteUrl = UrlUtils.normalizeUrl(allowedSiteRequestDto.siteUrl());
         AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId);
-        if (findAllowedSite != null) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+        if (!Objects.isNull(findAllowedSite)) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
 
         try {
-            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetch(siteUrl);
+            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(siteUrl);
             createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
@@ -174,16 +171,16 @@ public class AllowedGroupViewFacade {
 
     @Transactional
     public void mergeToTopDomain(Long allowedGroupId, String siteUrl) {
-        String topDomainUrl = fetchSiteInfoService.getTopDomainUrl(siteUrl);
-        String topDomain = fetchSiteInfoService.getTopDomain(siteUrl);
+        String topDomain = UrlUtils.getTopDomain(siteUrl);
+        if (Objects.isNull(topDomain) || topDomain.isEmpty() || topDomain.equals("localhost")) return;
         List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByDomainContaining(allowedGroupId, topDomain);
-        if (findAllowedSites.size() > 1) mergeToOne(topDomainUrl, findAllowedSites);
+        if (findAllowedSites.size() > 1) mergeToOne(topDomain, findAllowedSites);
     }
 
     public void mergeToOne(String topDomainUrl, List<AllowedSite> targetAllowedSites) {
         List<AllowedSite> sortedTargetAllowedSites = targetAllowedSites.stream().sorted(Comparator.comparing(AllowedSite::getSiteUrl)).toList();
         AllowedSite baseAllowedSite = sortedTargetAllowedSites.get(0);
-        allowedSiteManager.updateAllowedSiteInfo(baseAllowedSite, fetchSiteInfoService.fetch(topDomainUrl));
+        allowedSiteManager.updateAllowedSiteInfo(baseAllowedSite, fetchSiteInfoService.fetchSiteMetadataFromUrl(topDomainUrl));
         for (int i = 1; i < sortedTargetAllowedSites.size(); i++) {
             deleteAllowedSiteService.delete(sortedTargetAllowedSites.get(i).getId());
         }
@@ -206,6 +203,6 @@ public class AllowedGroupViewFacade {
     }
 
     public AllowedSiteVo fetchAllowedSiteInfoForOnBoard(String siteUrl) {
-        return fetchSiteInfoService.fetch(siteUrl);
+        return fetchSiteInfoService.fetchSiteMetadataFromUrl(siteUrl);
     }
 }
