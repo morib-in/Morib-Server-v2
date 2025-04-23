@@ -1,29 +1,29 @@
 package org.morib.server.global.common.util;
 
 import com.google.common.net.InternetDomainName;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.morib.server.global.exception.InvalidURLException;
+import org.morib.server.global.message.ErrorMessage;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class UrlUtils {
+public class UrlUtils {
 
-    public static String extractTopPrivateDomain(String urlString) {
-        if (urlString == null || urlString.isBlank()) {
+    private static final Pattern IP_ADDRESS_PATTERN = Pattern.compile(
+            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+    );
+
     public static String getTopDomain(String originalUrl) {
         if (originalUrl == null || originalUrl.trim().isEmpty()) {
             throw new InvalidURLException(ErrorMessage.URL_IS_EMPTY);
-        try {
+        }
 
         String urlToParse = originalUrl.trim();
 
         if (!urlToParse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
              if (!urlToParse.startsWith("//")) {
-            URL url = new URL(urlWithProtocol);
+                 urlToParse = "https://" + urlToParse;
              } else {
                  urlToParse = "https:" + urlToParse;
              }
@@ -57,81 +57,88 @@ public final class UrlUtils {
         }
     }
 
-        } catch (Exception e) {
-            log.error("도메인 추출 중 예상치 못한 오류 발생: {}", urlString, e);
-            return extractDomainFromRawUrl(urlString);
+    private static class HostPathPair {
+        final String host;
+        final String path;
+
+        HostPathPair(String host, String path) {
+            this.host = host;
+            this.path = path;
         }
     }
 
-    public static String getTopDomainUrl(String urlString) {
-        if (urlString == null || urlString.isBlank()) {
-            log.warn("입력된 URL 문자열이 null이거나 비어있습니다.");
-            return "";
-        }
-        try {
-            String topPrivateDomain = extractTopPrivateDomain(urlString);
-            if (topPrivateDomain.isEmpty() || topPrivateDomain.equals(extractDomainFromRawUrl(urlString))) {
-                return extractDomainFromRawUrl(urlString);
-            }
+    public static String normalizeUrl(String originalUrl) {
+        if (originalUrl == null || originalUrl.trim().isEmpty())
+            throw new InvalidURLException(ErrorMessage.URL_IS_EMPTY);
 
-            String urlWithProtocol = urlString;
-            if (!urlString.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
-                urlWithProtocol = "http://" + urlString;
-            }
-            URL originalUrl = new URL(urlWithProtocol);
-            String protocol = originalUrl.getProtocol();
+        String processedUrl = originalUrl.trim();
+        processedUrl = removeProtocol(processedUrl);
+        processedUrl = removeQueryAndFragment(processedUrl);
 
-            return protocol + "://" + topPrivateDomain + "/";
+        HostPathPair parts = splitAndNormalizeHostPath(processedUrl);
 
-        } catch (MalformedURLException e) {
-            log.warn("최상위 도메인 URL 생성 중 잘못된 형식의 URL 발생: {}, 기본 도메인 추출 시도 - {}", urlString, e.getMessage());
-            return extractDomainFromRawUrl(urlString);
-        } catch (Exception e) {
-            log.error("최상위 도메인 URL 생성 중 예상치 못한 오류 발생: {}", urlString, e);
-            return extractDomainFromRawUrl(urlString);
+        if (parts.path.isEmpty()) {
+            return parts.host;
+        } else {
+            return parts.host + parts.path;
         }
     }
 
-    /**
-     * URL 파싱 실패 시 또는 기본적인 방법으로 URL 문자열에서 도메인 부분을 추출합니다.
-     * 예: "https://www.example.com/path" -> "example.com"
-     * 예: "http://example.co.uk/" -> "example.co.uk"
-     * 예: "example.com" -> "example.com"
-     *
-     * @param urlString 원본 URL 문자열
-     * @return 추출된 도메인 문자열, 실패 시 원본 문자열 반환 가능성 있음.
-     */
-    private static String extractDomainFromRawUrl(String urlString) {
-        if (urlString == null || urlString.isBlank()) {
+    private static String removeProtocol(String url) {
+        int protocolIndex = url.indexOf("://");
+        if (protocolIndex != -1) {
+            return url.substring(protocolIndex + 3);
+        }
+        return url;
+    }
+
+    private static String removeQueryAndFragment(String url) {
+        String result = url;
+        int queryIndex = result.indexOf('?');
+        if (queryIndex != -1) {
+            result = result.substring(0, queryIndex);
+        }
+        int fragmentIndex = result.indexOf('#');
+        if (fragmentIndex != -1) {
+            result = result.substring(0, fragmentIndex);
+        }
+        return result;
+    }
+
+    private static HostPathPair splitAndNormalizeHostPath(String urlWithoutProtocolQuery) {
+        String hostPart;
+        String pathPart = "";
+        int firstSlashIndex = urlWithoutProtocolQuery.indexOf('/');
+
+        if (firstSlashIndex != -1) {
+            hostPart = urlWithoutProtocolQuery.substring(0, firstSlashIndex);
+            pathPart = urlWithoutProtocolQuery.substring(firstSlashIndex);
+        } else {
+            hostPart = urlWithoutProtocolQuery;
+        }
+
+        String normalizedHost = normalizeHost(hostPart);
+        String normalizedPath = normalizePath(pathPart);
+
+        return new HostPathPair(normalizedHost, normalizedPath);
+    }
+
+    private static String normalizeHost(String host) {
+        if (host == null) return "";
+        String normalized = host.toLowerCase();
+        if (normalized.startsWith("www.")) {
+            normalized = normalized.substring(4);
+        }
+        return normalized;
+    }
+
+    private static String normalizePath(String path) {
+        if (path == null) return "";
+        if (path.equals("/")) {
             return "";
+        } else if (path.endsWith("/")) {
+            return path.substring(0, path.length() - 1);
         }
-        String domain = urlString;
-        try {
-            // 프로토콜 제거 (존재하는 경우)
-            if (domain.contains("://")) {
-                domain = domain.split("://")[1];
-            }
-            // 경로 및 쿼리 파라미터 제거
-            if (domain.contains("/")) {
-                domain = domain.split("/")[0];
-            }
-            // 포트 번호 제거
-            if (domain.contains(":")) {
-                domain = domain.split(":")[0];
-            }
-            // 'www.' 제거 (존재하는 경우)
-            if (domain.startsWith("www.")) {
-                domain = domain.substring(4);
-            }
-            // 유효성 검사 추가 (간단히 . 포함 여부만 확인)
-            if (!domain.contains(".") || domain.startsWith(".") || domain.endsWith(".")){
-                log.warn("Raw URL에서 유효한 도메인 추출 실패: {}, 원본 반환 시도", urlString);
-                return urlString; // 유효하지 않다고 판단되면 원본 반환 (혹은 다른 처리)
-            }
-        } catch (Exception e) {
-            log.error("Raw URL에서 도메인 추출 중 오류 발생: {}, 원본 반환", urlString, e);
-            return urlString; // 예외 발생 시 안전하게 원본 반환
-        }
-        return domain;
+        return path;
     }
 }
