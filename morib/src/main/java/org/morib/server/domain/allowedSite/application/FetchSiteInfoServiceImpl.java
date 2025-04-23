@@ -14,7 +14,7 @@ import java.net.URL;
 public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
 
     @Override
-    public AllowedSiteVo fetch(String url) {
+    public AllowedSiteVo fetchSiteMetadataFromUrl(String url) {
         try {
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -49,69 +49,10 @@ public class FetchSiteInfoServiceImpl implements FetchSiteInfoService {
 
             return AllowedSiteVo.of(favicon, siteName, pageName, url);
         }
-        catch (IOException e) {
-            String domain = UrlUtils.extractTopPrivateDomain(url);
-            return AllowedSiteVo.of("", domain, domain, url);
+        catch (Exception e) {
+            String normalizedUrl = UrlUtils.normalizeUrl(url);
+            return AllowedSiteVo.of("", normalizedUrl, normalizedUrl, url);
         }
     }
 
-    @Override
-    public String getTopDomain(String urlString) {
-        return UrlUtils.extractTopPrivateDomain(urlString);
-    }
-
-    @Override
-    public String getTopDomainUrl(String urlString) {
-        return UrlUtils.getTopDomainUrl(urlString);
-    }
-
-    @Override
-    public String getTopDomainWhenParsingFailed(String urlString) {
-        return UrlUtils.extractTopPrivateDomain(urlString);
-    }
-
-    @Override
-    public String normalizeUrl(String urlString) {
-        try {
-            // 프로토콜이 없으면 "https://" 추가
-            if (!urlString.matches("^(http://|https://).*")) {
-                urlString = "https://" + urlString;
-            }
-
-            URL url = new URL(urlString);
-
-            // 항상 https로 강제 (요구사항에 따라 변경 가능)
-            String scheme = "https";
-
-            // 호스트를 소문자로 변환하고 "www." 접두어 제거
-            String host = url.getHost().toLowerCase();
-            if (host.startsWith("www.")) {
-                host = host.substring(4);
-            }
-
-            // 포트: 기본 포트가 아니라면 포함 (예: https의 기본 포트 443)
-            int port = url.getPort();
-            String portPart = "";
-            if (port != -1 && port != (scheme.equals("https") ? 443 : 80)) {
-                portPart = ":" + port;
-            }
-
-            // 경로: "/"인 경우나 빈 문자열은 빈 문자열로 처리하고, 나머지 경우 끝의 "/" 제거
-            String path = url.getPath();
-            if (path == null || path.equals("/") || path.isEmpty()) {
-                path = "";
-            } else if (path.endsWith("/")) {
-                path = path.substring(0, path.length() - 1);
-            }
-
-            return scheme + "://" + host + portPart + path;
-        } catch (Exception e) {
-            return urlString;
-        }
-    }
-
-    @Override
-    public String getDomainExceptHost(String urlString) {
-        return UrlUtils.extractTopPrivateDomain(urlString);
-    }
 }
