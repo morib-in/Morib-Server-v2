@@ -146,13 +146,20 @@ public class AllowedGroupViewFacade {
     @Transactional
     public void createAllowedSite(Long allowedGroupId, AllowedSiteRequestDto allowedSiteRequestDto) {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
-        String siteUrl = UrlUtils.normalizeUrl(allowedSiteRequestDto.siteUrl());
-        AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId);
+        String originalUrl = allowedSiteRequestDto.siteUrl();
+        String normalizedUrl = UrlUtils.normalizeUrl(originalUrl);
+        AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(normalizedUrl, allowedGroupId);
         if (!Objects.isNull(findAllowedSite)) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
 
         try {
-            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(siteUrl);
-            createAllowedSiteService.create(findAllowedGroup, allowedSiteVo);
+            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(originalUrl);
+            AllowedSiteVo voToSave = AllowedSiteVo.of(
+                    allowedSiteVo.favicon(),
+                    allowedSiteVo.siteName(),
+                    allowedSiteVo.pageName(),
+                    normalizedUrl
+            );
+            createAllowedSiteService.create(findAllowedGroup, voToSave);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
         }
