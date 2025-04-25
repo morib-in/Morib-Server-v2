@@ -152,7 +152,7 @@ public class AllowedGroupViewFacade {
         if (!Objects.isNull(findAllowedSite)) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
 
         try {
-            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(originalUrl);
+            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(UrlUtils.normalizeUrlForFavicon(originalUrl));
             AllowedSiteVo voToSave = AllowedSiteVo.of(
                     allowedSiteVo.favicon(),
                     allowedSiteVo.siteName(),

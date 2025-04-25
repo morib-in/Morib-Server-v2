@@ -6,6 +6,7 @@ import org.morib.server.global.message.ErrorMessage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.regex.Pattern;
 
 public class UrlUtils {
@@ -141,4 +142,44 @@ public class UrlUtils {
         }
         return path;
     }
+
+    public static String normalizeUrlForFavicon(String urlString) {
+        try {
+            // 프로토콜이 없으면 "https://" 추가
+            if (!urlString.matches("^(http://|https://).*")) {
+                urlString = "https://" + urlString;
+            }
+
+            URL url = new URL(urlString);
+
+            // 항상 https로 강제 (요구사항에 따라 변경 가능)
+            String scheme = "https";
+
+            // 호스트를 소문자로 변환하고 "www." 접두어 제거
+            String host = url.getHost().toLowerCase();
+            if (host.startsWith("www.")) {
+                host = host.substring(4);
+            }
+
+            // 포트: 기본 포트가 아니라면 포함 (예: https의 기본 포트 443)
+            int port = url.getPort();
+            String portPart = "";
+            if (port != -1 && port != 443) {
+                portPart = ":" + port;
+            }
+
+            // 경로: "/"인 경우나 빈 문자열은 빈 문자열로 처리하고, 나머지 경우 끝의 "/" 제거
+            String path = url.getPath();
+            if (path == null || path.equals("/") || path.isEmpty()) {
+                path = "";
+            } else if (path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
+
+            return scheme + "://" + host + portPart + path;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
