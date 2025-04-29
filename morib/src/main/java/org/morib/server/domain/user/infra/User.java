@@ -43,7 +43,7 @@ public class User extends BaseTimeEntity {
     private Set<RecentAllowedGroup> recentAllowedGroups = new LinkedHashSet<>();
     @Enumerated(EnumType.STRING)
     private Role role;
-
+    @Enumerated(EnumType.STRING)
     private InterestArea interestArea;
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
