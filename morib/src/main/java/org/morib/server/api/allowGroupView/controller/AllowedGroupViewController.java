@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2")
@@ -87,9 +89,10 @@ public class AllowedGroupViewController {
     }
 
     @GetMapping("/recommendSite")
-    public ResponseEntity<BaseResponse<?>> fetchRecommendSites(@AuthenticationPrincipal CustomUserDetails customUserDetails){
+    public ResponseEntity<BaseResponse<?>> fetchRecommendSites(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                               @RequestParam(required = false) Optional<Long> allowedGroupId){
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchRecommendSites(userId));
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchRecommendSites(userId, allowedGroupId));
     }
 
     @DeleteMapping("/allowedSite/{allowedSiteId}")

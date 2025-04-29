@@ -137,10 +137,25 @@ public class AllowedGroupViewFacade {
     }
 
     @Transactional(readOnly = true)
-    public InterestAreaSiteResponseDto fetchRecommendSites(Long userId) {
-        User user = fetchUserService.fetchByUserId(userId);
-        if (user.getInterestArea() == null) return InterestAreaSiteResponseDto.of(InterestArea.OTHERS.getAreaSiteVos());
-        else return InterestAreaSiteResponseDto.of(user.getInterestArea().getAreaSiteVos());
+    public RecommendSiteResponseWrapperDto fetchRecommendSites(Long userId, Optional<Long> allowedGroupId) {
+        InterestArea interestAreaOfUser = fetchUserService.fetchByUserId(userId).getInterestArea();
+
+        if (allowedGroupId.isPresent()) {
+            Set<String> findAllowedSiteUrl = fetchAllowedSiteService.fetchByAllowedGroupId(allowedGroupId.get())
+                    .stream()
+                    .map(AllowedSite::getSiteUrl)
+                    .collect(Collectors.toUnmodifiableSet());
+            return RecommendSiteResponseWrapperDto.from(fetchRecommendSiteService.fetchByInterestArea(Objects.isNull(interestAreaOfUser) ? InterestArea.OTHERS : interestAreaOfUser)
+                    .stream()
+                    .filter(recommendSite -> !findAllowedSiteUrl.contains(recommendSite.getSiteUrl()))
+                    .map(RecommendSiteResponseDto::from)
+                    .toList());
+        }
+
+        return RecommendSiteResponseWrapperDto.from(fetchRecommendSiteService.fetchByInterestArea(Objects.isNull(interestAreaOfUser) ? InterestArea.OTHERS : interestAreaOfUser)
+                .stream()
+                .map(RecommendSiteResponseDto::from)
+                .toList());
     }
 
     @Transactional
