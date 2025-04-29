@@ -193,6 +193,14 @@ public class AllowedGroupViewFacade {
         }
     }
 
+    public Map<InterestArea, List<RecommendSiteResponseDto>> fetchRecommendSitesOnboard() {
+        return fetchRecommendSiteService.fetchAll().stream()
+                .collect(Collectors.groupingBy(
+                        RecommendSite::getInterestArea,
+                        Collectors.mapping(RecommendSiteResponseDto::from, Collectors.toList())
+                ));
+    }
+
     @Transactional
     public void onboard(Long userId, String interestArea, OnboardRequestDto onboardRequestDto) {
         User findUser = fetchUserService.fetchByUserId(userId);

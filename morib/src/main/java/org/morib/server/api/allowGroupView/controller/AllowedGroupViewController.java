@@ -107,6 +107,11 @@ public class AllowedGroupViewController {
     }
   
     // 온보딩
+    @GetMapping("/onboard")
+    public ResponseEntity<BaseResponse<?>> fetchRecommendSitesOnboard() {
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, allowedGroupViewFacade.fetchRecommendSitesOnboard());
+    }
+
     @PostMapping("/onboard")
     public ResponseEntity<BaseResponse<?>> onboard(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                                    @RequestParam(value = "interestArea", defaultValue = "unknown") String interestArea,
