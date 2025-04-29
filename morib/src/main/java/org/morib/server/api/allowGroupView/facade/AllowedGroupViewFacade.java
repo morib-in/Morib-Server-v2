@@ -14,6 +14,8 @@ import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchSiteInfoService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
+import org.morib.server.domain.recommendSite.application.FetchRecommendSiteService;
+import org.morib.server.domain.recommendSite.infra.RecommendSite;
 import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
@@ -26,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.morib.server.global.common.Constants.MAX_VISIBLE_ALLOWED_SERVICES;
 
@@ -44,6 +47,7 @@ public class AllowedGroupViewFacade {
     private final CreateAllowedGroupService createAllowedGroupService;
     private final FetchAllowedSiteService fetchAllowedSiteService;
     private final AllowedSiteManager allowedSiteManager;
+    private final FetchRecommendSiteService fetchRecommendSiteService;
 
     public CreateAllowedGroupResponse createAllowedGroup(Long userId) {
         User findUser = fetchUserService.fetchByUserId(userId);
@@ -163,19 +167,47 @@ public class AllowedGroupViewFacade {
         AllowedGroup findAllowedGroup = fetchAllowedGroupService.findById(allowedGroupId);
         String originalUrl = allowedSiteRequestDto.siteUrl();
         String normalizedUrl = UrlUtils.normalizeUrl(originalUrl);
-        AllowedSite findAllowedSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(normalizedUrl, allowedGroupId);
-        if (!Objects.isNull(findAllowedSite)) throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
-
+        checkDuplicateAllowedSite(normalizedUrl, allowedGroupId);
         try {
-            AllowedSiteVo allowedSiteVo = fetchSiteInfoService.fetchSiteMetadataFromUrl(UrlUtils.normalizeUrlForFavicon(originalUrl));
-            AllowedSiteVo voToSave = AllowedSiteVo.of(
-                    allowedSiteVo.favicon(),
-                    allowedSiteVo.siteName(),
-                    allowedSiteVo.pageName(),
-                    normalizedUrl
-            );
+            AllowedSiteVo voToSave = determineAllowedSiteVoToSave(originalUrl, normalizedUrl);
             createAllowedSiteService.create(findAllowedGroup, voToSave);
         } catch (DataIntegrityViolationException e) {
+            throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+        }
+    }
+
+    private AllowedSiteVo determineAllowedSiteVoToSave(String originalUrl, String normalizedUrl) {
+        RecommendSite findRecommendSite = fetchRecommendSiteService.fetchBySiteUrl(normalizedUrl);
+        if (!Objects.isNull(findRecommendSite)) {
+            return AllowedSiteVo.of(
+                    findRecommendSite.getFavicon(),
+                    findRecommendSite.getSiteName(),
+                    findRecommendSite.getPageName(),
+                    normalizedUrl
+            );
+        }
+        AllowedSiteVo voToSave = fetchSiteInfoService.fetchSiteMetadataFromUrl(UrlUtils.normalizeUrlForFavicon(originalUrl));
+        String faviconToUse;
+        if (isFaviconValid(voToSave.favicon())) faviconToUse = voToSave.favicon();
+        else {
+            RecommendSite similarSiteCandidate = fetchRecommendSiteService.fetchBySiteUrlContaining(normalizedUrl);
+            faviconToUse = similarSiteCandidate.getFavicon();
+        }
+        return AllowedSiteVo.of(
+                faviconToUse,
+                voToSave.siteName(),
+                voToSave.pageName(),
+                normalizedUrl
+        );
+    }
+
+    private boolean isFaviconValid(String faviconUrl) {
+        return !Objects.isNull(faviconUrl) && !faviconUrl.isEmpty();
+    }
+
+    private void checkDuplicateAllowedSite(String normalizedUrl, Long allowedGroupId) {
+        AllowedSite existingSite = fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(normalizedUrl, allowedGroupId);
+        if (!Objects.isNull(existingSite)) {
             throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
         }
     }
