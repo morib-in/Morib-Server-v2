@@ -10,4 +10,5 @@ public interface FetchAllowedSiteService {
     List<AllowedSite> fetchByDomainContaining(Long allowedGroupId, String topDomainUrl);
     AllowedSite fetchBySiteUrlAndAllowedGroupId(String siteUrl, Long allowedGroupId);
     AllowedSite fetchBySiteUrlContainingAndAllowedGroupId(String siteUrl, Long allowedGroupId);
+    List<AllowedSite> fetchByAllowedGroupId(Long allowedGroupId);
 }

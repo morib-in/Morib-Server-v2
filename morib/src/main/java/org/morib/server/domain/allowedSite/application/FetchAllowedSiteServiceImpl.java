@@ -33,6 +33,11 @@ public class FetchAllowedSiteServiceImpl implements FetchAllowedSiteService{
     }
 
     @Override
+    public List<AllowedSite> fetchByAllowedGroupId(Long allowedGroupId) {
+        return allowedSiteRepository.findByAllowedGroupId(allowedGroupId);
+    }
+
+    @Override
     public AllowedSite fetchById(Long id) {
         return allowedSiteRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(ErrorMessage.NOT_FOUND)
