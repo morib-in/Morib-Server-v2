@@ -95,7 +95,8 @@ public class ModalViewFacade {
                         user,
                         fetchTimerService.sumElapsedTimeByUser(user, LocalDate.now()),
                         healthCheckController.isUserActive(user.getId())))
-                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed())
+                .sorted(Comparator.comparing(FetchRelationshipResponseDto::isOnline).reversed()
+                        .thenComparing(FetchRelationshipResponseDto::elapsedTime).reversed())
                 .toList();
     }
 
