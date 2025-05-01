@@ -1,59 +1,16 @@
-# Morib
-_당신의 온전한 몰입을 도와줄 작업 공간, **Morib**_
+<img width="1920" alt="커버" src="https://github.com/user-attachments/assets/ec6d9420-5747-490d-9667-31ee18ab80b2" />
+
+
+![landingpage_desktop](https://github.com/user-attachments/assets/8a585149-94ce-4f9e-a2f6-f28651f778c3)
+
 
 <br>
 
-할 일에 필요한 모립 세트를 등록하고, 그 이외의 방해 요소로부터 자유로워지세요.
+## ERD
+![moribdb_dev](https://github.com/user-attachments/assets/8644af83-7d61-442c-b408-77c6c387d3f0)
 
-### 1️⃣ 간편한 모립 세트
-할 일에 몰입하는 데에 필요한 사이트 Url을 입력해서 모립 세트를 등록해보세요. 이미 열어놓은 웹사이트에서도 간편하게 모립 세트를 등록할 수 있어요.
+## Architecture
 
-### 2️⃣ 온전한 몰입을 위한 타이머
-틀어놓기만 하고 시간이 흘러가는 타이머는 이제 그만! 당신의 몰입 여부에 따라 정확한 시간이 카운트되는 타이머가 여러분의 몰입을 도와줘요.
-
-### 3️⃣ 몰입하되, 고립되지 않는
-친구를 추가하고 몰입 현황을 공유하며 동기부여 받으세요. 친구의 온라인/오프라인 여부 뿐만 아니라 몰입 시간 및 작업 내용을 공유할 수 있어요.
-
-<br>
-
-## 🧑🏻‍💻 Contributors
-
-
-
-
-|<img src="https://github.com/HanIpBoy/Documents/blob/master/%EC%9D%B4%EB%AA%A8%EC%A7%80/%EC%9C%A0%EC%98%81%EC%9E%AC%20%EC%9D%B4%EB%AA%A8%EC%A7%80.png" width=200>|<img src="https://github.com/user-attachments/assets/f862afb7-9f46-4c0e-9488-b67a262f572d" width=200>|
-|:--:|:--:|
-|**영재**|**효준**|
-|[@geniusYoo](https://github.com/geniusYoo)|[@khyojun](https://github.com/khyojun)|
-|Backend|Backend| 
-
-<br>
-
-## 🗂️ Foldering
-```
-┗ 📂main/java/org/morib/server
-┃ ┣ 📂annotation
-┃ ┣ 📂api
-┃ ┃ ┣ 📂homeView
-┃ ┃ ┣ 📂modalView
-┃ ┃ ┗ 📂timerView
-┃ ┣ 📂domain
-┃ ┃ ┣ 📂allowedSite
-┃ ┃ ┣ 📂category
-┃ ┃ ┣ 📂relationship
-┃ ┃ ┣ 📂task
-┃ ┃ ┣ 📂timer
-┃ ┃ ┣ 📂todo
-┃ ┃ ┗ 📂user
-┃ ┣ 📂global
-```
-<br>
-
-## 📉 Architecture
-1차 아키텍처
-
-![architect](https://github.com/user-attachments/assets/56334adf-d315-49b2-88e1-4f6c26623cdd)
-
-
+<img width="613" alt="스크린샷 2025-05-01 17 52 50" src="https://github.com/user-attachments/assets/3b747d3f-7694-405c-88fa-1302b93550b3" />
 
 
