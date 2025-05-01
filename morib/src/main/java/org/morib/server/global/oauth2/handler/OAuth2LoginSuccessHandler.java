@@ -49,7 +49,9 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
-
+        log.info("OAuth2 Request URI : " + request.getRequestURI());
+        log.info("OAuth2 Query String : " + request.getQueryString());
+        log.info("OAuth2 Request URL : " + request.getRequestURL());
         try {
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
             User findUser = userRepository.findById(oAuth2User.getUserId())
@@ -76,10 +78,11 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         String redirectUri = UriComponentsBuilder.fromUriString(secretProperties.getClientRedirectUriProd())
                 .queryParam(IS_ONBOARDING_COMPLETED, isOnboardingCompleted)
                 .queryParam(ACCESS_TOKEN_SUBJECT, accessToken)
+                .queryParam(REFRESH_TOKEN_SUBJECT, refreshToken)
                 .build()
                 .toUri()
                 .toString();
-        response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
+//        response.addCookie(dataUtils.getCookieForToken(REFRESH_TOKEN_SUBJECT, refreshToken));
         response.sendRedirect(redirectUri);
     }
 
