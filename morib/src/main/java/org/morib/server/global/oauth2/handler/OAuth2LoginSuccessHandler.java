@@ -51,7 +51,6 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserRepository userRepository;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
     private final SecretProperties secretProperties;
-    private final DataUtils dataUtils;
     private final FetchUserService fetchUserService;
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -63,28 +62,30 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        OAuth2AuthorizationRequest authorizationRequest = this.authorizationRequestRepository.loadAuthorizationRequest(request);
         String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
 
         String clientType = "web"; // 기본값
         try {
-            String encodedStateFromSession = authorizationRequest.getState(); // 세션에 저장된 state (우리가 만든 인코딩된 JSON)
-            byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromSession);
-            String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
-            Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
+            if (!StringUtils.hasText(encodedStateFromRequest)) {
+                log.warn("State parameter is missing or invalid. Cannot determine client type. Defaulting to 'web'.");
+            } else {
+                byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromRequest);
+                String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
+                Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
 
-            clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
-            String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
-            log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
+                clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
+                String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
+                log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
 
-            CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-            User findUser = userRepository.findById(oAuth2User.getUserId())
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-            if(oAuth2User.getRole() == Role.GUEST) { // 회원 가입
-                findUser.authorizeUser();
+                CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+                User findUser = userRepository.findById(oAuth2User.getUserId())
+                        .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+                if (oAuth2User.getRole() == Role.GUEST) { // 회원 가입
+                    findUser.authorizeUser();
+                }
+                // 아니면 로그인으로 바로 직행
+                loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
             }
-            // 아니면 로그인으로 바로 직행
-            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } finally {
