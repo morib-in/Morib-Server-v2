@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
@@ -50,7 +51,9 @@ public class SecurityConfig {
                     oauth2.failureHandler(oAuth2LoginFailureHandler);
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
                     oauth2.authorizationEndpoint(auth -> auth
-                                    .authorizationRequestResolver(customAuthorizationRequestResolver));
+                            .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
+                            .authorizationRequestResolver(customAuthorizationRequestResolver));
+
                 });
 
         http.authorizeHttpRequests((auth) -> auth
