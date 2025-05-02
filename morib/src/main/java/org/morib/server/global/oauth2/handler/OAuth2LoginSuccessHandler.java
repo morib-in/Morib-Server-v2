@@ -1,5 +1,7 @@
 package org.morib.server.global.oauth2.handler;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,15 +23,24 @@ import org.morib.server.global.oauth2.CustomOAuth2User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
 
 import static org.morib.server.global.common.Constants.ACCESS_TOKEN_SUBJECT;
 import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
+import static org.morib.server.global.config.CustomAuthorizationRequestResolver.STATE_CLIENT_TYPE_KEY;
+import static org.morib.server.global.config.CustomAuthorizationRequestResolver.STATE_CSRF_KEY;
 
 @Slf4j
 @Component
@@ -43,16 +54,29 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final DataUtils dataUtils;
     private final FetchUserService fetchUserService;
     private final UserManager userManager;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    
+    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+
+
     @Override
     @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("OAuth2 Login 성공!");
-        log.info("OAuth2 Request URI : " + request.getRequestURI());
-        log.info("OAuth2 Query String : " + request.getQueryString());
-        log.info("OAuth2 Request URL : " + request.getRequestURL());
+
+        OAuth2AuthorizationRequest authorizationRequest = this.authorizationRequestRepository.loadAuthorizationRequest(request);
+        String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
+
+        String clientType = "web"; // 기본값
         try {
+            String encodedStateFromSession = authorizationRequest.getState(); // 세션에 저장된 state (우리가 만든 인코딩된 JSON)
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromSession);
+            String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
+            Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
+
+            clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
+            String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
+            log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
+
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
             User findUser = userRepository.findById(oAuth2User.getUserId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
@@ -60,13 +84,16 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
                 findUser.authorizeUser();
             }
             // 아니면 로그인으로 바로 직행
-            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted());
+            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
+        } finally {
+            // 사용 완료 후 세션에서 제거
+            this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isOnboardingCompleted) throws IOException {
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isOnboardingCompleted, String clientType) throws IOException {
         log.info("login success 진입");
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
@@ -75,7 +102,16 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
 
-        String redirectUri = UriComponentsBuilder.fromUriString(secretProperties.getClientRedirectUriProd())
+        String targetRedirectUri;
+        if ("electron".equalsIgnoreCase(clientType)) {
+            targetRedirectUri = secretProperties.getClientRedirectUriElectron(); // Electron 용 URI 프로퍼티 필요
+            log.info("Redirecting Electron client...");
+        } else {
+            targetRedirectUri = secretProperties.getClientRedirectUriProd(); // Web 용 URI
+            log.info("Redirecting Web client...");
+        }
+
+        String redirectUri = UriComponentsBuilder.fromUriString(targetRedirectUri)
                 .queryParam(IS_ONBOARDING_COMPLETED, isOnboardingCompleted)
                 .queryParam(ACCESS_TOKEN_SUBJECT, accessToken)
                 .queryParam(REFRESH_TOKEN_SUBJECT, refreshToken)
