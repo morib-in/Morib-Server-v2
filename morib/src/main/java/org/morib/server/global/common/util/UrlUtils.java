@@ -157,9 +157,6 @@ public class UrlUtils {
 
             // 호스트를 소문자로 변환하고 "www." 접두어 제거
             String host = url.getHost().toLowerCase();
-            if (host.startsWith("www.")) {
-                host = host.substring(4);
-            }
 
             // 포트: 기본 포트가 아니라면 포함 (예: https의 기본 포트 443)
             int port = url.getPort();
