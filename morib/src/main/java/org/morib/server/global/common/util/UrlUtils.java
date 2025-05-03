@@ -48,7 +48,12 @@ public class UrlUtils {
 
             InternetDomainName domainName = InternetDomainName.from(host);
             if (domainName.hasPublicSuffix()) {
-                return domainName.topPrivateDomain().toString();
+                InternetDomainName topPrivateDomain = domainName.topPrivateDomain();
+                if (!topPrivateDomain.parts().isEmpty()) {
+                    return topPrivateDomain.parts().get(0);
+                } else {
+                    return topPrivateDomain.toString();
+                }
             } else {
                 return normalizeHost(host);
             }
