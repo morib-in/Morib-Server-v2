@@ -283,6 +283,29 @@ public class AllowedGroupViewFacade {
     }
 
     public AllowedSiteVo fetchAllowedSiteInfoForOnBoard(String siteUrl) {
-        return fetchSiteInfoService.fetchSiteMetadataFromUrl(siteUrl);
+        String originalUrl = siteUrl;
+        String normalizedUrl = UrlUtils.normalizeUrl(originalUrl);
+        AllowedSiteVo voToSave;
+        try {
+            voToSave = determineAllowedSiteVoToSave(originalUrl, normalizedUrl);
+            if (voToSave.siteName().isEmpty() || voToSave.pageName().isEmpty()) {
+                return AllowedSiteVo.of(
+                        voToSave.favicon().isEmpty() ? "" : voToSave.favicon(),
+                        UrlUtils.getTopDomain(originalUrl),
+                        UrlUtils.getTopDomain(originalUrl),
+                        originalUrl
+                );
+            }
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+        } catch (Exception e) {
+            return AllowedSiteVo.of(
+                    "",
+                    UrlUtils.getTopDomain(originalUrl),
+                    UrlUtils.getTopDomain(originalUrl),
+                    originalUrl
+            );
+        }
+        return voToSave;
     }
 }
