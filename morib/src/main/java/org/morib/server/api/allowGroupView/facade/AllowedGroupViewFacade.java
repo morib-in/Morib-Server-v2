@@ -14,6 +14,7 @@ import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchSiteInfoService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
+import org.morib.server.domain.recentAllowedGroup.application.DeleteRecentAllowedGroupService;
 import org.morib.server.domain.recommendSite.application.FetchRecommendSiteService;
 import org.morib.server.domain.recommendSite.infra.RecommendSite;
 import org.morib.server.domain.user.UserManager;
@@ -170,9 +171,26 @@ public class AllowedGroupViewFacade {
         checkDuplicateAllowedSite(normalizedUrl, allowedGroupId);
         try {
             AllowedSiteVo voToSave = determineAllowedSiteVoToSave(originalUrl, normalizedUrl);
-            createAllowedSiteService.create(findAllowedGroup, voToSave);
+            if (voToSave.siteName().isEmpty() || voToSave.pageName().isEmpty()) {
+                AllowedSiteVo voToSaveIfNameIsEmpty = AllowedSiteVo.of(
+                        voToSave.favicon().isEmpty() ? "" : voToSave.favicon(),
+                        UrlUtils.getTopDomain(originalUrl),
+                        UrlUtils.getTopDomain(originalUrl),
+                        originalUrl
+                );
+                createAllowedSiteService.create(findAllowedGroup, voToSaveIfNameIsEmpty);
+            }
+            else createAllowedSiteService.create(findAllowedGroup, voToSave);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateResourceException(ErrorMessage.DUPLICATE_RESOURCE);
+        } catch (Exception e) {
+            AllowedSiteVo voToSave = AllowedSiteVo.of(
+                    "",
+                    UrlUtils.getTopDomain(originalUrl),
+                    UrlUtils.getTopDomain(originalUrl),
+                    originalUrl
+            );
+            createAllowedSiteService.create(findAllowedGroup, voToSave);
         }
     }
 
