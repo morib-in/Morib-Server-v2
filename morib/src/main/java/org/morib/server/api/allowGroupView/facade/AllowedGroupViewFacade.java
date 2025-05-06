@@ -176,7 +176,7 @@ public class AllowedGroupViewFacade {
                         voToSave.favicon().isEmpty() ? "" : voToSave.favicon(),
                         UrlUtils.getTopDomain(originalUrl),
                         UrlUtils.getTopDomain(originalUrl),
-                        originalUrl
+                        normalizedUrl
                 );
                 createAllowedSiteService.create(findAllowedGroup, voToSaveIfNameIsEmpty);
             }
@@ -188,7 +188,7 @@ public class AllowedGroupViewFacade {
                     "",
                     UrlUtils.getTopDomain(originalUrl),
                     UrlUtils.getTopDomain(originalUrl),
-                    originalUrl
+                    normalizedUrl
             );
             createAllowedSiteService.create(findAllowedGroup, voToSave);
         }
