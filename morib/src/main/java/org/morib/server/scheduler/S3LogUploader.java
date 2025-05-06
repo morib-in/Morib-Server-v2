@@ -55,8 +55,7 @@ public class S3LogUploader {
 
                 log.info("Successfully uploaded log file {} to S3.", logFileName);
 
-                // Optional: Uncomment to delete local file after successful upload
-                // deleteLocalFile(localLogFilePath);
+                 deleteLocalFile(localLogFilePath);
 
             } catch (S3Exception e) {
                 log.error("Error uploading log file {} to S3: {}", logFileName, e.awsErrorDetails().errorMessage(), e);
