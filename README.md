@@ -11,6 +11,6 @@
 
 ## Architecture
 
-<img width="613" alt="스크린샷 2025-05-01 17 52 50" src="https://github.com/user-attachments/assets/3b747d3f-7694-405c-88fa-1302b93550b3" />
+![image](https://github.com/user-attachments/assets/a509052f-64ac-45a5-98e2-381b56748ffc)
 
 
