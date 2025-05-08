@@ -33,6 +33,7 @@ import org.morib.server.domain.todo.infra.Todo;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.global.common.HealthCheckController;
+import org.morib.server.global.exception.InvalidStateException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,24 +122,6 @@ public class TimerViewFacade {
         TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, targetDate);
         timerSessionManager.handleHeartbeat(findTimerSession, now);
     }
-
-
-//
-
-    // ----------------------------------------------------------------------
-//    @Transactional
-//    public void saveTimerSession(Long userId, SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
-//        TimerSession findTimerSession = fetchTimerSessionService.fetchTimerSession(userId, saveTimerSessionRequestDto.targetDate());
-//        Category findCategory = fetchCategoryService.fetchByUserIdAndTaskId(userId, saveTimerSessionRequestDto.taskId());
-//        Timer findTimer = fetchTimerService.fetchByTaskIdAndTargetDate(saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.targetDate());
-//        timerManager.setElapsedTime(findTimer, saveTimerSessionRequestDto.elapsedTime());
-//
-//        if (findTimerSession == null) {
-//            createTimerSessionService.create(userId, findCategory.getName(), saveTimerSessionRequestDto.taskId(), saveTimerSessionRequestDto.elapsedTime(), saveTimerSessionRequestDto.timerStatus(), saveTimerSessionRequestDto.targetDate());
-//        } else {
-//            timerSessionManager.updateTimerSession(findTimerSession, saveTimerSessionRequestDto);
-//        }
-//    }
 
     @Transactional
     public TodoCardResponseDto fetchTodoCard(Long userId, LocalDate targetDate) {
