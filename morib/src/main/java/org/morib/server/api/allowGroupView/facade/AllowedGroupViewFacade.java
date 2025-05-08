@@ -258,10 +258,10 @@ public class AllowedGroupViewFacade {
         }
     }
 
-    public Map<InterestArea, List<RecommendSiteResponseDto>> fetchRecommendSitesOnboard() {
+    public Map<String, List<RecommendSiteResponseDto>> fetchRecommendSitesOnboard() {
         return fetchRecommendSiteService.fetchAll().stream()
                 .collect(Collectors.groupingBy(
-                        RecommendSite::getInterestArea,
+                        recommendSite -> recommendSite.getInterestArea().getInterestArea(),
                         Collectors.mapping(RecommendSiteResponseDto::from, Collectors.toList())
                 ));
     }
