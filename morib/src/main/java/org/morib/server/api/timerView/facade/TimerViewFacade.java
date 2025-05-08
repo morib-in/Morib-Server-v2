@@ -72,6 +72,7 @@ public class TimerViewFacade {
         if (findTimerSession == null || !Objects.equals(findTimerSession.getSelectedTask().getId(), requestDto.taskId())) {
             throw new NotFoundException(ErrorMessage.TIMER_SESSION_NOT_FOUND);
         }
+        if (Boolean.TRUE.equals(findTimerSession.getSelectedTask().getIsComplete())) throw new InvalidStateException(ErrorMessage.FAILED_TO_START_COMPLETED_TASK);
         timerSessionManager.run(findTimerSession, now);
     }
 
