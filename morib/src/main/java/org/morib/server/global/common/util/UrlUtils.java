@@ -15,6 +15,62 @@ public class UrlUtils {
             "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
     );
 
+    // 상위 도메인의 Full URL 반환. maps.naver.com -> https://naver.com
+    public static String getTopDomainUrl(String originalUrl) {
+        if (originalUrl == null || originalUrl.trim().isEmpty()) {
+            throw new InvalidURLException(ErrorMessage.URL_IS_EMPTY);
+        }
+
+        String urlToParse = originalUrl.trim();
+
+        if (!urlToParse.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
+            if (!urlToParse.startsWith("//")) {
+                urlToParse = "https://" + urlToParse;
+            } else {
+                urlToParse = "https:" + urlToParse;
+            }
+        }
+
+        try {
+            URI uri = new URI(urlToParse);
+            String host = uri.getHost();
+
+            if (host == null || host.isEmpty()) {
+                return normalizeUrl(originalUrl);
+            }
+
+            if ("localhost".equalsIgnoreCase(host)) {
+                return "http://localhost"; // 또는 http://localhost 등 요구사항에 맞게
+            }
+
+            // IP 주소 처리
+            if (IP_ADDRESS_PATTERN.matcher(host).matches()) {
+                return "https://" + host; // IP 주소에 https 붙여 반환
+            }
+
+            // Guava를 사용하여 도메인 분석
+            InternetDomainName domainName = InternetDomainName.from(host);
+
+            // 공개 접미사(public suffix)를 가지고 있는지 확인 (예: .com, .co.uk)
+            if (domainName.hasPublicSuffix()) {
+                // 최상위 등록 도메인 추출 (예: naver.com, google.co.uk)
+                InternetDomainName topPrivateDomain = domainName.topPrivateDomain();
+                // 추출된 도메인 문자열에 https:// 추가하여 반환
+                return "https://" + topPrivateDomain.toString();
+            } else {
+                // 공개 접미사가 없는 경우 (예: 내부망 호스트 이름)
+                // 이 경우, 호스트 이름 자체에 https:// 를 붙여 반환하거나 다른 규칙 적용 가능
+                return "https://" + normalizeHost(host);
+            }
+
+        } catch (URISyntaxException e) {
+            return normalizeUrl(originalUrl);
+        } catch (IllegalArgumentException e) {
+            return normalizeUrl(originalUrl);
+        }
+    }
+
+    // 상위 도메인만을 호출 maps.naver.com -> naver
     public static String getTopDomain(String originalUrl) {
         if (originalUrl == null || originalUrl.trim().isEmpty()) {
             throw new InvalidURLException(ErrorMessage.URL_IS_EMPTY);
