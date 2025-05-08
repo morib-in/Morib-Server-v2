@@ -54,7 +54,7 @@ public class TimerViewController {
 
     @PostMapping("/timer/select")
     public ResponseEntity<BaseResponse<?>> selectTimerInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                                           @Valid @RequestBody TimerRequestDto requestDto) { // @Valid 추가 가능
+                                                           @Valid @RequestBody TimerRequestDto requestDto) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         timerViewFacade.selectTimerInfo(userId, requestDto);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
@@ -67,27 +67,6 @@ public class TimerViewController {
         timerViewFacade.handleHeartbeat(userId, targetDate);
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
-
-    // ----------------------------------------------------------------------------------- //
-//    @PostMapping("/timer/sync")
-//    public ResponseEntity<BaseResponse<?>> saveTimerSession(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-//                                                            @Valid @RequestBody SaveTimerSessionRequestDto saveTimerSessionRequestDto) {
-//        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-//        timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
-//        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-//    }
-//
-//    @GetMapping("/timer/ping")
-//    public ResponseEntity<BaseResponse<?>> timerPing(@AuthenticationPrincipal CustomUserDetails customUserDetails,
-//                                                            @RequestParam Long taskId,
-//                                                            @RequestParam int elapsedTime,
-//                                                            @RequestParam TimerStatus timerStatus,
-//                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
-//        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-//        SaveTimerSessionRequestDto saveTimerSessionRequestDto = SaveTimerSessionRequestDto.of(taskId, elapsedTime, timerStatus, targetDate);
-//        timerViewFacade.saveTimerSession(userId, saveTimerSessionRequestDto);
-//        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-//    }
 
     @GetMapping("/timer/todo-card")
     public ResponseEntity<BaseResponse<?>> getTodoCards(@AuthenticationPrincipal CustomUserDetails customUserDetails,

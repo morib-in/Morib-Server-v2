@@ -119,5 +119,11 @@ public class GlobalExceptionHandler {
         log.error(">>> handle: MissingServletRequestParameterException, parameter name: {}", e.getParameterName());
         return ApiResponseUtil.failure(ErrorMessage.valueOf(e.getMessage()));
     }
+
+    @ExceptionHandler(InvalidStateException.class)
+    protected ResponseEntity<BaseResponse<?>> handleInvalidStateException(final InvalidStateException e) {
+        log.error(">>> handle: InvalidStateException ", e);
+        return ApiResponseUtil.failure(e.getErrorMessage());
+    }
 }
 

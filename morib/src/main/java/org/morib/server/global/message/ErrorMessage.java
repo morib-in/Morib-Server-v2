@@ -22,6 +22,7 @@ public enum ErrorMessage {
     TIMER_SESSION_NOT_FOUND(HttpStatus.BAD_REQUEST, "타이머 세션을 찾을 수 없습니다."),
     MISSING_REQUIRED_PARAMETER(HttpStatus.BAD_REQUEST, "필수 요청 파라미터가 누락되었습니다."),
     TARGET_DATE_IS_NOT_PRESENT(HttpStatus.BAD_REQUEST, "targetDate 날짜는 오늘이어야 합니다."),
+    FAILED_TO_START_COMPLETED_TASK(HttpStatus.BAD_REQUEST, "완료된 할 일은 시작할 수 없습니다."),
     /**
      * 401 Unauthorized
      */

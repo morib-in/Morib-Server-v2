@@ -2,6 +2,7 @@ package org.morib.server.api.loginView.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.loginView.dto.UserReissueResponseDto;
+import org.morib.server.api.loginView.dto.UserReissueTmpRequestDto;
 import org.morib.server.api.loginView.facade.UserAuthFacade;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
 import org.morib.server.global.common.BaseResponse;
@@ -32,6 +33,13 @@ public class UserAuthController {
         return ResponseEntity.status(SuccessMessage.SUCCESS.getHttpStatus())
                 .header(HttpHeaders.SET_COOKIE, buildCookieForRefreshToken(dto.refreshToken()).toString())
                 .body(BaseResponse.of(SuccessMessage.SUCCESS, UserReissueResponseDto.of(dto.accessToken())));
+    }
+
+    @PostMapping("/users/reissue/tmp")
+    public ResponseEntity<BaseResponse<?>> reissueTemporaryApi(
+            @RequestBody UserReissueTmpRequestDto userReissueTmpRequestDto
+    ) {
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS, userAuthFacade.reissue(userReissueTmpRequestDto.refreshToken()));
     }
 
     @DeleteMapping("/users/withdraw")

@@ -246,7 +246,7 @@ public class AllowedGroupViewFacade {
         String topDomain = UrlUtils.getTopDomain(siteUrl);
         if (Objects.isNull(topDomain) || topDomain.isEmpty() || topDomain.equals("localhost")) return;
         List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByDomainContaining(allowedGroupId, topDomain);
-        if (findAllowedSites.size() > 1) mergeToOne(topDomain, findAllowedSites);
+        if (findAllowedSites.size() > 1) mergeToOne(UrlUtils.getTopDomainUrl(siteUrl), findAllowedSites);
     }
 
     public void mergeToOne(String topDomainUrl, List<AllowedSite> targetAllowedSites) {
@@ -258,10 +258,10 @@ public class AllowedGroupViewFacade {
         }
     }
 
-    public Map<InterestArea, List<RecommendSiteResponseDto>> fetchRecommendSitesOnboard() {
+    public Map<String, List<RecommendSiteResponseDto>> fetchRecommendSitesOnboard() {
         return fetchRecommendSiteService.fetchAll().stream()
                 .collect(Collectors.groupingBy(
-                        RecommendSite::getInterestArea,
+                        recommendSite -> recommendSite.getInterestArea().getInterestArea(),
                         Collectors.mapping(RecommendSiteResponseDto::from, Collectors.toList())
                 ));
     }
