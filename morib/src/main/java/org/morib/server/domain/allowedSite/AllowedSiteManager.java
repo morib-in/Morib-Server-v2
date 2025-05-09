@@ -14,7 +14,7 @@ public class AllowedSiteManager {
     }
 
     @Transactional
-    public void updateAllowedSiteInfo(AllowedSite allowedSite, AllowedSiteVo allowedSiteVo) {
-        allowedSite.updateAllowedSiteInfo(allowedSiteVo.favicon(), allowedSiteVo.siteName(), allowedSiteVo.pageName(), allowedSiteVo.siteUrl());
+    public void updateAllowedSiteInfo(AllowedSite allowedSite, AllowedSiteVo allowedSiteVo, String siteUrl) {
+        allowedSite.updateAllowedSiteInfo(allowedSiteVo.favicon(), allowedSiteVo.siteName(), allowedSiteVo.pageName(), siteUrl);
     }
 }
