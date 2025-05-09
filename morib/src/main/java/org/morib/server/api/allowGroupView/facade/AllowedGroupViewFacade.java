@@ -243,6 +243,7 @@ public class AllowedGroupViewFacade {
 
     @Transactional
     public void mergeToTopDomain(Long allowedGroupId, String siteUrl) {
+        if (fetchAllowedSiteService.fetchBySiteUrlAndAllowedGroupId(siteUrl, allowedGroupId) == null) throw new NotFoundException(ErrorMessage.NOT_FOUND);
         String topDomain = UrlUtils.getTopDomain(siteUrl);
         if (Objects.isNull(topDomain) || topDomain.isEmpty() || topDomain.equals("localhost")) return;
         List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByDomainContaining(allowedGroupId, topDomain);
