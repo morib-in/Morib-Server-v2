@@ -14,7 +14,6 @@ import org.morib.server.domain.allowedSite.application.DeleteAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchAllowedSiteService;
 import org.morib.server.domain.allowedSite.application.FetchSiteInfoService;
 import org.morib.server.domain.allowedSite.infra.AllowedSite;
-import org.morib.server.domain.recentAllowedGroup.application.DeleteRecentAllowedGroupService;
 import org.morib.server.domain.recommendSite.application.FetchRecommendSiteService;
 import org.morib.server.domain.recommendSite.infra.RecommendSite;
 import org.morib.server.domain.user.UserManager;
@@ -24,6 +23,7 @@ import org.morib.server.domain.user.infra.type.InterestArea;
 import org.morib.server.global.common.ConnectType;
 import org.morib.server.global.common.util.UrlUtils;
 import org.morib.server.global.exception.DuplicateResourceException;
+import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.message.ErrorMessage;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -247,13 +247,13 @@ public class AllowedGroupViewFacade {
         String topDomain = UrlUtils.getTopDomain(siteUrl);
         if (Objects.isNull(topDomain) || topDomain.isEmpty() || topDomain.equals("localhost")) return;
         List<AllowedSite> findAllowedSites = fetchAllowedSiteService.fetchByDomainContaining(allowedGroupId, topDomain);
-        if (findAllowedSites.size() > 1) mergeToOne(UrlUtils.getTopDomainUrl(siteUrl), findAllowedSites);
+        if (!findAllowedSites.isEmpty()) mergeToOne(UrlUtils.getTopDomainUrl(siteUrl), findAllowedSites);
     }
 
     public void mergeToOne(String topDomainUrl, List<AllowedSite> targetAllowedSites) {
         List<AllowedSite> sortedTargetAllowedSites = targetAllowedSites.stream().sorted(Comparator.comparing(AllowedSite::getSiteUrl)).toList();
         AllowedSite baseAllowedSite = sortedTargetAllowedSites.get(0);
-        allowedSiteManager.updateAllowedSiteInfo(baseAllowedSite, fetchSiteInfoService.fetchSiteMetadataFromUrl(topDomainUrl));
+        allowedSiteManager.updateAllowedSiteInfo(baseAllowedSite, fetchSiteInfoService.fetchSiteMetadataFromUrl(topDomainUrl), UrlUtils.normalizeUrl(topDomainUrl));
         for (int i = 1; i < sortedTargetAllowedSites.size(); i++) {
             deleteAllowedSiteService.delete(sortedTargetAllowedSites.get(i).getId());
         }
