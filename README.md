@@ -13,6 +13,7 @@
 <br>
 
 ## Archieve
-- [홈 뷰 API 응답 속도, pt-query-digest와 Sentry로 81% 개선기](https://velog.io/@geniuus/%ED%99%88-%EB%B7%B0-API-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-pt-query-digest%EC%99%80-Sentry%EB%A1%9C-81-%EA%B0%9C%EC%84%A0%EA%B8%B0)
-- [SSE의 배신? OutOfMemoryError와의 전쟁, 그리고 Polling으로의 전환](https://velog.io/@geniuus/SSE%EC%9D%98-%EB%B0%B0%EC%8B%A0-OutOfMemoryError%EC%99%80%EC%9D%98-%EC%A0%84%EC%9F%81-%EA%B7%B8%EB%A6%AC%EA%B3%A0-Polling%EC%9C%BC%EB%A1%9C%EC%9D%98-%EC%A0%84%ED%99%98)
+- [홈 뷰 API 응답 속도, pt-query-digest와 Sentry로 81% 개선](https://velog.io/@geniuus/%ED%99%88-%EB%B7%B0-API-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-pt-query-digest%EC%99%80-Sentry%EB%A1%9C-81-%EA%B0%9C%EC%84%A0%EA%B8%B0)
+- [SSE -> Polling 방식 전환](https://velog.io/@geniuus/SSE%EC%9D%98-%EB%B0%B0%EC%8B%A0-OutOfMemoryError%EC%99%80%EC%9D%98-%EC%A0%84%EC%9F%81-%EA%B7%B8%EB%A6%AC%EA%B3%A0-Polling%EC%9C%BC%EB%A1%9C%EC%9D%98-%EC%A0%84%ED%99%98)
 - [타이머 동작 방식 개선](https://github.com/morib-in/Morib-Server-v2/wiki/%ED%83%80%EC%9D%B4%EB%A8%B8-%EB%8F%99%EC%9E%91-%EB%B0%A9%EC%8B%9D-%EA%B0%9C%EC%84%A0)
+- [아키텍처 개선 (v1 -> v2)](https://github.com/morib-in/Morib-Server-v2/wiki/%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-%EA%B0%9C%EC%84%A0-(v1-%E2%80%90--v2))
