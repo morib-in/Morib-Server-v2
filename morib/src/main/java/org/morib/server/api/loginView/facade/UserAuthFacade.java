@@ -8,6 +8,7 @@ import org.morib.server.domain.relationship.infra.Relationship;
 import org.morib.server.domain.relationship.infra.RelationshipRepository;
 import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
+import org.morib.server.domain.user.application.service.CreateWaitingUserWindowService;
 import org.morib.server.domain.user.application.service.DeleteUserService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.application.service.ReissueTokenService;
@@ -27,9 +28,9 @@ public class UserAuthFacade {
     private final DeleteUserService deleteUserService;
     private final UserManager userManager;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final DeleteRelationshipService deleteRelationshipService;
     private final FetchRelationshipService fetchRelationshipService;
     private final RelationshipRepository relationshipRepository;
+    private final CreateWaitingUserWindowService createWaitingUserWindowService;
 
     public ReissueTokenServiceDto reissue(String refreshToken) {
         return reissueTokenService.reissue(refreshToken);
@@ -53,5 +54,9 @@ public class UserAuthFacade {
         deleteUserService.delete(userId);
     }
 
+    @Transactional
+    public void createWaitingUserWindow(String email) {
+        createWaitingUserWindowService.createWaitingUserWindow(email);
+    }
 
 }

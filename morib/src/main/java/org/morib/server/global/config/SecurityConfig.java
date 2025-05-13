@@ -57,7 +57,7 @@ public class SecurityConfig {
                 });
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico", "/profile", "/health,", "/actuator/**", "/error", "/api/v2/s3/**").permitAll()
+                .requestMatchers("/","/css/**","/images/**","/js/**","/favicon.ico", "/profile", "/health,", "/actuator/**", "/error", "/api/v2/s3/**", "/api/v2/waiting/windows").permitAll()
                 .anyRequest().authenticated()
         );
         http.addFilterAfter(jwtAuthenticationFilter(), LogoutFilter.class);

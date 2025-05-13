@@ -3,6 +3,7 @@ package org.morib.server.api.loginView.controller;
 import lombok.RequiredArgsConstructor;
 import org.morib.server.api.loginView.dto.UserReissueResponseDto;
 import org.morib.server.api.loginView.dto.UserReissueTmpRequestDto;
+import org.morib.server.api.loginView.dto.WaitingUserWindowRequestDto;
 import org.morib.server.api.loginView.facade.UserAuthFacade;
 import org.morib.server.domain.user.application.dto.ReissueTokenServiceDto;
 import org.morib.server.global.common.BaseResponse;
@@ -46,6 +47,12 @@ public class UserAuthController {
     public ResponseEntity<BaseResponse<?>> withdraw(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
         userAuthFacade.withdraw(userId);
+        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
+    }
+
+    @PostMapping("/waiting/windows")
+    public ResponseEntity<BaseResponse<?>> createWaitingUserWindow(@RequestBody WaitingUserWindowRequestDto waitingUserWindowRequestDto) {
+        userAuthFacade.createWaitingUserWindow(waitingUserWindowRequestDto.email());
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
