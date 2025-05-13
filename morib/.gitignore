@@ -40,8 +40,12 @@ out/
 *.yaml
 
 ## log
-
 *.log
+
 ## secret properties
 **/src/main/java/org/morib/server/global/common/SecretProperties.java
 **/src/main/java/org/morib/server/global/sse/**
+
+## for load test
+**/src/main/java/org/morib/server/global/common/TestTokenDtos.java
+**/src/main/java/org/morib/server/global/common/TestTokenController.java
