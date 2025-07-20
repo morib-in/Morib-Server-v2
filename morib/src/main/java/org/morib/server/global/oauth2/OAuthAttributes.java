@@ -26,9 +26,9 @@ public class OAuthAttributes {
         return ofGoogle(userNameAttributeName, attributes);
     }
 
-    public static OAuthAttributes ofApple(Platform platform, String userNameAttributeName, Map<String, Object> attributes){
+    public static OAuthAttributes ofApple(Platform platform, Map<String, Object> attributes){
         return OAuthAttributes.builder()
-            .nameAttributeKey(userNameAttributeName)
+            .nameAttributeKey("sub")
             .oauth2UserInfo(new AppleOAuth2UserInfo(attributes))
             .build();
     }
