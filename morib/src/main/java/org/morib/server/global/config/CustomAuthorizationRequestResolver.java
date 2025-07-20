@@ -62,6 +62,15 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     private OAuth2AuthorizationRequest customAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
 
+
+        if(authorizationRequest.getAttribute("registration_id").equals("apple")) {
+            log.info("now in here before return apple social login redirection");
+
+            return OAuth2AuthorizationRequest.from(authorizationRequest)
+                .redirectUri("https://api.morib.in/login/oauth2/code/apple")
+                .build();
+        }
+
         String clientType = request.getParameter(CLIENT_TYPE_PARAM);
         // clientType 파라미터가 없으면 기본값 "web" 사용
         if (!StringUtils.hasText(clientType)) {
