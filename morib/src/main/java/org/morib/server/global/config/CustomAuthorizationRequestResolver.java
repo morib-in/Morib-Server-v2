@@ -62,11 +62,13 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     private OAuth2AuthorizationRequest customAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
 
+        String originalState = authorizationRequest.getState();
 
         if(authorizationRequest.getAttribute("registration_id").equals("apple")) {
             log.info("now in here before return apple social login redirection");
-
+            log.info("original state: {}", originalState);
             return OAuth2AuthorizationRequest.from(authorizationRequest)
+                .state(originalState)
                 .redirectUri(authorizationRequest.getRedirectUri())
                 .build();
         }
@@ -77,7 +79,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             clientType = "web";
         }
 
-        String originalState = authorizationRequest.getState();
 
         Map<String, String> newStateMap = new HashMap<>();
         newStateMap.put(STATE_CSRF_KEY, originalState);
