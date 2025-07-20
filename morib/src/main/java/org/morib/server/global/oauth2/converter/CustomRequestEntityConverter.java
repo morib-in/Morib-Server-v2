@@ -95,6 +95,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
 	private PrivateKey getPrivateKey() throws IOException {
 
+		log.info("loading private key in path {}", path);
 		ClassPathResource resource = new ClassPathResource(path);
 
 		InputStream in = resource.getInputStream();

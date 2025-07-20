@@ -67,7 +67,7 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             log.info("now in here before return apple social login redirection");
 
             return OAuth2AuthorizationRequest.from(authorizationRequest)
-                .redirectUri("https://api.morib.in/login/oauth2/code/apple")
+                .redirectUri(authorizationRequest.getRedirectUri())
                 .build();
         }
 
