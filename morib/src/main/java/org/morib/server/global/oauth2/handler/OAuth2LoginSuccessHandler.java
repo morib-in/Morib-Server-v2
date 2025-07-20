@@ -63,21 +63,26 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
-
+        log.info("OAuth2LoginSuccessHandler onAuthenticationSuccess");
         String clientType = "web"; // 기본값
         try {
             if (!StringUtils.hasText(encodedStateFromRequest)) {
                 log.warn("State parameter is missing or invalid. Cannot determine client type. Defaulting to 'web'.");
             } else {
+
+                log.info("now in else phase");
                 byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromRequest);
                 String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
                 Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
 
+                log.info("now before clientType");
                 clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
                 String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
                 log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
 
                 CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+
+                log.info("now find oAuth2User {}", oAuth2User);
                 User findUser = userRepository.findById(oAuth2User.getUserId())
                         .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
                 if (oAuth2User.getRole() == Role.GUEST) { // 회원 가입
