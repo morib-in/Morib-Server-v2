@@ -14,6 +14,7 @@ public final class Constants {
     public static final String RECEIVE = "receive";
     public static final String INVALID_REFRESH_TOKEN = "invalid";
     public static final String GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
+    public static final String APPLE_REVOKE_URL = "https://appleid.apple.com/auth/revoke";
     public static final int MAX_VISIBLE_ALLOWED_SERVICES = 5;
 
     // SSE 관련 상수들

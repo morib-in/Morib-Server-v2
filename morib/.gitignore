@@ -45,6 +45,8 @@ out/
 ## secret properties
 **/src/main/java/org/morib/server/global/common/SecretProperties.java
 **/src/main/java/org/morib/server/global/sse/**
+/src/main/resources/key/**
+
 
 ## for load test
 **/src/main/java/org/morib/server/global/common/TestTokenDtos.java
