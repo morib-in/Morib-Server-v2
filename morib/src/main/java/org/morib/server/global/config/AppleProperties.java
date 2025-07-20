@@ -14,8 +14,9 @@ public class AppleProperties {
 
 	private String path;
 	private String url;
-	private String cid;
-	private String tid;
-	private String kid;
+	private String client_id;
+	private String team_id;
+	private String key_id;
+	private String bundle_id;
 
 }

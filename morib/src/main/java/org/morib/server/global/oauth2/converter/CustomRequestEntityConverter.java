@@ -46,10 +46,10 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 	public CustomRequestEntityConverter(AppleProperties appleProperties) {
 		this.defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
 		this.path = appleProperties.getPath();
-		this.keyId=appleProperties.getKid();
-		this.clientId= appleProperties.getCid();
+		this.keyId=appleProperties.getKey_id();
+		this.clientId= appleProperties.getClient_id();
 		this.url = appleProperties.getUrl();
-		this.teamId = appleProperties.getTid();
+		this.teamId = appleProperties.getTeam_id();
 	}
 
 	@Override
