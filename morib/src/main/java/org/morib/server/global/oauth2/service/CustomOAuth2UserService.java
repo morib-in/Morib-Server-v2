@@ -75,7 +75,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
 			attributes = decodeJwtTokenPayload(idToken);
 			log.info("attributes was this {}", attributes);
-			oAuthAttributes = OAuthAttributes.ofApple(platform, (String)attributes.get("email"),
+			oAuthAttributes = OAuthAttributes.ofApple(platform,
 				attributes);
 			principalName = oAuthAttributes.getOauth2UserInfo().getName();
 			log.info("principalName was this {}", principalName);
