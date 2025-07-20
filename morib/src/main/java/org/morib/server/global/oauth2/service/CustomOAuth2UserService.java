@@ -61,26 +61,29 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		log.info("CustomOAuth2UserService.loadUser() 실행 - OAuth2 로그인 요청 진입");
 		OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-		OAuth2User oAuth2User = delegate.loadUser(userRequest);
+		OAuth2User oAuth2User;
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
 		Platform platform = getSocialType(registrationId);
-		String principalName = (String)oAuth2User.getAttributes().get("sub");
-		String userNameAttributeName = userRequest.getClientRegistration()
-			.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 		OAuthAttributes oAuthAttributes;
 		Map<String, Object> attributes;
-
+		String principalName;
 		if (registrationId.equals("apple")) {
 			log.info("[now in apple social login]");
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
 			attributes = decodeJwtTokenPayload(idToken);
-			oAuthAttributes = OAuthAttributes.ofApple(platform, userNameAttributeName,
+			log.info("attributes was this {}", attributes);
+			oAuthAttributes = OAuthAttributes.ofApple(platform, "",
 				attributes);
-
+			principalName = oAuthAttributes.getOauth2UserInfo().getName();
+			log.info("principalName was this {}", principalName);
 			log.info("now idToken {}, now attributes {}, now oAuthAttributes was this {}", idToken, attributes, oAuthAttributes);
 		}else{
-			 attributes = oAuth2User.getAttributes();
-			 oAuthAttributes = OAuthAttributes.of(platform, userNameAttributeName, attributes);
+			oAuth2User = delegate.loadUser(userRequest);
+			String userNameAttributeName = userRequest.getClientRegistration()
+				.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+			principalName = (String)oAuth2User.getAttributes().get("sub");
+			attributes = oAuth2User.getAttributes();
+			oAuthAttributes = OAuthAttributes.of(platform, userNameAttributeName, attributes);
 		}
 
 		User createdUser = getUser(oAuthAttributes, platform);
