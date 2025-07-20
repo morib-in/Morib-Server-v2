@@ -55,6 +55,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 	@Override
 	public RequestEntity<?> convert(OAuth2AuthorizationCodeGrantRequest req) {
 
+		log.info("now request was this req {}", req);
 		RequestEntity<?> entity= defaultConverter.convert(req);
 
 		String registrationId = req.getClientRegistration().getRegistrationId();
@@ -63,6 +64,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 
 		if(registrationId.contains("apple")) {
 			try {
+				log.info("now made apple client secret");
 				params.add("client_secret", createClientSecret());
 				log.info("now in apple social login request params {}", params);
 			} catch (IOException e) {
