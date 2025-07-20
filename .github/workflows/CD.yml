@@ -37,7 +37,15 @@ jobs:
           echo "${{ secrets.CD_APPLICATION }}" > ./application.yml
           cat ./application.yml
         working-directory: ${{ env.working-directory }}
-        
+      - name: apple_key 생성
+        run: |
+          mkdir -p ./morib/src/main/resources/key cd $_
+          touch ./${{secrets.APPLE_KEY_FILE}}
+          echo "${{secrets.APPLE_KEY_CONTENT}}" > ./${{secrets.APPLE_KEY_FILE}}
+          cat ./${{secrets.APPLE_KEY_FILE}}
+          echo "now apple key create success!"
+        working-directory: ${{ env.working-directory }}
+
       # - name: logback-spring.xml 생성
       #   run: |
       #     cd ./morib/src/main/resources
