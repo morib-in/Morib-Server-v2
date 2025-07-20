@@ -29,6 +29,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -63,6 +64,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 		OAuth2User oAuth2User;
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
+		log.info("show userRequest {}", userRequest);
+		log.info("now additional parameter was this {}", userRequest.getAdditionalParameters());
 		Platform platform = getSocialType(registrationId);
 		OAuthAttributes oAuthAttributes;
 		Map<String, Object> attributes;
@@ -72,7 +75,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
 			attributes = decodeJwtTokenPayload(idToken);
 			log.info("attributes was this {}", attributes);
-			oAuthAttributes = OAuthAttributes.ofApple(platform, "",
+			oAuthAttributes = OAuthAttributes.ofApple(platform, (String)attributes.get("email"),
 				attributes);
 			principalName = oAuthAttributes.getOauth2UserInfo().getName();
 			log.info("principalName was this {}", principalName);
