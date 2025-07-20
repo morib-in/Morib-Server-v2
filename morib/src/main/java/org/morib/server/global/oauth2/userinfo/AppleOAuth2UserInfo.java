@@ -10,12 +10,12 @@ public class AppleOAuth2UserInfo extends OAuth2UserInfo {
 
 	@Override
 	public String getId() {
-		return (String) attributes.get("sub");
+		return (String) attributes.get("email");
 	}
 
 	@Override
 	public String getName() {
-		return (String) attributes.get("name");
+		return (String) attributes.get("email");
 	}
 
 	@Override
