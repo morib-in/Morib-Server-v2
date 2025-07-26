@@ -30,7 +30,6 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 
 
 	private final CustomRequestEntityConverter customRequestEntityConverter;
-	private final UserRepository userRepository;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -61,7 +60,6 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 			String accessToken = (String) tokenResponse.get("access_token");
 			String refreshToken = (String) tokenResponse.get("refresh_token");
 			String idToken = (String) tokenResponse.get("id_token");
-			String tokenType = (String) tokenResponse.get("token_type");
 			Integer expiresIn = (Integer) tokenResponse.get("expires_in");
 
 			log.info("🎯 Apple token response - access: {}, refresh: {}, id: {}",
@@ -79,7 +77,6 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 				log.info("tokenResponse: {}", objectMapper.writeValueAsString(tokenResponse));
 			}
 
-			// Spring Security OAuth2AccessTokenResponse 객체로 변환
 			return OAuth2AccessTokenResponse.withToken(accessToken)
 				.tokenType(OAuth2AccessToken.TokenType.BEARER)
 				.expiresIn(expiresIn != null ? expiresIn : 3600)

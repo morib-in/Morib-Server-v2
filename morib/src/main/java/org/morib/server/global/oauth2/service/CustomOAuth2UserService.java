@@ -73,6 +73,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		if (registrationId.equals("apple")) {
 			log.info("[now in apple social login]");
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
+			String refresgToken = userRequest.getAdditionalParameters().get("refresg_token").toString();
 			attributes = decodeJwtTokenPayload(idToken);
 			log.info("attributes was this {}", attributes);
 			oAuthAttributes = OAuthAttributes.ofApple(platform,
