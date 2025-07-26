@@ -93,6 +93,7 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             if(authorizationRequest.getAttribute("registration_id").equals("apple")) {
                 log.info("now in here before return apple social login redirection");
                 log.info("now redirect url was this : {}", authorizationRequest.getRedirectUri());
+
                 log.info("original state: {}", originalState);
                 return OAuth2AuthorizationRequest.from(authorizationRequest)
                     .state(encodedNewState)

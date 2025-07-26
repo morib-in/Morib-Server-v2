@@ -67,6 +67,7 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 				refreshToken != null ? "✓" : "✗",
 				idToken != null ? "✓" : "✗");
 
+
 			if(tokenResponse != null) {
 				log.info("tokenResponse: {}", objectMapper.writeValueAsString(tokenResponse));
 			}
