@@ -32,7 +32,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.context.annotation.Lazy;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -60,8 +60,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    @Lazy
-    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository;
+
 
 
     @Override
@@ -69,7 +68,12 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
-        log.info("OAuth2LoginSuccessHandler onAuthenticationSuccess");
+        log.info("=== OAUTH2 CALLBACK RECEIVED ===");
+        log.info("Request URI: {}", request.getRequestURI());
+        log.info("Request Method: {}", request.getMethod());
+        log.info("Session ID: {}", request.getSession(false) != null ? request.getSession(false).getId() : "NO SESSION");
+        log.info("State from request: {}", encodedStateFromRequest);
+        log.info("All parameters: {}", request.getParameterMap());
         String clientType = "web"; // 기본값
         try {
             if (!StringUtils.hasText(encodedStateFromRequest)) {
@@ -100,8 +104,8 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         } catch (Exception e) {
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } finally {
-            // 사용 완료 후 세션에서 제거
-            this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
+            // Spring Security가 자동으로 authorization request를 정리하므로 별도 처리 불필요
+            log.debug("OAuth2 authentication success processing completed");
         }
     }
 

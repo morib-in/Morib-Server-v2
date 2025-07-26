@@ -81,9 +81,12 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             String newStateJson = objectMapper.writeValueAsString(newStateMap);
             String encodedNewState = Base64.getUrlEncoder().withoutPadding().encodeToString(newStateJson.getBytes(StandardCharsets.UTF_8));
 
-            log.debug("Original State (CSRF): {}", originalState);
-            log.debug("Client Type: {}", clientType);
-            log.debug("Encoded New State: {}", encodedNewState);
+            log.info("=== AUTHORIZATION REQUEST CREATION ===");
+            log.info("Registration ID: {}", authorizationRequest.getAttribute("registration_id"));
+            log.info("Original State (CSRF): {}", originalState);
+            log.info("Client Type: {}", clientType);
+            log.info("Encoded New State: {}", encodedNewState);
+            log.info("Request Session ID: {}", request.getSession(true).getId());
 
             Map<String, Object> additionalParameters =
                     new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
