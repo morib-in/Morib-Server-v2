@@ -58,10 +58,8 @@ public class SecurityConfig {
                     oauth2.failureHandler(oAuth2LoginFailureHandler);
                     oauth2.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient(customRequestEntityConverter())));
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
-                    oauth2.authorizationEndpoint(auth -> auth
-                            .authorizationRequestRepository(authorizationRequestRepository())
-                            .authorizationRequestResolver(customAuthorizationRequestResolver));
-
+                    // oauth2.authorizationEndpoint(auth -> auth
+                    //         .authorizationRequestResolver(customAuthorizationRequestResolver));
                 });
 
         http.authorizeHttpRequests((auth) -> auth
@@ -89,11 +87,6 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtService, userRepository, customJwtAuthenticationEntryPoint);
-    }
-
-    @Bean
-    public HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
-        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 
 }
