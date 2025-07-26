@@ -194,8 +194,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		try{
 			RestClient restClient = RestClient.create();
 
+			log.info("refreshToken was this : {}", refreshToken);
+
 			String requestBody = "token=" + refreshToken +
-				"&client_id=" + appleProperties.getClient_id() +  // getBundle_id() → getClient_id()
+				"&client_id=" + appleProperties.getClient_id() +
 				"&client_secret=" + createClientSecret() +
 				"&token_type_hint=refresh_token";
 
@@ -233,7 +235,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			.setIssuer(appleProperties.getTeam_id())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 + 5)))
-			.setAudience(APPLE_REVOKE_URL)
+			.setAudience(appleProperties.getUrl())
 			.setSubject(appleProperties.getClient_id())
 			.signWith(getPrivateKey(), SignatureAlgorithm.ES256)
 			.compact();
