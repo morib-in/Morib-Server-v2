@@ -95,10 +95,16 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
                 log.info("now redirect url was this : {}", authorizationRequest.getRedirectUri());
 
                 log.info("original state: {}", originalState);
+                log.info("encoded new state: {}", encodedNewState);
+                
+                // Apple의 경우 추가 파라미터를 Apple 스펙에 맞게 조정
+                Map<String, Object> appleAdditionalParameters = new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
+                appleAdditionalParameters.put("response_mode", "form_post");
+                
                 return OAuth2AuthorizationRequest.from(authorizationRequest)
                     .state(encodedNewState)
                     .redirectUri(authorizationRequest.getRedirectUri())
-                    .additionalParameters(additionalParameters)
+                    .additionalParameters(appleAdditionalParameters)
                     .build();
             }
 
