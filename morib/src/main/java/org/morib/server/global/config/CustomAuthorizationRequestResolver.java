@@ -82,7 +82,6 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             String encodedNewState = Base64.getUrlEncoder().withoutPadding().encodeToString(newStateJson.getBytes(StandardCharsets.UTF_8));
 
             log.info("=== AUTHORIZATION REQUEST CREATION ===");
-            log.info("Registration ID: {}", authorizationRequest.getAttribute("registration_id"));
             log.info("Original State (CSRF): {}", originalState);
             log.info("Client Type: {}", clientType);
             log.info("Encoded New State: {}", encodedNewState);

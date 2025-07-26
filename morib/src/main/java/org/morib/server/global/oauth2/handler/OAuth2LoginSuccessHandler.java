@@ -60,6 +60,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
+    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
 
 
 
@@ -79,7 +80,6 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
             if (!StringUtils.hasText(encodedStateFromRequest)) {
                 log.warn("State parameter is missing or invalid. Cannot determine client type. Defaulting to 'web'.");
             } else {
-
                 log.info("now in else phase");
                 byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromRequest);
                 String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
@@ -89,23 +89,25 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
                 clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
                 String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
                 log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
-
-                CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-
-                log.info("now find oAuth2User {}", oAuth2User);
-                User findUser = userRepository.findById(oAuth2User.getUserId())
-                        .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-                if (oAuth2User.getRole() == Role.GUEST) { // 회원 가입
-                    findUser.authorizeUser();
-                }
-                // 아니면 로그인으로 바로 직행
-                loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
             }
+
+            CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+            log.info("now find oAuth2User {}", oAuth2User);
+            
+            User findUser = userRepository.findById(oAuth2User.getUserId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+            if (oAuth2User.getRole() == Role.GUEST) { // 회원 가입
+                findUser.authorizeUser();
+            }
+            // 아니면 로그인으로 바로 직행
+            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
+            
         } catch (Exception e) {
+            log.error("OAuth2 authentication processing failed", e);
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } finally {
-            // Spring Security가 자동으로 authorization request를 정리하므로 별도 처리 불필요
-            log.debug("OAuth2 authentication success processing completed");
+            // 사용 완료 후 세션에서 제거
+            this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
         }
     }
 
