@@ -27,6 +27,8 @@ import org.morib.server.global.oauth2.userinfo.AppleOAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
@@ -61,7 +63,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    private final DebugOAuth2AuthorizationRequestRepository authorizationRequestRepository;
+    // Repository는 Spring Security가 자동으로 관리하므로 주입 불필요
 
 
 
