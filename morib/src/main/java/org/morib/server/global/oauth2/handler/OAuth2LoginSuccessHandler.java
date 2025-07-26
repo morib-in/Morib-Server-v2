@@ -108,9 +108,10 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         String refreshToken = jwtService.createRefreshToken();
         jwtService.updateRefreshToken(oAuth2User.getUserId(), refreshToken);
         User user = fetchUserService.fetchByUserId(oAuth2User.getUserId());
-        String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
+        String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User);
 
         log.info("now socialRefreshToken {}", socialRefreshToken);
+        //userManager.updateSocialRefreshToken(user, socialRefreshToken);
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
 
         String targetRedirectUri;
@@ -133,16 +134,11 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         response.sendRedirect(redirectUri);
     }
 
-    private String getSocialRefreshTokenByAuthorizedClient(String registrationId, String principalName) {
+    private String getSocialRefreshTokenByAuthorizedClient(CustomOAuth2User oAuth2User) {
+        String registrationId = oAuth2User.getRegistrationId();
+        String principalName = oAuth2User.getPrincipalName();
         log.info("getSocialRefreshTokenByAuthorizedClient 진입");
-        log.info("registrationId: {}, principalName was this : {}", registrationId, principalName);
-        OAuth2AuthorizedClient user = oAuth2AuthorizedClientService.loadAuthorizedClient(registrationId, principalName);
-        if (user == null) {
-            log.error("OAuth2AuthorizedClient is null! The client might not be registered.");
-            return null;
-        }
-
-        log.info("now OAuth2AuthorizedClient was this : {}", user);
+        log.info("registrationId: {}, principalName was this : {}", oAuth2User.getRegistrationId(), principalName);
 
         if(registrationId.equals("apple")) {
             User appleUser = userRepository.findByPlatformAndSocialId(Platform.APPLE, principalName)
@@ -154,6 +150,13 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
             log.info("[getSocialRefreshTokenByAuthorizedClient] appleUser.getSocial_refreshToken() : {}", appleUser.getSocial_refreshToken());
 
             return appleUser.getSocial_refreshToken();
+        }
+
+
+        OAuth2AuthorizedClient user = oAuth2AuthorizedClientService.loadAuthorizedClient(registrationId, principalName);
+        if (user == null) {
+            log.error("OAuth2AuthorizedClient is null! The client might not be registered.");
+            return null;
         }
         OAuth2RefreshToken refreshToken = user.getRefreshToken();
         if (refreshToken == null) {
