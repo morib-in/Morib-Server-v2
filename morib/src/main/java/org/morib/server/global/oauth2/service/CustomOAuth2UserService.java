@@ -33,6 +33,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,6 +45,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -189,24 +192,25 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	public void withdrawInApple(String refreshToken) {
 		try{
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Content-Type", "application/x-www-form-urlencoded");
+			RestClient restClient = RestClient.create();
 
-		String url = UriComponentsBuilder.fromPath(APPLE_REVOKE_URL)
-			.queryParam("token", refreshToken)
-			.queryParam("client_id", appleProperties.getBundle_id())
-			.queryParam("client_secret", createClientSecret())
-			.queryParam("token_type_hint", "refresh_token")
-			.build()
-			.toString();
+			String requestBody = "token=" + refreshToken +
+				"&client_id=" + appleProperties.getClient_id() +  // getBundle_id() → getClient_id()
+				"&client_secret=" + createClientSecret() +
+				"&token_type_hint=refresh_token";
 
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(null, headers),
-			String.class);
+			 restClient.post()
+				.uri(APPLE_REVOKE_URL)  // 직접 사용
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.body(requestBody)
+				.retrieve()
+				.onStatus(HttpStatusCode::isError, (request, responseEntity) -> {
+					log.error("Apple revoke failed with status: {}", responseEntity.getStatusCode());
+					throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
+				})
+				.body(String.class);
 
-		if (!response.getStatusCode().is2xxSuccessful()) {
-			throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
-		}}catch (IOException e){
+		}catch (IOException e){
 			log.error("apple_social logout failed {}", e.getMessage());
 			throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
 		}
