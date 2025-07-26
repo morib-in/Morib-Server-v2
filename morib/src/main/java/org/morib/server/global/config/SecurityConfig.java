@@ -5,6 +5,9 @@ import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.global.jwt.CustomJwtAuthenticationEntryPoint;
 import org.morib.server.global.jwt.JwtAuthenticationFilter;
 import org.morib.server.global.jwt.JwtService;
+import org.morib.server.global.oauth2.converter.AppleOAuth2AccessTokenResponseClient;
+import org.morib.server.global.oauth2.converter.CompositeOAuth2AccessTokenResponseClient;
+import org.morib.server.global.oauth2.converter.CustomRequestEntityConverter;
 import org.morib.server.global.oauth2.handler.CustomLogoutHandler;
 import org.morib.server.global.oauth2.handler.CustomLogoutSuccessHandler;
 import org.morib.server.global.oauth2.handler.OAuth2LoginFailureHandler;
@@ -16,6 +19,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -33,6 +39,7 @@ public class SecurityConfig {
     private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
     private final CustomLogoutHandler customLogoutHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final AppleProperties appleProperties;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -49,6 +56,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {
                     oauth2.successHandler(oAuth2LoginSuccessHandler);
                     oauth2.failureHandler(oAuth2LoginFailureHandler);
+                    oauth2.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient(customRequestEntityConverter())));
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
                     oauth2.authorizationEndpoint(auth -> auth
                             .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
@@ -63,6 +71,20 @@ public class SecurityConfig {
         http.addFilterAfter(jwtAuthenticationFilter(), LogoutFilter.class);
         return http.build();
     }
+
+    @Bean
+    public CustomRequestEntityConverter customRequestEntityConverter() {
+        return new CustomRequestEntityConverter(appleProperties);
+    }
+
+    // SecurityConfig.java 수정
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient(
+        CustomRequestEntityConverter customRequestEntityConverter) {
+
+        return new CompositeOAuth2AccessTokenResponseClient(customRequestEntityConverter, userRepository);
+    }
+
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {

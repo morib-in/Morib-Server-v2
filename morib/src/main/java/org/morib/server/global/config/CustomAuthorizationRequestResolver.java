@@ -62,13 +62,16 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     private OAuth2AuthorizationRequest customAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
 
+        String originalState = authorizationRequest.getState();
+
+
+
         String clientType = request.getParameter(CLIENT_TYPE_PARAM);
         // clientType 파라미터가 없으면 기본값 "web" 사용
         if (!StringUtils.hasText(clientType)) {
             clientType = "web";
         }
 
-        String originalState = authorizationRequest.getState();
 
         Map<String, String> newStateMap = new HashMap<>();
         newStateMap.put(STATE_CSRF_KEY, originalState);
@@ -86,6 +89,18 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
                     new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
             additionalParameters.put("access_type", "offline");
             additionalParameters.put("prompt", "consent");
+
+            if(authorizationRequest.getAttribute("registration_id").equals("apple")) {
+                log.info("now in here before return apple social login redirection");
+                log.info("now redirect url was this : {}", authorizationRequest.getRedirectUri());
+                log.info("original state: {}", originalState);
+                return OAuth2AuthorizationRequest.from(authorizationRequest)
+                    .state(encodedNewState)
+                    .redirectUri(authorizationRequest.getRedirectUri())
+                    .additionalParameters(additionalParameters)
+                    .build();
+            }
+
 
             return OAuth2AuthorizationRequest.from(authorizationRequest)
                     .state(encodedNewState)
