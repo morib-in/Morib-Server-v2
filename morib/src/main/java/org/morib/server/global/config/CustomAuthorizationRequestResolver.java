@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -103,12 +105,15 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
                 // Apple의 경우 추가 파라미터를 Apple 스펙에 맞게 조정
                 Map<String, Object> appleAdditionalParameters = new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
                 appleAdditionalParameters.put("response_mode", "form_post");
-                
-                return OAuth2AuthorizationRequest.from(authorizationRequest)
+
+                val req = OAuth2AuthorizationRequest.from(authorizationRequest)
                     .state(originalState)  // 기존 시스템과 일관성 유지를 위해 encodedNewState 사용
                     .redirectUri(authorizationRequest.getRedirectUri())
                     .additionalParameters(appleAdditionalParameters)
                     .build();
+                log.info("response state: " + req.getState());
+                return req;
+                
             }
 
 
