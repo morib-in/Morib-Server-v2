@@ -22,6 +22,7 @@ import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.jwt.JwtService;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
+import org.morib.server.global.oauth2.userinfo.AppleOAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -108,9 +109,10 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         String refreshToken = jwtService.createRefreshToken();
         jwtService.updateRefreshToken(oAuth2User.getUserId(), refreshToken);
         User user = fetchUserService.fetchByUserId(oAuth2User.getUserId());
-        String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
+        String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User);
 
         log.info("now socialRefreshToken {}", socialRefreshToken);
+        //userManager.updateSocialRefreshToken(user, socialRefreshToken);
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
 
         String targetRedirectUri;
@@ -133,27 +135,23 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         response.sendRedirect(redirectUri);
     }
 
-    private String getSocialRefreshTokenByAuthorizedClient(String registrationId, String principalName) {
+    private String getSocialRefreshTokenByAuthorizedClient(CustomOAuth2User oAuth2User) {
+        String registrationId = oAuth2User.getRegistrationId();
+        String principalName = oAuth2User.getPrincipalName();
         log.info("getSocialRefreshTokenByAuthorizedClient 진입");
-        log.info("registrationId: {}, principalName was this : {}", registrationId, principalName);
+        log.info("registrationId: {}, principalName was this : {}", oAuth2User.getRegistrationId(), principalName);
+
+        if(registrationId.equals("apple")) {
+            Object socialRefreshToken = oAuth2User.getAttributes().get("refresh_token");
+            log.info("social_refreshToken {}", socialRefreshToken);
+            return socialRefreshToken != null ? socialRefreshToken.toString() : null;
+        }
+
+
         OAuth2AuthorizedClient user = oAuth2AuthorizedClientService.loadAuthorizedClient(registrationId, principalName);
         if (user == null) {
             log.error("OAuth2AuthorizedClient is null! The client might not be registered.");
             return null;
-        }
-
-        log.info("now OAuth2AuthorizedClient was this : {}", user);
-
-        if(registrationId.equals("apple")) {
-            User appleUser = userRepository.findByPlatformAndSocialId(Platform.APPLE, principalName)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-
-            if(Objects.isNull(appleUser.getSocial_refreshToken()))
-                return null;
-
-            log.info("[getSocialRefreshTokenByAuthorizedClient] appleUser.getSocial_refreshToken() : {}", appleUser.getSocial_refreshToken());
-
-            return appleUser.getSocial_refreshToken();
         }
         OAuth2RefreshToken refreshToken = user.getRefreshToken();
         if (refreshToken == null) {

@@ -42,6 +42,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,6 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final UserRepository userRepository;
@@ -75,11 +77,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuthAttributes oAuthAttributes;
 		Map<String, Object> attributes;
 		String principalName;
-		User user;
 		if (registrationId.equals("apple")) {
 			log.info("[now in apple social login]");
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
-
 			String refreshToken = Optional.ofNullable(userRequest.getAdditionalParameters().get("refresh_token"))
 				.map(Object::toString)
 				.orElse(null);
@@ -105,7 +105,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		User createdUser = getUser(oAuthAttributes, platform);
 
 
-		log.info("now social login createdUser was this {}", createdUser);
+		log.info("now social login createdUser RefreshToken was this {}", createdUser.getSocial_refreshToken());
 		return new CustomOAuth2User(
 			Collections.singleton(new SimpleGrantedAuthority(createdUser.getRole().getKey())),
 			attributes,
@@ -161,6 +161,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			String refreshToken = oauth2UserInfo.getRefreshToken();
 			log.info("refreshToken was this : {}", refreshToken);
 			createdUser.updateSocialRefreshToken(refreshToken);
+
+			log.info("createdUpdate User was this {}", createdUser);
 		}
 
 
