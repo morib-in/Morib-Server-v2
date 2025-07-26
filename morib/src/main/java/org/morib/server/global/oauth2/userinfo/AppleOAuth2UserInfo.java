@@ -27,4 +27,8 @@ public class AppleOAuth2UserInfo extends OAuth2UserInfo {
 	public String getImageUrl() {
 		return (String) attributes.get("picture");
 	}
+
+	public String getRefreshToken(){
+		return (String) attributes.get("refresh_token");
+	}
 }
