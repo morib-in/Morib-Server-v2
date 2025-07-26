@@ -59,7 +59,7 @@ public class SecurityConfig {
                     oauth2.tokenEndpoint(tokenEndpointConfig -> tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient(customRequestEntityConverter())));
                     oauth2.userInfoEndpoint(user -> user.userService(customOAuth2UserService));
                     oauth2.authorizationEndpoint(auth -> auth
-                            .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
+                            .authorizationRequestRepository(authorizationRequestRepository())
                             .authorizationRequestResolver(customAuthorizationRequestResolver));
 
                 });
@@ -89,6 +89,11 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtService, userRepository, customJwtAuthenticationEntryPoint);
+    }
+
+    @Bean
+    public HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 
 }

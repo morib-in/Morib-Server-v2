@@ -67,11 +67,6 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 				refreshToken != null ? "✓" : "✗",
 				idToken != null ? "✓" : "✗");
 
-			// refresh_token을 ThreadLocal에 저장
-			if (refreshToken != null) {
-				AppleTokenHolder.setRefreshToken(refreshToken);
-				log.info("🎯 Apple refresh_token successfully captured!");
-			}
 
 			if(tokenResponse != null) {
 				log.info("tokenResponse: {}", objectMapper.writeValueAsString(tokenResponse));
