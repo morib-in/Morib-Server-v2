@@ -5,6 +5,8 @@ import org.morib.server.domain.user.infra.UserRepository;
 import org.morib.server.global.jwt.CustomJwtAuthenticationEntryPoint;
 import org.morib.server.global.jwt.JwtAuthenticationFilter;
 import org.morib.server.global.jwt.JwtService;
+import org.morib.server.global.oauth2.converter.AppleOAuth2AccessTokenResponseClient;
+import org.morib.server.global.oauth2.converter.CompositeOAuth2AccessTokenResponseClient;
 import org.morib.server.global.oauth2.converter.CustomRequestEntityConverter;
 import org.morib.server.global.oauth2.handler.CustomLogoutHandler;
 import org.morib.server.global.oauth2.handler.CustomLogoutSuccessHandler;
@@ -75,13 +77,14 @@ public class SecurityConfig {
         return new CustomRequestEntityConverter(appleProperties);
     }
 
+    // SecurityConfig.java 수정
     @Bean
-    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient(CustomRequestEntityConverter customRequestEntityConverter) {
-        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
-        accessTokenResponseClient.setRequestEntityConverter(customRequestEntityConverter);
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient(
+        CustomRequestEntityConverter customRequestEntityConverter) {
 
-        return accessTokenResponseClient;
+        return new CompositeOAuth2AccessTokenResponseClient(customRequestEntityConverter, userRepository);
     }
+
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
