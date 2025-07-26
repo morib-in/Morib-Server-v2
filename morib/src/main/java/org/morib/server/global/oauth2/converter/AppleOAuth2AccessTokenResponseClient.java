@@ -82,6 +82,7 @@ public class AppleOAuth2AccessTokenResponseClient implements OAuth2AccessTokenRe
 				.expiresIn(expiresIn != null ? expiresIn : 3600)
 				.refreshToken(refreshToken)
 				.additionalParameters(Map.of("id_token", idToken))
+				.additionalParameters(Map.of("refresh_token", refreshToken))
 				.build();
 		}catch (JsonProcessingException e){
 			log.error("Failed to parse Apple token response", e);

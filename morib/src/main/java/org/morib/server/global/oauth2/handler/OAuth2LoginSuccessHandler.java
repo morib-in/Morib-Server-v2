@@ -12,9 +12,11 @@ import org.morib.server.domain.user.UserManager;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.infra.User;
 import org.morib.server.domain.user.infra.UserRepository;
+import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.SecretProperties;
 import org.morib.server.global.common.util.DataUtils;
+import org.morib.server.global.exception.BusinessException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.jwt.JwtService;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.morib.server.global.common.Constants.ACCESS_TOKEN_SUBJECT;
 import static org.morib.server.global.common.Constants.REFRESH_TOKEN_SUBJECT;
@@ -137,6 +140,20 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         if (user == null) {
             log.error("OAuth2AuthorizedClient is null! The client might not be registered.");
             return null;
+        }
+
+        log.info("now OAuth2AuthorizedClient was this : {}", user);
+
+        if(registrationId.equals("apple")) {
+            User appleUser = userRepository.findByPlatformAndSocialId(Platform.APPLE, principalName)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
+
+            if(Objects.isNull(appleUser.getSocial_refreshToken()))
+                return null;
+
+            log.info("[getSocialRefreshTokenByAuthorizedClient] appleUser.getSocial_refreshToken() : {}", appleUser.getSocial_refreshToken());
+
+            return appleUser.getSocial_refreshToken();
         }
         OAuth2RefreshToken refreshToken = user.getRefreshToken();
         if (refreshToken == null) {

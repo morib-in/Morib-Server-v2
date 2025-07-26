@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
@@ -24,6 +26,9 @@ import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
 import org.morib.server.global.oauth2.OAuthAttributes;
+import org.morib.server.global.oauth2.converter.AppleOAuth2AccessTokenResponseClient;
+import org.morib.server.global.oauth2.userinfo.AppleOAuth2UserInfo;
+import org.morib.server.global.oauth2.userinfo.OAuth2UserInfo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -70,10 +75,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuthAttributes oAuthAttributes;
 		Map<String, Object> attributes;
 		String principalName;
+		User user;
 		if (registrationId.equals("apple")) {
 			log.info("[now in apple social login]");
 			String idToken = userRequest.getAdditionalParameters().get("id_token").toString();
+
+			String refreshToken = Optional.ofNullable(userRequest.getAdditionalParameters().get("refresh_token"))
+				.map(Object::toString)
+				.orElse(null);
+
+			log.info("now refreshToken was this : {}", refreshToken);
 			attributes = decodeJwtTokenPayload(idToken);
+			attributes.put("refresh_token", refreshToken);
 			log.info("attributes was this {}", attributes);
 			oAuthAttributes = OAuthAttributes.ofApple(platform,
 				attributes);
@@ -90,6 +103,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		}
 
 		User createdUser = getUser(oAuthAttributes, platform);
+
 
 		log.info("now social login createdUser was this {}", createdUser);
 		return new CustomOAuth2User(
@@ -141,6 +155,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private User saveUser(OAuthAttributes attributes, Platform platform) {
 		User createdUser = User.createByOAuth2UserInfo(platform, attributes.getOauth2UserInfo());
+
+		if(platform == Platform.APPLE){
+			AppleOAuth2UserInfo oauth2UserInfo = (AppleOAuth2UserInfo) attributes.getOauth2UserInfo();
+			String refreshToken = oauth2UserInfo.getRefreshToken();
+			log.info("refreshToken was this : {}", refreshToken);
+			createdUser.updateSocialRefreshToken(refreshToken);
+		}
+
+
 		return userRepository.saveAndFlush(createdUser);
 	}
 
