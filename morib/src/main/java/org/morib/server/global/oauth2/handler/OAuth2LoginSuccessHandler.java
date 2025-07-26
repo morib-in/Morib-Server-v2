@@ -124,7 +124,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
             throw new UnauthorizedException(ErrorMessage.INVALID_TOKEN);
         } finally {
             // 사용 완료 후 세션에서 제거
-            this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
+            //this.authorizationRequestRepository.removeAuthorizationRequest(request, response);
         }
     }
 
