@@ -86,7 +86,7 @@ public class CustomRequestEntityConverter implements Converter<OAuth2Authorizati
 			.setHeaderParams(jwtHeader)
 			.setIssuer(teamId)
 			.setIssuedAt(new Date(System.currentTimeMillis()))
-			.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 + 5)))
+			.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60)))
 			.setAudience(url)
 			.setSubject(clientId)
 			.signWith(getPrivateKey(), SignatureAlgorithm.ES256)

@@ -105,7 +105,7 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
                 appleAdditionalParameters.put("response_mode", "form_post");
                 
                 return OAuth2AuthorizationRequest.from(authorizationRequest)
-                    .state(encodedNewState)  // 기존 시스템과 일관성 유지를 위해 encodedNewState 사용
+                    .state(originalState)  // 기존 시스템과 일관성 유지를 위해 encodedNewState 사용
                     .redirectUri(authorizationRequest.getRedirectUri())
                     .additionalParameters(appleAdditionalParameters)
                     .build();

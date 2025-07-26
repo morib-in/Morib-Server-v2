@@ -73,8 +73,25 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         log.info("Request URI: {}", request.getRequestURI());
         log.info("Request Method: {}", request.getMethod());
         log.info("Session ID: {}", request.getSession(false) != null ? request.getSession(false).getId() : "NO SESSION");
-        log.info("State from request: {}", encodedStateFromRequest);
+        log.info("State from request (Apple 반환값): {}", encodedStateFromRequest);
+        log.info("State length: {}", encodedStateFromRequest != null ? encodedStateFromRequest.length() : "null");
         log.info("All parameters: {}", request.getParameterMap());
+        
+        // Base64 디코딩 시도해서 JSON인지 확인
+        if (encodedStateFromRequest != null) {
+            try {
+                byte[] decoded = Base64.getUrlDecoder().decode(encodedStateFromRequest);
+                String decodedString = new String(decoded, StandardCharsets.UTF_8);
+                log.info("Decoded state: {}", decodedString);
+                if (decodedString.startsWith("{")) {
+                    log.info("✅ Apple이 우리의 encodedState를 그대로 반환함");
+                } else {
+                    log.info("❌ Apple이 원본 state를 반환함 - 이게 문제!");
+                }
+            } catch (Exception e) {
+                log.info("❌ State 디코딩 실패 - 원본 state일 가능성 높음: {}", e.getMessage());
+            }
+        }
         String clientType = "web"; // 기본값
         try {
             if (!StringUtils.hasText(encodedStateFromRequest)) {
