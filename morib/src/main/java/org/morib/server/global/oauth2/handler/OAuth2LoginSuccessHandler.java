@@ -16,6 +16,7 @@ import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.SecretProperties;
 import org.morib.server.global.common.util.DataUtils;
+import org.morib.server.global.config.DebugOAuth2AuthorizationRequestRepository;
 import org.morib.server.global.exception.BusinessException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.exception.UnauthorizedException;
@@ -60,7 +61,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+    private final DebugOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
 
 
