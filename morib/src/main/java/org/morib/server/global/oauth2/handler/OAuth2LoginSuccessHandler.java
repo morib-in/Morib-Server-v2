@@ -59,7 +59,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
 
     @Override
