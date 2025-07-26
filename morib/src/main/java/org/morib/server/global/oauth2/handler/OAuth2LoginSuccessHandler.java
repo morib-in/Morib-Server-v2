@@ -106,6 +106,8 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         jwtService.updateRefreshToken(oAuth2User.getUserId(), refreshToken);
         User user = fetchUserService.fetchByUserId(oAuth2User.getUserId());
         String socialRefreshToken = getSocialRefreshTokenByAuthorizedClient(oAuth2User.getRegistrationId(), oAuth2User.getPrincipalName());
+
+        log.info("now socialRefreshToken {}", socialRefreshToken);
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
 
         String targetRedirectUri;
@@ -130,6 +132,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
 
     private String getSocialRefreshTokenByAuthorizedClient(String registrationId, String principalName) {
         log.info("getSocialRefreshTokenByAuthorizedClient 진입");
+        log.info("registrationId: {}, principalName was this : {}", registrationId, principalName);
         OAuth2AuthorizedClient user = oAuth2AuthorizedClientService.loadAuthorizedClient(registrationId, principalName);
         if (user == null) {
             log.error("OAuth2AuthorizedClient is null! The client might not be registered.");

@@ -20,8 +20,7 @@ public class CompositeOAuth2AccessTokenResponseClient implements OAuth2AccessTok
 		CustomRequestEntityConverter converter,
 		UserRepository userRepository
 		) {
-		this.appleClient = new AppleOAuth2AccessTokenResponseClient(converter,
-			userRepository);
+		this.appleClient = new AppleOAuth2AccessTokenResponseClient(converter);
 		this.defaultClient = new DefaultAuthorizationCodeTokenResponseClient();
 		defaultClient.setRequestEntityConverter(converter);
 	}
