@@ -234,7 +234,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			.setHeaderParams(jwtHeader)
 			.setIssuer(appleProperties.getTeam_id())
 			.setIssuedAt(new Date(System.currentTimeMillis()))
-			.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 + 5)))
+			.setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60)))
 			.setAudience(appleProperties.getUrl())
 			.setSubject(appleProperties.getClient_id())
 			.signWith(getPrivateKey(), SignatureAlgorithm.ES256)
