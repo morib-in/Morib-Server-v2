@@ -199,12 +199,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				"&client_secret=" + createClientSecret() +
 				"&token_type_hint=refresh_token";
 
+			log.info("requestBody : {}", requestBody);
+
 			 restClient.post()
 				.uri(APPLE_REVOKE_URL)  // 직접 사용
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
 				.body(requestBody)
 				.retrieve()
 				.onStatus(HttpStatusCode::isError, (request, responseEntity) -> {
+					log.error("now request url : {}", request.getURI());
 					log.error("Apple revoke failed with status: {}", responseEntity.getStatusCode());
 					throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
 				})
