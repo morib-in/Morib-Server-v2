@@ -209,6 +209,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				.onStatus(HttpStatusCode::isError, (request, responseEntity) -> {
 					log.error("now request url : {}", request.getURI());
 					log.error("Apple revoke failed with status: {}", responseEntity.getStatusCode());
+					log.error("Apple revoke error : {}", responseEntity.getBody());
 					throw new UnauthorizedException(ErrorMessage.FAILED_WITHDRAW);
 				})
 				.body(String.class);
