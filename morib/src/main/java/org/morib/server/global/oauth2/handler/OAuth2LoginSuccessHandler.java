@@ -22,6 +22,7 @@ import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.jwt.JwtService;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
+import org.morib.server.global.oauth2.userinfo.AppleOAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -141,15 +142,9 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         log.info("registrationId: {}, principalName was this : {}", oAuth2User.getRegistrationId(), principalName);
 
         if(registrationId.equals("apple")) {
-            User appleUser = userRepository.findByPlatformAndSocialId(Platform.APPLE, principalName)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND));
-
-            if(Objects.isNull(appleUser.getSocial_refreshToken()))
-                return null;
-
-            log.info("[getSocialRefreshTokenByAuthorizedClient] appleUser.getSocial_refreshToken() : {}", appleUser.getSocial_refreshToken());
-
-            return appleUser.getSocial_refreshToken();
+            Object socialRefreshToken = oAuth2User.getAttributes().get("refresh_token");
+            log.info("social_refreshToken {}", socialRefreshToken);
+            return socialRefreshToken != null ? socialRefreshToken.toString() : null;
         }
 
 
