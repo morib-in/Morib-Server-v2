@@ -16,6 +16,7 @@ import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.domain.user.infra.type.Role;
 import org.morib.server.global.common.SecretProperties;
 import org.morib.server.global.common.util.DataUtils;
+import org.morib.server.global.config.DebugOAuth2AuthorizationRequestRepository;
 import org.morib.server.global.exception.BusinessException;
 import org.morib.server.global.exception.NotFoundException;
 import org.morib.server.global.exception.UnauthorizedException;
@@ -60,7 +61,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     private final UserManager userManager;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private static final String IS_ONBOARDING_COMPLETED = "isOnboardingCompleted";
-    private final HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository = new HttpSessionOAuth2AuthorizationRequestRepository();
+    private final DebugOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
 
 
@@ -98,14 +99,25 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
                 log.warn("State parameter is missing or invalid. Cannot determine client type. Defaulting to 'web'.");
             } else {
                 log.info("now in else phase");
-                byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromRequest);
-                String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
-                Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
+                
+                // Apple은 원본 state 사용으로 JSON 파싱 불가 - 특별 처리
+                CustomOAuth2User tempOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
+                String registrationId = tempOAuth2User.getRegistrationId();
+                
+                if ("apple".equals(registrationId)) {
+                    log.info("Apple 로그인: 원본 state 사용, clientType을 web으로 기본 설정");
+                    clientType = "web"; // Apple은 기본적으로 web으로 처리
+                } else {
+                    // 다른 provider는 기존 JSON 파싱 방식
+                    byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedStateFromRequest);
+                    String stateJson = new String(decodedBytes, StandardCharsets.UTF_8);
+                    Map<String, String> stateMap = objectMapper.readValue(stateJson, new TypeReference<Map<String, String>>() {});
 
-                log.info("now before clientType");
-                clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
-                String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
-                log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
+                    log.info("now before clientType");
+                    clientType = stateMap.getOrDefault(STATE_CLIENT_TYPE_KEY, "web");
+                    String originalCsrfToken = stateMap.get(STATE_CSRF_KEY);
+                    log.info("Successfully validated state. Client Type: {}, Original CSRF: {}", clientType, originalCsrfToken);
+                }
             }
 
             CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
