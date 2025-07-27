@@ -58,6 +58,17 @@ public class UserAuthFacade {
     }
 
     @Transactional
+    public void withdrawApple(Long userId){
+        User findUser = fetchUserService.fetchByUserId(userId);
+        customOAuth2UserService.withdrawInApple(findUser.getSocial_refreshToken());
+        List<Relationship> toDelete = new ArrayList<>();
+        toDelete.addAll(fetchRelationshipService.fetchUnconnectedRelationship(userId));
+        toDelete.addAll(fetchRelationshipService.fetchConnectedRelationship(userId));
+        relationshipRepository.deleteAll(toDelete);
+        deleteUserService.delete(userId);
+    }
+
+    @Transactional
     public void createWaitingUserWindow(String email) {
         createWaitingUserWindowService.createWaitingUserWindow(email);
     }
