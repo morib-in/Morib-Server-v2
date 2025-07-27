@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -62,13 +64,16 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     private OAuth2AuthorizationRequest customAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
 
+        String originalState = authorizationRequest.getState();
+
+
+
         String clientType = request.getParameter(CLIENT_TYPE_PARAM);
         // clientType 파라미터가 없으면 기본값 "web" 사용
         if (!StringUtils.hasText(clientType)) {
             clientType = "web";
         }
 
-        String originalState = authorizationRequest.getState();
 
         Map<String, String> newStateMap = new HashMap<>();
         newStateMap.put(STATE_CSRF_KEY, originalState);
@@ -78,14 +83,39 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
             String newStateJson = objectMapper.writeValueAsString(newStateMap);
             String encodedNewState = Base64.getUrlEncoder().withoutPadding().encodeToString(newStateJson.getBytes(StandardCharsets.UTF_8));
 
-            log.debug("Original State (CSRF): {}", originalState);
-            log.debug("Client Type: {}", clientType);
-            log.debug("Encoded New State: {}", encodedNewState);
+            log.info("=== AUTHORIZATION REQUEST CREATION ===");
+            log.info("Original State (CSRF): {}", originalState);
+            log.info("Client Type: {}", clientType);
+            log.info("Encoded New State: {}", encodedNewState);
+            log.info("Request Session ID: {}", request.getSession(true).getId());
 
             Map<String, Object> additionalParameters =
                     new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
             additionalParameters.put("access_type", "offline");
             additionalParameters.put("prompt", "consent");
+
+            if(authorizationRequest.getAttribute("registration_id").equals("apple")) {
+                log.info("now in here before return apple social login redirection");
+                log.info("now redirect url was this : {}", authorizationRequest.getRedirectUri());
+
+                log.info("original state: {}", originalState);
+                log.info("encoded new state: {}", encodedNewState);
+                log.info("Apple용 encodedNewState 사용 (기존 시스템과 일관성 유지)");
+                
+                // Apple의 경우 추가 파라미터를 Apple 스펙에 맞게 조정
+                Map<String, Object> appleAdditionalParameters = new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
+                appleAdditionalParameters.put("response_mode", "form_post");
+
+                val req = OAuth2AuthorizationRequest.from(authorizationRequest)
+                    .state(originalState)  // 기존 시스템과 일관성 유지를 위해 encodedNewState 사용
+                    .redirectUri(authorizationRequest.getRedirectUri())
+                    .additionalParameters(appleAdditionalParameters)
+                    .build();
+                log.info("response state: " + req.getState());
+                return req;
+                
+            }
+
 
             return OAuth2AuthorizationRequest.from(authorizationRequest)
                     .state(encodedNewState)
