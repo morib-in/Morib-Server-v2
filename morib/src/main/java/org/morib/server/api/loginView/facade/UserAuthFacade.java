@@ -13,6 +13,7 @@ import org.morib.server.domain.user.application.service.DeleteUserService;
 import org.morib.server.domain.user.application.service.FetchUserService;
 import org.morib.server.domain.user.application.service.ReissueTokenService;
 import org.morib.server.domain.user.infra.User;
+import org.morib.server.domain.user.infra.type.Platform;
 import org.morib.server.global.oauth2.service.CustomOAuth2UserService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,6 @@ public class UserAuthFacade {
         return reissueTokenService.reissue(refreshToken);
     }
 
-    // TODO : 이후 google rtk 무효화 로직 추가
     @Transactional
     public void logout(Long userId) {
         User findUser = fetchUserService.fetchByUserId(userId);
@@ -46,7 +46,10 @@ public class UserAuthFacade {
     @Transactional
     public void withdraw(Long userId) {
         User findUser = fetchUserService.fetchByUserId(userId);
-        customOAuth2UserService.withdrawInGoogle(findUser.getSocial_refreshToken());
+        if (findUser.getPlatform().equals(Platform.APPLE))
+            customOAuth2UserService.withdrawInApple(findUser.getSocial_refreshToken());
+        else if (findUser.getPlatform().equals(Platform.GOOGLE))
+            customOAuth2UserService.withdrawInGoogle(findUser.getSocial_refreshToken());
         List<Relationship> toDelete = new ArrayList<>();
         toDelete.addAll(fetchRelationshipService.fetchUnconnectedRelationship(userId));
         toDelete.addAll(fetchRelationshipService.fetchConnectedRelationship(userId));
