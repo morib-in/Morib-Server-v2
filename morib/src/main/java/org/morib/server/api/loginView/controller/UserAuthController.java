@@ -50,13 +50,6 @@ public class UserAuthController {
         return ApiResponseUtil.success(SuccessMessage.SUCCESS);
     }
 
-    @DeleteMapping("/users/withdraw/apple")
-    public ResponseEntity<BaseResponse<?>> withdrawApple(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Long userId = principalHandler.getUserIdFromUserDetails(customUserDetails);
-        userAuthFacade.withdrawApple(userId);
-        return ApiResponseUtil.success(SuccessMessage.SUCCESS);
-    }
-
     @PostMapping("/waiting/windows")
     public ResponseEntity<BaseResponse<?>> createWaitingUserWindow(@RequestBody WaitingUserWindowRequestDto waitingUserWindowRequestDto) {
         userAuthFacade.createWaitingUserWindow(waitingUserWindowRequestDto.email());
