@@ -93,4 +93,8 @@ public class User extends BaseTimeEntity {
     public void completeOnboarding() {
         this.isOnboardingCompleted = true;
     }
+
+    public void updateUserName(String fullName) {
+        this.name = fullName;
+    }
 }

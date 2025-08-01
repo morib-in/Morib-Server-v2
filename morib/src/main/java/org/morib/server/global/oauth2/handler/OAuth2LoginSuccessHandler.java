@@ -23,6 +23,7 @@ import org.morib.server.global.exception.UnauthorizedException;
 import org.morib.server.global.jwt.JwtService;
 import org.morib.server.global.message.ErrorMessage;
 import org.morib.server.global.oauth2.CustomOAuth2User;
+import org.morib.server.global.oauth2.apple.dto.AppleUserInfoDto;
 import org.morib.server.global.oauth2.userinfo.AppleOAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -42,6 +43,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
 
@@ -72,11 +74,23 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
+        String user = request.getParameter("user");
+        String fullName = null;
+        if(Objects.nonNull(user)) {
+            AppleUserInfoDto appleUserInfoDto = objectMapper.readValue(user, AppleUserInfoDto.class);
+            fullName = AppleUserInfoDto.fullName(appleUserInfoDto);
+        }
+            
+
+        Enumeration<String> parameterNames = request.getParameterNames();
         log.info("=== OAUTH2 CALLBACK RECEIVED ===");
         log.info("Request URI: {}", request.getRequestURI());
+        log.info("success user parameter value was this : {}", user);
         log.info("Request Method: {}", request.getMethod());
         log.info("Session ID: {}", request.getSession(false) != null ? request.getSession(false).getId() : "NO SESSION");
         log.info("State from request (Apple 반환값): {}", encodedStateFromRequest);
+        log.info("Code from Apple {}", parameterNames.nextElement());
+
         log.info("State length: {}", encodedStateFromRequest != null ? encodedStateFromRequest.length() : "null");
         log.info("All parameters: {}", request.getParameterMap());
         
@@ -86,11 +100,6 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
                 byte[] decoded = Base64.getUrlDecoder().decode(encodedStateFromRequest);
                 String decodedString = new String(decoded, StandardCharsets.UTF_8);
                 log.info("Decoded state: {}", decodedString);
-                if (decodedString.startsWith("{")) {
-                    log.info("✅ Apple이 우리의 encodedState를 그대로 반환함");
-                } else {
-                    log.info("❌ Apple이 원본 state를 반환함 - 이게 문제!");
-                }
             } catch (Exception e) {
                 log.info("❌ State 디코딩 실패 - 원본 state일 가능성 높음: {}", e.getMessage());
             }
@@ -131,7 +140,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
                 findUser.authorizeUser();
             }
             // 아니면 로그인으로 바로 직행
-            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType);
+            loginSuccess(response, oAuth2User, findUser.isOnboardingCompleted(), clientType, fullName);
             
         } catch (Exception e) {
             log.error("OAuth2 authentication processing failed", e);
@@ -142,7 +151,8 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User, boolean isOnboardingCompleted, String clientType) throws IOException {
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User,
+        boolean isOnboardingCompleted, String clientType, String fullName) throws IOException {
         log.info("login success 진입");
         String accessToken = jwtService.createAccessToken(oAuth2User.getUserId());
         String refreshToken = jwtService.createRefreshToken();
@@ -153,6 +163,7 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
         log.info("now socialRefreshToken {}", socialRefreshToken);
         //userManager.updateSocialRefreshToken(user, socialRefreshToken);
         userManager.updateSocialRefreshToken(user, socialRefreshToken);
+        userManager.updateUserName(user, fullName);
 
         String targetRedirectUri;
         if ("electron".equalsIgnoreCase(clientType)) {
