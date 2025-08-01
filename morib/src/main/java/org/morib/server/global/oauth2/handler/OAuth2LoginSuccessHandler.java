@@ -42,6 +42,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
 
@@ -72,11 +73,21 @@ public class  OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String encodedStateFromRequest = request.getParameter(OAuth2ParameterNames.STATE);
+        String user = request.getParameter("user");
+        ObjectMapper objectMapper1 = new ObjectMapper();
+
+        Enumeration<String> parameterNames = request.getParameterNames();
         log.info("=== OAUTH2 CALLBACK RECEIVED ===");
         log.info("Request URI: {}", request.getRequestURI());
+        log.info("success user parameter value was this : {}", user);
         log.info("Request Method: {}", request.getMethod());
         log.info("Session ID: {}", request.getSession(false) != null ? request.getSession(false).getId() : "NO SESSION");
         log.info("State from request (Apple 반환값): {}", encodedStateFromRequest);
+        log.info("Code from Apple {}", parameterNames.nextElement());
+
+        parameterNames.asIterator().forEachRemaining(clone-> log.info("now parameterName was this {}", clone));
+
+
         log.info("State length: {}", encodedStateFromRequest != null ? encodedStateFromRequest.length() : "null");
         log.info("All parameters: {}", request.getParameterMap());
         
