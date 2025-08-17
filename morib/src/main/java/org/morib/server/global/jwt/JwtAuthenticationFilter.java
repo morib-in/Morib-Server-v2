@@ -34,19 +34,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (requestUri.contains("reissue")) {
             jwtService.isTokenValidWhenReissueToken(request);
         }
-
-        String accessToken = jwtService.extractAccessToken(request).orElse(null);
-
-        if (accessToken != null) {
-            if (jwtService.isTokenValid(accessToken)) {
-                handleAccessToken(accessToken);
-            } else {
-                SecurityContextHolder.clearContext();
-                customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
-                return;
+        String accessToken = null;
+        try {
+            accessToken = jwtService.extractAccessToken(request).orElse(null);
+            if (accessToken != null) {
+                if (jwtService.isTokenValid(accessToken)) {
+                    handleAccessToken(accessToken);
+                } else {
+                    SecurityContextHolder.clearContext();
+                    customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
+                    return;
+                }
             }
+            filterChain.doFilter(request, response);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.error("ExpiredJwtException" + e.getMessage());
+            SecurityContextHolder.clearContext();
+            if (!response.isCommitted())
+                customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.EXPIRED_TOKEN.getMessage()));
+        } catch (org.morib.server.global.exception.UnauthorizedException | io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+            log.error("UnauthorizedException || JwtException || IllegalArgumentException" + e.getMessage());
+            request.setAttribute("auth_error_code", "invalid_token");
+            SecurityContextHolder.clearContext();
+            if (!response.isCommitted())
+                customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
+        } catch (Exception e) {
+            log.error("Unknown Exception" + e.getMessage());
+            request.setAttribute("auth_error_code", "invalid_token");
+            SecurityContextHolder.clearContext();
+            if (!response.isCommitted())
+                customJwtAuthenticationEntryPoint.commence(request, response, new BadCredentialsException(ErrorMessage.INVALID_TOKEN.getMessage()));
         }
-        filterChain.doFilter(request, response);
     }
 
     private void handleAccessToken(String accessToken) throws NotFoundException {
