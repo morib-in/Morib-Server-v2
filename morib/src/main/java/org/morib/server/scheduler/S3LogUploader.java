@@ -63,7 +63,7 @@ public class S3LogUploader {
                 log.error("An unexpected error occurred during S3 upload of {}: {}", logFileName, e.getMessage(), e);
             }
         } else {
-            log.info("Log file {} not found locally, skipping upload.", logFileName);
+            log.info("Log file {} not found locally, skipping upload!", logFileName);
         }
     }
 
